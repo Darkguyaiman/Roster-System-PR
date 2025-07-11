@@ -10,7 +10,8 @@
   <img src="https://img.shields.io/badge/Google_Apps_Script-4285F4.svg?style=for-the-badge&logo=google&logoColor=white" alt="Google Apps Script"/>
   <img src="https://img.shields.io/badge/Google_Sheets-34A853.svg?style=for-the-badge&logo=googlesheets&logoColor=white" alt="Google Sheets"/>
   <img src="https://img.shields.io/badge/HTML5-E34F26.svg?style=for-the-badge&logo=html5&logoColor=white" alt="HTML5"/>
-  <img src="https://img.shields.io/badge/JavaScript-F7DF1E.svg?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript"/>
+  <img src="https://img.shields.io/badge/CSS3-1572B6.svg?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3"/>
+
 </p>
 
 ---
