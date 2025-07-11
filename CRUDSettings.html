@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --dark-teal: #001219;
+        --teal: #005F73;
+        --turquoise: #0A9396;
+        --light-teal: #94D2BD;
+        --cream: #E9D8A6;
+        --orange: #EE9B00;
+        --burnt-orange: #CA6702;
+        --rust: #BB3E03;
+        --red: #AE2012;
+        --dark-red: #9B2226;
+      }
+      
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      
+      body {
+        font-family: 'Poppins', Arial, sans-serif;
+        background: linear-gradient(135deg, #e9d8a6 0%, #94d2bd 100%);
+        min-height: 100vh;
+        padding: 20px;
+        color: var(--dark-teal);
+      }
+      
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      
+      h1 {
+        color: var(--dark-teal);
+        text-align: center;
+        margin-bottom: 30px;
+        font-weight: 600;
+        position: relative;
+        padding: 15px;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        margin-top: 10px;
+        transition: all 0.3s ease;
+        animation: fadeIn 0.5s ease-out;
+      }
+      
+      h1:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+      }
+      
+      .section-title {
+        color: var(--teal);
+        text-align: center;
+        margin: 40px 0 20px;
+        padding: 15px;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        transition: all 0.3s ease;
+        animation: slideInFromLeft 0.5s ease-out;
+      }
+      
+      .section-title:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+      }
+      
+      .section-title i {
+        margin-right: 10px;
+        color: var(--turquoise);
+      }
+      
+      .subsection-title {
+        color: var(--turquoise);
+        margin: 30px 0 15px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: white;
+        padding: 15px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        animation: slideInFromRight 0.5s ease-out;
+      }
+      
+      .subsection-title:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+      }
+      
+      .subsection-title i {
+        margin-right: 10px;
+      }
+      
+      .card-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 25px;
+        margin-top: 20px;
+        animation: fadeIn 0.7s ease-out;
+      }
+      
+      .card {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        padding: 25px;
+        transition: all 0.3s ease;
+        position: relative;
+        border-left: 4px solid var(--turquoise);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        min-height: 160px;
+      }
+      
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+      }
+      
+      .card-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: var(--teal);
+        display: flex;
+        align-items: center;
+        word-break: break-word;
+      }
+      
+      .card-title i {
+        margin-right: 10px;
+        color: var(--turquoise);
+        flex-shrink: 0;
+      }
+      
+      .card-content {
+        color: var(--dark-teal);
+        font-size: 14px;
+        flex-grow: 1;
+        margin-bottom: 50px;
+      }
+      
+      .roster-card {
+        display: flex;
+        align-items: flex-start;
+      }
+      
+      .color-box {
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
+        margin-right: 15px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+      }
+      
+      .color-box:hover {
+        transform: scale(1.1);
+      }
+      
+      .loading {
+        text-align: center;
+        padding: 50px;
+        font-size: 18px;
+        color: var(--teal);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        margin: 40px auto;
+        max-width: 400px;
+        animation: pulse 2s infinite;
+      }
+      
+      .loading i {
+        font-size: 40px;
+        animation: spin 1.5s linear infinite;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      @keyframes pulse {
+        0% { box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        50% { box-shadow: 0 4px 25px rgba(0,0,0,0.15); }
+        100% { box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      @keyframes slideInFromLeft {
+        from { transform: translateX(-30px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      
+      @keyframes slideInFromRight {
+        from { transform: translateX(30px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      
+      @keyframes slideInFromBottom {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      
+      .error {
+        background-color: white;
+        color: var(--dark-red);
+        padding: 15px;
+        border-radius: 12px;
+        margin: 20px 0;
+        border-left: 4px solid var(--dark-red);
+        display: flex;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        animation: shake 0.5s ease-in-out;
+      }
+      
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+      }
+      
+      .error i {
+        margin-right: 10px;
+        font-size: 20px;
+        color: var(--dark-red);
+      }
+      
+      .success {
+        background-color: white;
+        color: var(--turquoise);
+        padding: 15px;
+        border-radius: 12px;
+        margin: 20px 0;
+        border-left: 4px solid var(--turquoise);
+        display: flex;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        animation: slideInFromBottom 0.5s ease-out;
+      }
+      
+      .success i {
+        margin-right: 10px;
+        font-size: 20px;
+        color: var(--turquoise);
+      }
+      
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 18px;
+        background-color: var(--turquoise);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-family: 'Poppins', Arial, sans-serif;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        gap: 8px;
+      }
+      
+      .btn:hover {
+        background-color: var(--teal);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      }
+      
+      .btn-danger {
+        background-color: var(--red);
+      }
+      
+      .btn-danger:hover {
+        background-color: var(--dark-red);
+      }
+      
+      .btn-success {
+        background-color: var(--turquoise);
+      }
+      
+      .btn-success:hover {
+        background-color: var(--teal);
+      }
+      
+      .btn-edit {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        padding: 8px 14px;
+        font-size: 14px;
+        background-color: var(--orange);
+      }
+      
+      .btn-edit:hover {
+        background-color: var(--burnt-orange);
+      }
+      
+      .btn-delete {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        padding: 8px 14px;
+        font-size: 14px;
+      }
+      
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,18,25,0.7);
+        backdrop-filter: blur(4px);
+      }
+      
+      .modal-content {
+        background-color: white;
+        margin: 10% auto;
+        padding: 30px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        transform: translateY(20px);
+        animation: modalSlideIn 0.3s forwards;
+      }
+      
+      @keyframes modalSlideIn {
+        to { transform: translateY(0); }
+      }
+      
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--light-teal);
+      }
+      
+      .modal-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--teal);
+      }
+      
+      .close {
+        color: var(--teal);
+        font-size: 24px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .close:hover {
+        color: var(--red);
+        transform: scale(1.1);
+      }
+      
+      .form-group {
+        margin-bottom: 20px;
+      }
+      
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--dark-teal);
+      }
+      
+      .form-control {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--light-teal);
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-family: 'Poppins', Arial, sans-serif;
+        transition: border-color 0.3s;
+      }
+      
+      .form-control:focus {
+        outline: none;
+        border-color: var(--turquoise);
+        box-shadow: 0 0 0 3px rgba(10, 147, 150, 0.2);
+      }
+      
+      .color-picker-container {
+        position: relative;
+      }
+      
+      .color-picker {
+        width: 100%;
+        height: 45px;
+        padding: 0;
+        border: 1px solid var(--light-teal);
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      
+      .color-presets {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        margin-top: 10px;
+      }
+      
+      .color-preset {
+        width: 100%;
+        height: 30px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .color-preset:hover {
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      }
+      
+      .modal-footer {
+        margin-top: 25px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+      }
+      
+      .admin-badge {
+        display: inline-flex;
+        align-items: center;
+        background-color: var(--orange);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        margin-left: 10px;
+        font-weight: 500;
+        gap: 5px;
+      }
+      
+      .user-info {
+        background-color: white;
+        padding: 15px 20px;
+        border-radius: 12px;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        animation: fadeIn 0.5s ease-out;
+      }
+      
+      .user-email {
+        font-weight: 600;
+        color: var(--teal);
+      }
+      
+      .section-actions {
+        display: flex;
+        gap: 10px;
+      }
+      
+      .empty-message {
+        text-align: center;
+        padding: 20px;
+        color: var(--teal);
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      }
+      
+      @media (max-width: 768px) {
+        body {
+          padding: 10px;
+        }
+        
+        .container {
+          padding: 0;
+        }
+        
+        h1 {
+          font-size: 22px;
+          padding: 12px;
+          margin-bottom: 20px;
+        }
+        
+        .section-title {
+          font-size: 18px;
+          margin: 30px 0 15px;
+          padding: 12px;
+        }
+        
+        .subsection-title {
+          font-size: 16px;
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+          padding: 12px;
+        }
+        
+        .section-actions {
+          width: 100%;
+          justify-content: center;
+          margin-top: 10px;
+        }
+        
+        .card-container {
+          grid-template-columns: 1fr;
+        }
+        
+        .card {
+          padding: 20px;
+          min-height: 180px;
+        }
+        
+        .btn-edit, .btn-delete {
+          padding: 6px 12px;
+          font-size: 12px;
+        }
+        
+        .modal-content {
+          width: 95%;
+          margin: 5% auto;
+          padding: 20px;
+        }
+        
+        .user-info {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+        
+        .admin-badge {
+          margin-left: 0;
+        }
+      }
+
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      
+      ::-webkit-scrollbar-track {
+        background: rgba(148, 210, 189, 0.1);
+        border-radius: 10px;
+      }
+      
+      ::-webkit-scrollbar-thumb {
+        background: var(--teal);
+        border-radius: 10px;
+        transition: all 0.3s ease;
+      }
+      
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--turquoise);
+      }
+
+    :root {
+      --dark-teal: #001219;
+      --teal: #005F73;
+      --turquoise: #0A9396;
+      --light-teal: #94D2BD;
+      --orange: #EE9B00;
+      
+      --sidebar-width: 250px;
+      --sidebar-bg: var(--dark-teal);
+      --sidebar-text: white;
+      --sidebar-hover: var(--turquoise);
+      --sidebar-active: var(--turquoise);
+      --sidebar-icon-size: 20px;
+      --sidebar-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+
+    .sidebar {
+      width: var(--sidebar-width);
+      height: 100vh;
+      background-color: var(--sidebar-bg);
+      color: var(--sidebar-text);
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1000;
+      transition: var(--sidebar-transition);
+      overflow-x: hidden;
+      overflow-y: auto;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      transform: translateX(0);
+    }
+
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      background-color: var(--sidebar-bg);
+      z-index: 10;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .sidebar-logo i {
+      font-size: 24px;
+      color: var(--orange);
+    }
+
+    .sidebar-logo h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--sidebar-text);
+      margin: 0;
+    }
+
+    .sidebar-menu {
+      padding: 20px 0;
+      list-style: none;
+      margin: 0;
+    }
+
+    .sidebar-menu-item {
+      position: relative;
+    }
+
+    .sidebar-menu-link {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      text-decoration: none;
+      color: var(--sidebar-text);
+      transition: var(--sidebar-transition);
+      white-space: nowrap;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .sidebar-menu-link::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background-color: var(--sidebar-active);
+      transform: scaleY(0);
+      transition: transform var(--sidebar-transition);
+    }
+
+    .sidebar-menu-link:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--sidebar-hover);
+    }
+
+    .sidebar-menu-link.active {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: var(--sidebar-active);
+    }
+
+    .sidebar-menu-link.active::before {
+      transform: scaleY(1);
+    }
+
+    .sidebar-menu-icon {
+      font-size: var(--sidebar-icon-size);
+      min-width: 30px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .sidebar-menu-text {
+      margin-left: 10px;
+    }
+
+    
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      transition: var(--sidebar-transition);
+      padding: 20px;
+      width: calc(100% - var(--sidebar-width));
+      min-height: 100vh;
+    }
+
+    .main-content.sidebar-hidden {
+      margin-left: 0;
+      width: 100%;
+    }
+
+    
+    .sidebar-toggle {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background-color: var(--teal);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: var(--sidebar-transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .sidebar-toggle:hover {
+      background-color: var(--turquoise);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-toggle:active {
+      transform: translateY(0);
+    }
+
+    
+    .sidebar-toggle.sidebar-open {
+      left: calc(var(--sidebar-width) + 20px);
+    }
+
+    
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity var(--sidebar-transition), visibility var(--sidebar-transition);
+    }
+
+    .sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        z-index: 1000;
+      }
+      
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      
+      .sidebar-toggle.sidebar-open {
+        left: 20px;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 80px 15px 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-content {
+        padding: 80px 10px 15px;
+      }
+    }
+    </style>
+  </head>
+  <body>
+
+<button class="sidebar-toggle" id="sidebarToggle">
+  <i class="fas fa-bars"></i>
+</button>
+
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="fas fa-feather"></i>
+          <h2>Rooster System</h2>
+        </div>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-menu-item">
+          <a href="YOUR_DASHBOARD_DEPLOYMENT_LINK"class="sidebar-menu-link" data-page="dashboard">
+            <span class="sidebar-menu-icon"><i class="fas fa-chart-line"></i></span>
+            <span class="sidebar-menu-text">Dashboard</span>
+          </a>
+        </li>
+        <li class="sidebar-menu-item">
+          <a href="YOUR_ROSTERS_DEPLOYMENT_LINK" class="sidebar-menu-link">
+            <span class="sidebar-menu-icon"><i class="fas fa-calendar-alt"></i></span>
+            <span class="sidebar-menu-text">Rosters</span>
+          </a>
+        </li>
+        <li class="sidebar-menu-item">
+          <a class="sidebar-menu-link active">
+            <span class="sidebar-menu-icon"><i class="fas fa-cog"></i></span>
+            <span class="sidebar-menu-text">Settings</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+
+<main class="main-content" id="mainContent">
+    <div class="container">
+      <h1><i class="fas fa-cogs"></i> Settings</h1>
+      
+      <div id="user-info" class="user-info">
+        <div>
+          <i class="fas fa-user-circle"></i> Logged in as: <span id="current-user-email" class="user-email"></span>
+          <span id="admin-badge" class="admin-badge" style="display: none;"><i class="fas fa-crown"></i> Admin</span>
+        </div>
+      </div>
+      
+      <div id="loading" class="loading">
+        <i class="fas fa-spinner"></i>
+        Loading data...
+      </div>
+      <div id="error" class="error" style="display: none;"><i class="fas fa-exclamation-circle"></i> <span id="error-message"></span></div>
+      <div id="success" class="success" style="display: none;"><i class="fas fa-check-circle"></i> <span id="success-message"></span></div>
+      
+      <div id="content" style="display: none;">
+        
+        <h2 class="section-title"><i class="fas fa-users"></i> Users</h2>
+        <div class="subsection-title">
+          <span>User Accounts</span>
+          <div id="user-actions" class="section-actions" style="display: none;">
+            <button id="add-user-btn" class="btn"><i class="fas fa-plus"></i> Add User</button>
+          </div>
+        </div>
+        <div id="users-container" class="card-container"></div>
+        
+        
+        <h2 class="section-title"><i class="fas fa-calendar-alt"></i> Calendar Preferences</h2>
+        
+        <div class="subsection-title">
+          <span><i class="fas fa-palette"></i> Roster Types and Colors</span>
+          <div id="roster-actions" class="section-actions" style="display: none;">
+            <button id="add-roster-btn" class="btn"><i class="fas fa-plus"></i> Add Roster Type</button>
+          </div>
+        </div>
+        <div id="rosters-container" class="card-container"></div>
+        
+        <div class="subsection-title">
+          <span><i class="fas fa-tag"></i> Statuses</span>
+          <div id="status-actions" class="section-actions" style="display: none;">
+            <button id="add-status-btn" class="btn"><i class="fas fa-plus"></i> Add Status</button>
+          </div>
+        </div>
+        <div id="statuses-container" class="card-container"></div>
+        
+        <div class="subsection-title">
+          <span><i class="fas fa-clock"></i> Staff Shifts</span>
+          <div id="shift-actions" class="section-actions" style="display: none;">
+            <button id="add-shift-btn" class="btn"><i class="fas fa-plus"></i> Add Staff Shift</button>
+          </div>
+        </div>
+        <div id="shifts-container" class="card-container"></div>
+        
+        
+        <h2 class="section-title"><i class="fas fa-user-shield"></i> Admin Users</h2>
+        <div id="admins-container" class="card-container"></div>
+      </div>
+    </div>
+    
+    
+    
+    <div id="roster-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="roster-modal-title" class="modal-title"><i class="fas fa-palette"></i> Add Roster Type</h3>
+          <span class="close" id="close-roster-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="roster-row-index">
+          <div class="form-group">
+            <label for="roster-type"><i class="fas fa-tag"></i> Roster Type</label>
+            <input type="text" id="roster-type" class="form-control" placeholder="Enter roster type">
+          </div>
+          <div class="form-group">
+            <label for="roster-color"><i class="fas fa-fill-drip"></i> Color</label>
+            <div class="color-picker-container">
+              <input type="color" id="roster-color" class="color-picker" value="#0A9396">
+              <div class="color-presets">
+                <div class="color-preset" style="background-color: #0A9396;" onclick="document.getElementById('roster-color').value='#0A9396'"></div>
+                <div class="color-preset" style="background-color: #005F73;" onclick="document.getElementById('roster-color').value='#005F73'"></div>
+                <div class="color-preset" style="background-color: #94D2BD;" onclick="document.getElementById('roster-color').value='#94D2BD'"></div>
+                <div class="color-preset" style="background-color: #E9D8A6;" onclick="document.getElementById('roster-color').value='#E9D8A6'"></div>
+                <div class="color-preset" style="background-color: #EE9B00;" onclick="document.getElementById('roster-color').value='#EE9B00'"></div>
+                <div class="color-preset" style="background-color: #CA6702;" onclick="document.getElementById('roster-color').value='#CA6702'"></div>
+                <div class="color-preset" style="background-color: #BB3E03;" onclick="document.getElementById('roster-color').value='#BB3E03'"></div>
+                <div class="color-preset" style="background-color: #AE2012;" onclick="document.getElementById('roster-color').value='#AE2012'"></div>
+                <div class="color-preset" style="background-color: #9B2226;" onclick="document.getElementById('roster-color').value='#9B2226'"></div>
+                <div class="color-preset" style="background-color: #001219;" onclick="document.getElementById('roster-color').value='#001219'"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="cancel-roster-btn" class="btn btn-danger"><i class="fas fa-times"></i> Cancel</button>
+          <button id="save-roster-btn" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
+        </div>
+      </div>
+    </div>
+    
+    
+    <div id="user-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="user-modal-title" class="modal-title"><i class="fas fa-user"></i> Add User</h3>
+          <span class="close" id="close-user-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="user-row-index">
+          <div class="form-group">
+            <label for="username"><i class="fas fa-user-tag"></i> Username</label>
+            <input type="text" id="username" class="form-control" placeholder="Enter username">
+          </div>
+          <div class="form-group">
+            <label for="email"><i class="fas fa-envelope"></i> Email</label>
+            <input type="email" id="email" class="form-control" placeholder="Enter email">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="cancel-user-btn" class="btn btn-danger"><i class="fas fa-times"></i> Cancel</button>
+          <button id="save-user-btn" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
+        </div>
+      </div>
+    </div>
+    
+    
+    <div id="status-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="status-modal-title" class="modal-title"><i class="fas fa-tag"></i> Add Status</h3>
+          <span class="close" id="close-status-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="status-row-index">
+          <div class="form-group">
+            <label for="status"><i class="fas fa-info-circle"></i> Status</label>
+            <input type="text" id="status" class="form-control" placeholder="Enter status">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="cancel-status-btn" class="btn btn-danger"><i class="fas fa-times"></i> Cancel</button>
+          <button id="save-status-btn" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
+        </div>
+      </div>
+    </div>
+    
+    
+    <div id="shift-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="shift-modal-title" class="modal-title"><i class="fas fa-clock"></i> Add Staff Shift</h3>
+          <span class="close" id="close-shift-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="shift-row-index">
+          <div class="form-group">
+            <label for="staff-shift"><i class="fas fa-user-clock"></i> Staff Shift</label>
+            <input type="text" id="staff-shift" class="form-control" placeholder="Enter staff shift">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="cancel-shift-btn" class="btn btn-danger"><i class="fas fa-times"></i> Cancel</button>
+          <button id="save-shift-btn" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
+        </div>
+      </div>
+    </div>
+    
+    
+    <div id="confirm-modal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h3>
+          <span class="close" id="close-confirm-modal">&times;</span>
+        </div>
+        <div class="modal-body">
+          <p id="confirm-message">Are you sure you want to delete this item?</p>
+          <input type="hidden" id="confirm-type">
+          <input type="hidden" id="confirm-row-index">
+        </div>
+        <div class="modal-footer">
+          <button id="cancel-confirm-btn" class="btn"><i class="fas fa-times"></i> Cancel</button>
+          <button id="confirm-delete-btn" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
+        </div>
+      </div>
+    </div>
+</main>
+    <script>
+
+      document.addEventListener('DOMContentLoaded', loadData);
+
+class SidebarManager {
+  constructor() {
+    this.sidebar = document.getElementById('sidebar');
+    this.mainContent = document.getElementById('mainContent');
+    this.sidebarToggle = document.getElementById('sidebarToggle');
+    this.sidebarOverlay = document.getElementById('sidebarOverlay');
+    this.menuLinks = document.querySelectorAll('.sidebar-menu-link');
+    
+    this.isOpen = true;
+    this.isMobile = window.innerWidth <= 768;
+    
+    this.init();
+  }
+  
+  init() {
+    this.bindEvents();
+    this.initializeSidebar();
+  }
+
+  initializeSidebar() {
+    if (this.isMobile) {
+      this.isOpen = false;
+      this.sidebar.classList.add('hidden');
+      this.mainContent.classList.add('sidebar-hidden');
+      this.sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+      this.sidebarToggle.classList.remove('sidebar-open');
+    } else {
+      this.isOpen = true;
+      this.sidebar.classList.remove('hidden', 'open');
+      this.mainContent.classList.remove('sidebar-hidden');
+      this.sidebarToggle.innerHTML = '<i class="fas fa-times"></i>';
+      this.sidebarToggle.classList.add('sidebar-open');
+    }
+  }
+
+  checkMobile() {
+    const wasMobile = this.isMobile;
+    this.isMobile = window.innerWidth <= 768;
+    
+    if (wasMobile !== this.isMobile) {
+      this.initializeSidebar();
+    }
+  }
+
+  openSidebar() {
+    this.isOpen = true;
+    
+    if (this.isMobile) {
+      this.sidebar.classList.add('open');
+      this.sidebar.classList.remove('hidden');
+      this.sidebarOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    } else {
+      this.sidebar.classList.remove('hidden');
+      this.mainContent.classList.remove('sidebar-hidden');
+      this.sidebarToggle.classList.add('sidebar-open');
+    }
+    
+    this.sidebarToggle.innerHTML = '<i class="fas fa-times"></i>';
+  }
+
+  closeSidebar() {
+    this.isOpen = false;
+    
+    if (this.isMobile) {
+      this.sidebar.classList.remove('open');
+      this.sidebar.classList.add('hidden');
+      this.sidebarOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    } else {
+      this.sidebar.classList.add('hidden');
+      this.mainContent.classList.add('sidebar-hidden');
+      this.sidebarToggle.classList.remove('sidebar-open');
+    }
+    
+    this.sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+  }
+
+  toggleSidebar() {
+    if (this.isOpen) {
+      this.closeSidebar();
+    } else {
+      this.openSidebar();
+    }
+  }
+
+  bindEvents() {
+    this.sidebarToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleSidebar();
+    });
+
+    this.sidebarOverlay.addEventListener('click', () => {
+      if (this.isMobile) {
+        this.closeSidebar();
+      }
+    });
+
+    this.menuLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        if (this.isMobile && this.isOpen) {
+          this.closeSidebar();
+        }
+      });
+    });
+
+    window.addEventListener('resize', () => {
+      this.checkMobile();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && this.isOpen) {
+        this.closeSidebar();
+      }
+    });
+
+    this.sidebar.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (document.getElementById('sidebar')) {
+    window.sidebarManager = new SidebarManager();
+  }
+});
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = SidebarManager;
+}
+
+      let isAdmin = false;
+      let currentUserEmail = '';
+      
+      function loadData() {
+        const loadingElement = document.getElementById('loading');
+        const errorElement = document.getElementById('error');
+        const contentElement = document.getElementById('content');
+        
+        google.script.run
+          .withSuccessHandler(function(data) {
+            isAdmin = data.isAdmin;
+            currentUserEmail = data.currentUserEmail;
+
+            document.getElementById('current-user-email').textContent = currentUserEmail;
+            if (isAdmin) {
+              document.getElementById('admin-badge').style.display = 'inline-flex';
+              document.getElementById('user-actions').style.display = 'block';
+              document.getElementById('roster-actions').style.display = 'block';
+              document.getElementById('status-actions').style.display = 'block';
+              document.getElementById('shift-actions').style.display = 'block';
+            }
+            
+            renderUsers(data.users);
+            renderAdmins(data.admins);
+            renderRosters(data.rosters);
+            renderStatuses(data.statuses);
+            renderStaffShifts(data.staffShifts);
+
+            loadingElement.style.display = 'none';
+            contentElement.style.display = 'block';
+
+            setupEventListeners();
+          })
+          .withFailureHandler(function(error) {
+            loadingElement.style.display = 'none';
+            document.getElementById('error-message').textContent = 'Error loading data: ' + error.message;
+            errorElement.style.display = 'flex';
+          })
+          .getSettingsData();
+      }
+     
+      function setupEventListeners() {
+        document.getElementById('add-roster-btn').addEventListener('click', function() {
+          document.getElementById('roster-modal-title').innerHTML = '<i class="fas fa-palette"></i> Add Roster Type';
+          document.getElementById('roster-row-index').value = '';
+          document.getElementById('roster-type').value = '';
+          document.getElementById('roster-color').value = '#0A9396';
+          document.getElementById('roster-modal').style.display = 'block';
+        });
+
+        document.getElementById('add-user-btn').addEventListener('click', function() {
+          document.getElementById('user-modal-title').innerHTML = '<i class="fas fa-user"></i> Add User';
+          document.getElementById('user-row-index').value = '';
+          document.getElementById('username').value = '';
+          document.getElementById('email').value = '';
+          document.getElementById('user-modal').style.display = 'block';
+        });
+
+        document.getElementById('add-status-btn').addEventListener('click', function() {
+          document.getElementById('status-modal-title').innerHTML = '<i class="fas fa-tag"></i> Add Status';
+          document.getElementById('status-row-index').value = '';
+          document.getElementById('status').value = '';
+          document.getElementById('status-modal').style.display = 'block';
+        });
+
+        document.getElementById('add-shift-btn').addEventListener('click', function() {
+          document.getElementById('shift-modal-title').innerHTML = '<i class="fas fa-clock"></i> Add Staff Shift';
+          document.getElementById('shift-row-index').value = '';
+          document.getElementById('staff-shift').value = '';
+          document.getElementById('shift-modal').style.display = 'block';
+        });
+
+        document.getElementById('close-roster-modal').addEventListener('click', function() {
+          document.getElementById('roster-modal').style.display = 'none';
+        });
+        
+        document.getElementById('close-user-modal').addEventListener('click', function() {
+          document.getElementById('user-modal').style.display = 'none';
+        });
+        
+        document.getElementById('close-status-modal').addEventListener('click', function() {
+          document.getElementById('status-modal').style.display = 'none';
+        });
+        
+        document.getElementById('close-shift-modal').addEventListener('click', function() {
+          document.getElementById('shift-modal').style.display = 'none';
+        });
+        
+        document.getElementById('close-confirm-modal').addEventListener('click', function() {
+          document.getElementById('confirm-modal').style.display = 'none';
+        });
+
+        document.getElementById('cancel-roster-btn').addEventListener('click', function() {
+          document.getElementById('roster-modal').style.display = 'none';
+        });
+        
+        document.getElementById('cancel-user-btn').addEventListener('click', function() {
+          document.getElementById('user-modal').style.display = 'none';
+        });
+        
+        document.getElementById('cancel-status-btn').addEventListener('click', function() {
+          document.getElementById('status-modal').style.display = 'none';
+        });
+        
+        document.getElementById('cancel-shift-btn').addEventListener('click', function() {
+          document.getElementById('shift-modal').style.display = 'none';
+        });
+        
+        document.getElementById('cancel-confirm-btn').addEventListener('click', function() {
+          document.getElementById('confirm-modal').style.display = 'none';
+        });
+
+        document.getElementById('save-roster-btn').addEventListener('click', saveRosterType);
+        document.getElementById('save-user-btn').addEventListener('click', saveUser);
+        document.getElementById('save-status-btn').addEventListener('click', saveStatus);
+        document.getElementById('save-shift-btn').addEventListener('click', saveStaffShift);
+        document.getElementById('confirm-delete-btn').addEventListener('click', confirmDelete);
+      }
+      
+      function renderUsers(users) {
+        const container = document.getElementById('users-container');
+        container.innerHTML = '';
+        
+        if (users.length === 0) {
+          container.innerHTML = '<p class="empty-message">No users found</p>';
+          return;
+        }
+        
+        users.forEach(user => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          
+          let cardContent = `
+            <div class="card-title"><i class="fas fa-user"></i> ${escapeHtml(user.username)}</div>
+            <div class="card-content">
+              <p><i class="fas fa-envelope"></i> ${escapeHtml(user.email)}</p>
+            </div>
+          `;
+          
+          if (isAdmin) {
+            cardContent += `
+              <button class="btn btn-edit" onclick="editUser(${user.rowIndex}, '${escapeHtml(user.username)}', '${escapeHtml(user.email)}')"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-danger btn-delete" onclick="deleteUserConfirm(${user.rowIndex}, '${escapeHtml(user.username)}')"><i class="fas fa-trash-alt"></i></button>
+            `;
+          }
+          
+          card.innerHTML = cardContent;
+          container.appendChild(card);
+        });
+      }
+      
+      function renderAdmins(admins) {
+        const container = document.getElementById('admins-container');
+        container.innerHTML = '';
+        
+        if (admins.length === 0) {
+          container.innerHTML = '<p class="empty-message">No admin users found</p>';
+          return;
+        }
+        
+        admins.forEach(admin => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          
+          card.innerHTML = `
+            <div class="card-title"><i class="fas fa-user-shield"></i> ${escapeHtml(admin.username)}</div>
+            <div class="card-content">
+              <p><i class="fas fa-envelope"></i> ${escapeHtml(admin.email)}</p>
+            </div>
+          `;
+          
+          container.appendChild(card);
+        });
+      }
+      
+      function renderRosters(rosters) {
+        const container = document.getElementById('rosters-container');
+        container.innerHTML = '';
+        
+        if (rosters.length === 0) {
+          container.innerHTML = '<p class="empty-message">No roster types found</p>';
+          return;
+        }
+        
+        rosters.forEach(roster => {
+          const card = document.createElement('div');
+          card.className = 'card roster-card';
+
+          const colorBox = document.createElement('div');
+          colorBox.className = 'color-box';
+          colorBox.style.backgroundColor = roster.color;
+          
+          const content = document.createElement('div');
+          content.style.width = '100%';
+          let contentHtml = `
+            <div class="card-title">${escapeHtml(roster.type)}</div>
+            <div class="card-content">
+              <p><i class="fas fa-palette"></i> ${escapeHtml(roster.color)}</p>
+            </div>
+          `;
+          
+          if (isAdmin) {
+            contentHtml += `
+              <button class="btn btn-edit" onclick="editRosterType(${roster.rowIndex}, '${escapeHtml(roster.type)}', '${escapeHtml(roster.color)}')"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-danger btn-delete" onclick="deleteRosterConfirm(${roster.rowIndex}, '${escapeHtml(roster.type)}')"><i class="fas fa-trash-alt"></i></button>
+            `;
+          }
+          
+          content.innerHTML = contentHtml;
+          
+          card.appendChild(colorBox);
+          card.appendChild(content);
+          container.appendChild(card);
+        });
+      }
+      
+      function renderStatuses(statuses) {
+        const container = document.getElementById('statuses-container');
+        container.innerHTML = '';
+        
+        if (statuses.length === 0) {
+          container.innerHTML = '<p class="empty-message">No statuses found</p>';
+          return;
+        }
+        
+        statuses.forEach(status => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          
+          let cardContent = `
+            <div class="card-title"><i class="fas fa-tag"></i> ${escapeHtml(status.status)}</div>
+            <div class="card-content"></div>
+          `;
+          
+          if (isAdmin) {
+            cardContent += `
+              <button class="btn btn-edit" onclick="editStatus(${status.rowIndex}, '${escapeHtml(status.status)}')"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-danger btn-delete" onclick="deleteStatusConfirm(${status.rowIndex}, '${escapeHtml(status.status)}')"><i class="fas fa-trash-alt"></i></button>
+            `;
+          }
+          
+          card.innerHTML = cardContent;
+          container.appendChild(card);
+        });
+      }
+      
+      function renderStaffShifts(shifts) {
+        const container = document.getElementById('shifts-container');
+        container.innerHTML = '';
+        
+        if (shifts.length === 0) {
+          container.innerHTML = '<p class="empty-message">No staff shifts found</p>';
+          return;
+        }
+        
+        shifts.forEach(shift => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          
+          let cardContent = `
+            <div class="card-title"><i class="fas fa-clock"></i> ${escapeHtml(shift.staffShift)}</div>
+            <div class="card-content"></div>
+          `;
+          
+          if (isAdmin) {
+            cardContent += `
+              <button class="btn btn-edit" onclick="editShift(${shift.rowIndex}, '${escapeHtml(shift.staffShift)}')"><i class="fas fa-edit"></i></button>
+              <button class="btn btn-danger btn-delete" onclick="deleteShiftConfirm(${shift.rowIndex}, '${escapeHtml(shift.staffShift)}')"><i class="fas fa-trash-alt"></i></button>
+            `;
+          }
+          
+          card.innerHTML = cardContent;
+          container.appendChild(card);
+        });
+      }
+
+      function editRosterType(rowIndex, rosterType, color) {
+        document.getElementById('roster-modal-title').innerHTML = '<i class="fas fa-palette"></i> Edit Roster Type';
+        document.getElementById('roster-row-index').value = rowIndex;
+        document.getElementById('roster-type').value = rosterType;
+        document.getElementById('roster-color').value = color;
+        document.getElementById('roster-modal').style.display = 'block';
+      }
+      
+      function editUser(rowIndex, username, email) {
+        document.getElementById('user-modal-title').innerHTML = '<i class="fas fa-user"></i> Edit User';
+        document.getElementById('user-row-index').value = rowIndex;
+        document.getElementById('username').value = username;
+        document.getElementById('email').value = email;
+        document.getElementById('user-modal').style.display = 'block';
+      }
+
+      function editStatus(rowIndex, status) {
+        document.getElementById('status-modal-title').innerHTML = '<i class="fas fa-tag"></i> Edit Status';
+        document.getElementById('status-row-index').value = rowIndex;
+        document.getElementById('status').value = status;
+        document.getElementById('status-modal').style.display = 'block';
+      }
+      
+      function editShift(rowIndex, staffShift) {
+        document.getElementById('shift-modal-title').innerHTML = '<i class="fas fa-clock"></i> Edit Staff Shift';
+        document.getElementById('shift-row-index').value = rowIndex;
+        document.getElementById('staff-shift').value = staffShift;
+        document.getElementById('shift-modal').style.display = 'block';
+      }
+
+      function deleteRosterConfirm(rowIndex, rosterType) {
+        document.getElementById('confirm-message').textContent = `Are you sure you want to delete the roster type "${rosterType}"?`;
+        document.getElementById('confirm-type').value = 'roster';
+        document.getElementById('confirm-row-index').value = rowIndex;
+        document.getElementById('confirm-modal').style.display = 'block';
+      }
+      
+      function deleteUserConfirm(rowIndex, username) {
+        document.getElementById('confirm-message').textContent = `Are you sure you want to delete the user "${username}"?`;
+        document.getElementById('confirm-type').value = 'user';
+        document.getElementById('confirm-row-index').value = rowIndex;
+        document.getElementById('confirm-modal').style.display = 'block';
+      }
+      
+      function deleteStatusConfirm(rowIndex, status) {
+        document.getElementById('confirm-message').textContent = `Are you sure you want to delete the status "${status}"?`;
+        document.getElementById('confirm-type').value = 'status';
+        document.getElementById('confirm-row-index').value = rowIndex;
+        document.getElementById('confirm-modal').style.display = 'block';
+      }
+      
+      function deleteShiftConfirm(rowIndex, shift) {
+        document.getElementById('confirm-message').textContent = `Are you sure you want to delete the staff shift "${shift}"?`;
+        document.getElementById('confirm-type').value = 'shift';
+        document.getElementById('confirm-row-index').value = rowIndex;
+        document.getElementById('confirm-modal').style.display = 'block';
+      }
+
+      function saveRosterType() {
+        const rowIndex = document.getElementById('roster-row-index').value;
+        const rosterType = document.getElementById('roster-type').value;
+        const color = document.getElementById('roster-color').value;
+        
+        if (!rosterType) {
+          showError('Roster type cannot be empty');
+          return;
+        }
+        
+        document.getElementById('roster-modal').style.display = 'none';
+        showLoading();
+        
+        if (rowIndex) {
+          google.script.run
+            .withSuccessHandler(function(result) {
+              showSuccess(result.message);
+              loadData();
+            })
+            .withFailureHandler(handleError)
+            .updateRosterType(parseInt(rowIndex), rosterType, color);
+        } else {
+          google.script.run
+            .withSuccessHandler(function(result) {
+              showSuccess(result.message);
+              loadData();
+            })
+            .withFailureHandler(handleError)
+            .addRosterType(rosterType, color);
+        }
+      }
+      
+      function saveUser() {
+        const rowIndex = document.getElementById('user-row-index').value;
+        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
+        
+        if (!username || !email) {
+          showError('Username and email cannot be empty');
+          return;
+        }
+        
+        document.getElementById('user-modal').style.display = 'none';
+        showLoading();
+        
+        if (rowIndex) {
+          google.script.run
+            .withSuccessHandler(function(result) {
+              showSuccess(result.message);
+              loadData();
+            })
+            .withFailureHandler(handleError)
+            .updateUser(parseInt(rowIndex), username, email);
+        } else {
+          google.script.run
+            .withSuccessHandler(function(result) {
+              showSuccess(result.message);
+              loadData();
+            })
+            .withFailureHandler(handleError)
+            .addUser(username, email);
+        }
+      }
+      
+      function saveStatus() {
+        const rowIndex = document.getElementById('status-row-index').value;
+        const status = document.getElementById('status').value;
+        
+        if (!status) {
+          showError('Status cannot be empty');
+          return;
+        }
+        
+        document.getElementById('status-modal').style.display = 'none';
+        showLoading();
+        
+        if (rowIndex) {
+          google.script.run
+            .withSuccessHandler(function(result) {
+              showSuccess(result.message);
+              loadData();
+            })
+            .withFailureHandler(handleError)
+            .updateStatus(parseInt(rowIndex), status);
+        } else {
+          google.script.run
+            .withSuccessHandler(function(result) {
+              showSuccess(result.message);
+              loadData();
+            })
+            .withFailureHandler(handleError)
+            .addStatus(status);
+        }
+      }
+      
+      function saveStaffShift() {
+        const rowIndex = document.getElementById('shift-row-index').value;
+        const staffShift = document.getElementById('staff-shift').value;
+        
+        if (!staffShift) {
+          showError('Staff shift cannot be empty');
+          return;
+        }
+        
+        document.getElementById('shift-modal').style.display = 'none';
+        showLoading();
+        
+        if (rowIndex) {
+          google.script.run
+            .withSuccessHandler(function(result) {
+              showSuccess(result.message);
+              loadData();
+            })
+            .withFailureHandler(handleError)
+            .updateStaffShift(parseInt(rowIndex), staffShift);
+        } else {
+          google.script.run
+            .withSuccessHandler(function(result) {
+              showSuccess(result.message);
+              loadData();
+            })
+            .withFailureHandler(handleError)
+            .addStaffShift(staffShift);
+        }
+      }
+      
+      function confirmDelete() {
+        const type = document.getElementById('confirm-type').value;
+        const rowIndex = parseInt(document.getElementById('confirm-row-index').value);
+        
+        document.getElementById('confirm-modal').style.display = 'none';
+        showLoading();
+        
+        switch (type) {
+          case 'roster':
+            google.script.run
+              .withSuccessHandler(function(result) {
+                showSuccess(result.message);
+                loadData();
+              })
+              .withFailureHandler(handleError)
+              .deleteRosterType(rowIndex);
+            break;
+          case 'user':
+            google.script.run
+              .withSuccessHandler(function(result) {
+                showSuccess(result.message);
+                loadData();
+              })
+              .withFailureHandler(handleError)
+              .deleteUser(rowIndex);
+            break;
+          case 'status':
+            google.script.run
+              .withSuccessHandler(function(result) {
+                showSuccess(result.message);
+                loadData();
+              })
+              .withFailureHandler(handleError)
+              .deleteStatus(rowIndex);
+            break;
+          case 'shift':
+            google.script.run
+              .withSuccessHandler(function(result) {
+                showSuccess(result.message);
+                loadData();
+              })
+              .withFailureHandler(handleError)
+              .deleteStaffShift(rowIndex);
+            break;
+        }
+      }
+
+      function showLoading() {
+        document.getElementById('loading').style.display = 'flex';
+        document.getElementById('content').style.display = 'none';
+        document.getElementById('error').style.display = 'none';
+        document.getElementById('success').style.display = 'none';
+      }
+      
+      function showError(message) {
+        const errorElement = document.getElementById('error');
+        document.getElementById('error-message').textContent = message;
+        errorElement.style.display = 'flex';
+
+        setTimeout(function() {
+          errorElement.style.display = 'none';
+        }, 5000);
+      }
+      
+      function showSuccess(message) {
+        const successElement = document.getElementById('success');
+        document.getElementById('success-message').textContent = message;
+        successElement.style.display = 'flex';
+
+        setTimeout(function() {
+          successElement.style.display = 'none';
+        }, 3000);
+      }
+      
+      function handleError(error) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+        showError('Error: ' + error.message);
+      }
+
+      function escapeHtml(unsafe) {
+        if (unsafe === undefined || unsafe === null) return '';
+        return unsafe
+          .toString()
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+    </script>
+  </body>
+</html>

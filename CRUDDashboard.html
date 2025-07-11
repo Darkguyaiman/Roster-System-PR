@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rosters Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --dark-teal: #001219;
+            --teal: #005F73;
+            --turquoise: #0A9396;
+            --light-teal: #94D2BD;
+            --cream: #E9D8A6;
+            --orange: #EE9B00;
+            --burnt-orange: #CA6702;
+            --rust: #BB3E03;
+            --red: #AE2012;
+            --dark-red: #9B2226;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #e9d8a6 0%, #94d2bd 100%);
+            min-height: 100vh;
+            padding: 16px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: var(--dark-teal);
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header p {
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 18, 25, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--turquoise), var(--teal));
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 18, 25, 0.15);
+        }
+
+        .card.clickable {
+            cursor: pointer;
+        }
+
+        .card.clickable:hover::before {
+            background: linear-gradient(90deg, var(--orange), var(--burnt-orange));
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 16px;
+            font-size: 20px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .card-title {
+            font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+            font-weight: 600;
+            color: var(--dark-teal);
+        }
+
+        .card-value {
+            font-size: clamp(2rem, 6vw, 2.5rem);
+            font-weight: 700;
+            color: var(--teal);
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+
+        .card-subtitle {
+            color: var(--teal);
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .this-month { 
+            background: linear-gradient(135deg, var(--turquoise), var(--teal)); 
+        }
+        
+        .total-assigned { 
+            background: linear-gradient(135deg, var(--orange), var(--burnt-orange)); 
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 32px rgba(0, 18, 25, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .section-title {
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            font-weight: 600;
+            color: var(--dark-teal);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title i {
+            color: var(--turquoise);
+            font-size: 1.2em;
+        }
+
+        .recent-rosters {
+            display: grid;
+            gap: 12px;
+        }
+
+        .roster-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: rgba(148, 210, 189, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid var(--turquoise);
+            transition: all 0.2s ease;
+        }
+
+        .roster-item:hover {
+            background: rgba(148, 210, 189, 0.2);
+            transform: translateX(4px);
+        }
+
+        .roster-type {
+            font-weight: 600;
+            color: var(--dark-teal);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .roster-type i {
+            color: var(--turquoise);
+        }
+
+        .roster-month {
+            color: var(--teal);
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            font-weight: 500;
+        }
+
+        .user-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 12px;
+        }
+
+        .user-card {
+            background: rgba(148, 210, 189, 0.1);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--turquoise), var(--teal));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .user-card:hover {
+            border-color: var(--turquoise);
+            background: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .user-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--dark-teal);
+            margin-bottom: 8px;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+        }
+
+        .user-count {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: 700;
+            color: var(--turquoise);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--teal);
+        }
+
+        .spinner {
+            border: 3px solid rgba(148, 210, 189, 0.3);
+            border-top: 3px solid var(--turquoise);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 18, 25, 0.6);
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            margin: 2% auto;
+            padding: 0;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 18, 25, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--turquoise), var(--teal));
+            color: white;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .close {
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: 24px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .roster-card {
+            background: rgba(148, 210, 189, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            border-left: 4px solid var(--turquoise);
+            transition: all 0.2s ease;
+        }
+
+        .roster-card:hover {
+            background: rgba(148, 210, 189, 0.2);
+            transform: translateX(4px);
+        }
+
+        .roster-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .roster-id {
+            font-weight: 700;
+            color: var(--dark-teal);
+            font-size: clamp(1rem, 2.5vw, 1.1rem);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .roster-id i {
+            color: var(--turquoise);
+        }
+
+        .roster-type-badge {
+            background: linear-gradient(135deg, var(--turquoise), var(--teal));
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: clamp(0.7rem, 2vw, 0.8rem);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+        }
+
+        .user-profile {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            box-shadow: 0 4px 16px rgba(0, 18, 25, 0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .user-profile:hover {
+            transform: translateY(-4px);
+            border-color: var(--turquoise);
+            box-shadow: 0 8px 24px rgba(0, 18, 25, 0.15);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--turquoise), var(--teal));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin: 0 auto 8px;
+            font-size: 16px;
+        }
+
+        .user-profile-name {
+            font-size: clamp(0.7rem, 2vw, 0.8rem);
+            font-weight: 600;
+            color: var(--dark-teal);
+            word-break: break-word;
+        }
+
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .user-stats {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 5% auto;
+                border-radius: 16px;
+            }
+            
+            .modal-body {
+                padding: 16px;
+            }
+            
+            .roster-card {
+                padding: 16px;
+            }
+            
+            .users-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                gap: 8px;
+            }
+            
+            .user-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+            
+            .section {
+                padding: 16px;
+            }
+            
+            .card {
+                padding: 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .roster-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .roster-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .users-grid {
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            }
+        }
+
+        
+        .modal-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-body::-webkit-scrollbar-track {
+            background: rgba(148, 210, 189, 0.1);
+            border-radius: 3px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb {
+            background: var(--turquoise);
+            border-radius: 3px;
+        }
+
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: var(--teal);
+        }
+
+        
+        .card, .section, .user-card, .roster-item, .user-profile {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .section:nth-child(3) { animation-delay: 0.3s; }
+        .section:nth-child(4) { animation-delay: 0.4s; }
+
+            :root {
+      --dark-teal: #001219;
+      --teal: #005F73;
+      --turquoise: #0A9396;
+      --light-teal: #94D2BD;
+      --orange: #EE9B00;
+      
+      
+      --sidebar-width: 250px;
+      --sidebar-bg: var(--dark-teal);
+      --sidebar-text: white;
+      --sidebar-hover: var(--turquoise);
+      --sidebar-active: var(--turquoise);
+      --sidebar-icon-size: 20px;
+      --sidebar-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    
+    .sidebar {
+      width: var(--sidebar-width);
+      height: 100vh;
+      background-color: var(--sidebar-bg);
+      color: var(--sidebar-text);
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1000;
+      transition: var(--sidebar-transition);
+      overflow-x: hidden;
+      overflow-y: auto;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+      transform: translateX(0);
+    }
+
+    .sidebar.hidden {
+      transform: translateX(-100%);
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: sticky;
+      top: 0;
+      background-color: var(--sidebar-bg);
+      z-index: 10;
+    }
+
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .sidebar-logo i {
+      font-size: 24px;
+      color: var(--orange);
+    }
+
+    .sidebar-logo h2 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--sidebar-text);
+      margin: 0;
+    }
+
+    .sidebar-menu {
+      padding: 20px 0;
+      list-style: none;
+      margin: 0;
+    }
+
+    .sidebar-menu-item {
+      position: relative;
+    }
+
+    .sidebar-menu-link {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      text-decoration: none;
+      color: var(--sidebar-text);
+      transition: var(--sidebar-transition);
+      white-space: nowrap;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .sidebar-menu-link::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background-color: var(--sidebar-active);
+      transform: scaleY(0);
+      transition: transform var(--sidebar-transition);
+    }
+
+    .sidebar-menu-link:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--sidebar-hover);
+    }
+
+    .sidebar-menu-link.active {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: var(--sidebar-active);
+    }
+
+    .sidebar-menu-link.active::before {
+      transform: scaleY(1);
+    }
+
+    .sidebar-menu-icon {
+      font-size: var(--sidebar-icon-size);
+      min-width: 30px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .sidebar-menu-text {
+      margin-left: 10px;
+    }
+
+    
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      transition: var(--sidebar-transition);
+      padding: 20px;
+      width: calc(100% - var(--sidebar-width));
+      min-height: 100vh;
+    }
+
+    .main-content.sidebar-hidden {
+      margin-left: 0;
+      width: 100%;
+    }
+
+    
+    .sidebar-toggle {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background-color: var(--teal);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: var(--sidebar-transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .sidebar-toggle:hover {
+      background-color: var(--turquoise);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-toggle:active {
+      transform: translateY(0);
+    }
+
+    
+    .sidebar-toggle.sidebar-open {
+      left: calc(var(--sidebar-width) + 20px);
+    }
+
+    
+    .sidebar-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity var(--sidebar-transition), visibility var(--sidebar-transition);
+    }
+
+    .sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        z-index: 1000;
+      }
+      
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      
+      .sidebar-toggle.sidebar-open {
+        left: 20px;
+      }
+      
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 80px 15px 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .main-content {
+        padding: 80px 10px 15px;
+      }
+    }
+    </style>
+</head>
+<body>
+
+<button class="sidebar-toggle" id="sidebarToggle">
+  <i class="fas fa-bars"></i>
+</button>
+
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <i class="fas fa-feather"></i>
+          <h2>Rooster System</h2>
+        </div>
+      </div>
+      <ul class="sidebar-menu">
+        <li class="sidebar-menu-item">
+          <a class="sidebar-menu-link active" data-page="dashboard">
+            <span class="sidebar-menu-icon"><i class="fas fa-chart-line"></i></span>
+            <span class="sidebar-menu-text">Dashboard</span>
+          </a>
+        </li>
+        <li class="sidebar-menu-item">
+          <a href="YOUR_ROSTERS_DEPLOYMENT_LINK" class="sidebar-menu-link">
+            <span class="sidebar-menu-icon"><i class="fas fa-calendar-alt"></i></span>
+            <span class="sidebar-menu-text">Rosters</span>
+          </a>
+        </li>
+        <li class="sidebar-menu-item">
+          <a href="YOUR_SETTINGS_DEPLOYMENT_LINK" class="sidebar-menu-link">
+            <span class="sidebar-menu-icon"><i class="fas fa-cog"></i></span>
+            <span class="sidebar-menu-text">Settings</span>
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+
+<main class="main-content" id="mainContent">
+    <div class="container">
+        <div class="header">
+            <h1>
+                <i class="fas fa-chart-line"></i>
+                Rosters Dashboard
+            </h1>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card clickable" id="thisMonthCard">
+                <div class="card-header">
+                    <div class="card-icon this-month">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="card-title">This Month's Rosters</div>
+                </div>
+                <div class="card-value" id="thisMonthCount">-</div>
+                <div class="card-subtitle">
+                    <i class="fas fa-mouse-pointer"></i>
+                    Click to view details
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon total-assigned">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <div class="card-title">Total Roster Assigned</div>
+                </div>
+                <div class="card-value" id="totalAssignedCount">-</div>
+                <div class="card-subtitle">
+                    <i class="fas fa-infinity"></i>
+                    All time assignments
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-clock"></i>
+                Recent Rosters
+            </h2>
+            <div class="recent-rosters" id="recentRosters">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading recent rosters...
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">
+                <i class="fas fa-users"></i>
+                User Statistics
+            </h2>
+            <div class="user-stats" id="userStats">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading user statistics...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="thisMonthModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class="fas fa-calendar-check"></i>
+                    This Month's Rosters
+                </h2>
+                <span class="close">
+                    <i class="fas fa-times"></i>
+                </span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Loading this month's rosters...
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+    <script>
+    class SidebarManager {
+  constructor() {
+    this.sidebar = document.getElementById('sidebar');
+    this.mainContent = document.getElementById('mainContent');
+    this.sidebarToggle = document.getElementById('sidebarToggle');
+    this.sidebarOverlay = document.getElementById('sidebarOverlay');
+    this.menuLinks = document.querySelectorAll('.sidebar-menu-link');
+    
+    this.isOpen = true;
+    this.isMobile = window.innerWidth <= 768;
+    
+    this.init();
+  }
+  
+  init() {
+    this.bindEvents();
+    this.initializeSidebar();
+  }
+
+  initializeSidebar() {
+    if (this.isMobile) {
+      this.isOpen = false;
+      this.sidebar.classList.add('hidden');
+      this.mainContent.classList.add('sidebar-hidden');
+      this.sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+      this.sidebarToggle.classList.remove('sidebar-open');
+    } else {
+      this.isOpen = true;
+      this.sidebar.classList.remove('hidden', 'open');
+      this.mainContent.classList.remove('sidebar-hidden');
+      this.sidebarToggle.innerHTML = '<i class="fas fa-times"></i>';
+      this.sidebarToggle.classList.add('sidebar-open');
+    }
+  }
+
+  checkMobile() {
+    const wasMobile = this.isMobile;
+    this.isMobile = window.innerWidth <= 768;
+    
+    if (wasMobile !== this.isMobile) {
+      this.initializeSidebar();
+    }
+  }
+
+  openSidebar() {
+    this.isOpen = true;
+    
+    if (this.isMobile) {
+      this.sidebar.classList.add('open');
+      this.sidebar.classList.remove('hidden');
+      this.sidebarOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    } else {
+      this.sidebar.classList.remove('hidden');
+      this.mainContent.classList.remove('sidebar-hidden');
+      this.sidebarToggle.classList.add('sidebar-open');
+    }
+    
+    this.sidebarToggle.innerHTML = '<i class="fas fa-times"></i>';
+  }
+
+  closeSidebar() {
+    this.isOpen = false;
+    
+    if (this.isMobile) {
+      this.sidebar.classList.remove('open');
+      this.sidebar.classList.add('hidden');
+      this.sidebarOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+    } else {
+      this.sidebar.classList.add('hidden');
+      this.mainContent.classList.add('sidebar-hidden');
+      this.sidebarToggle.classList.remove('sidebar-open');
+    }
+    
+    this.sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+  }
+
+  toggleSidebar() {
+    if (this.isOpen) {
+      this.closeSidebar();
+    } else {
+      this.openSidebar();
+    }
+  }
+
+  bindEvents() {
+    this.sidebarToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      this.toggleSidebar();
+    });
+
+    this.sidebarOverlay.addEventListener('click', () => {
+      if (this.isMobile) {
+        this.closeSidebar();
+      }
+    });
+
+    this.menuLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        if (this.isMobile && this.isOpen) {
+          this.closeSidebar();
+        }
+      });
+    });
+
+    window.addEventListener('resize', () => {
+      this.checkMobile();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && this.isOpen) {
+        this.closeSidebar();
+      }
+    });
+
+    this.sidebar.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (document.getElementById('sidebar')) {
+    window.sidebarManager = new SidebarManager();
+  }
+});
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = SidebarManager;
+}
+
+        
+        let dashboardData = null;
+
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            
+            document.getElementById('thisMonthCard').addEventListener('click', function() {
+                openThisMonthModal();
+            });
+
+            
+            document.querySelector('.close').addEventListener('click', function() {
+                closeModal();
+            });
+
+            
+            window.addEventListener('click', function(event) {
+                const modal = document.getElementById('thisMonthModal');
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+
+            
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeModal();
+                }
+            });
+        }
+
+        function loadDashboardData() {
+            google.script.run
+                .withSuccessHandler(onDashboardDataLoaded)
+                .withFailureHandler(onError)
+                .getDashboardData();
+        }
+
+        function onDashboardDataLoaded(data) {
+            dashboardData = data;
+            updateDashboard(data);
+        }
+
+        function onError(error) {
+            console.error('Error:', error);
+            
+            document.querySelectorAll('.loading').forEach(el => {
+                el.innerHTML = `
+                    <div style="color: var(--red); text-align: center;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 12px;"></i>
+                        <p>Error loading data. Please refresh the page.</p>
+                    </div>
+                `;
+            });
+        }
+
+        function updateDashboard(data) {
+            
+            animateCountUp('thisMonthCount', data.thisMonthCount);
+            animateCountUp('totalAssignedCount', data.totalAssignedCount);
+
+            
+            updateRecentRosters(data.recentRosters);
+
+            
+            updateUserStatistics(data.userStats);
+        }
+
+        function animateCountUp(elementId, targetValue) {
+            const element = document.getElementById(elementId);
+            const startValue = 0;
+            const duration = 1000;
+            const startTime = performance.now();
+
+            function updateCount(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const currentValue = Math.floor(startValue + (targetValue - startValue) * progress);
+                
+                element.textContent = currentValue;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateCount);
+                }
+            }
+            
+            requestAnimationFrame(updateCount);
+        }
+
+        function updateRecentRosters(rosters) {
+            const container = document.getElementById('recentRosters');
+            
+            if (!rosters || rosters.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: var(--teal); padding: 20px;">
+                        <i class="fas fa-inbox" style="font-size: 2rem; margin-bottom: 12px; opacity: 0.5;"></i>
+                        <p>No recent rosters found.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = rosters.map(roster => `
+                <div class="roster-item">
+                    <div class="roster-type">
+                        <i class="fas fa-briefcase"></i>
+                        ${roster.type}
+                    </div>
+                    <div class="roster-month">
+                        <i class="fas fa-calendar"></i>
+                        ${roster.month}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateUserStatistics(userStats) {
+            const container = document.getElementById('userStats');
+            
+            if (!userStats || userStats.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: var(--teal); padding: 20px; grid-column: 1 / -1;">
+                        <i class="fas fa-user-slash" style="font-size: 2rem; margin-bottom: 12px; opacity: 0.5;"></i>
+                        <p>No user statistics available.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = userStats.map(user => `
+                <div class="user-card">
+                    <div class="user-name">
+                        <i class="fas fa-user"></i>
+                        ${user.name}
+                    </div>
+                    <div class="user-count">${user.count}</div>
+                </div>
+            `).join('');
+        }
+
+        function openThisMonthModal() {
+            const modal = document.getElementById('thisMonthModal');
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            
+            google.script.run
+                .withSuccessHandler(onThisMonthDataLoaded)
+                .withFailureHandler(onError)
+                .getThisMonthRosters();
+        }
+
+        function onThisMonthDataLoaded(rosters) {
+            const modalBody = document.getElementById('modalBody');
+            
+            if (!rosters || rosters.length === 0) {
+                modalBody.innerHTML = `
+                    <div style="text-align: center; color: var(--teal); padding: 40px;">
+                        <i class="fas fa-calendar-times" style="font-size: 3rem; margin-bottom: 16px; opacity: 0.5;"></i>
+                        <p>No rosters found for this month.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            modalBody.innerHTML = rosters.map(roster => `
+                <div class="roster-card">
+                    <div class="roster-card-header">
+                        <div class="roster-id">
+                            <i class="fas fa-hashtag"></i>
+                            Roster ${roster.id}
+                        </div>
+                        <div class="roster-type-badge">
+                            <i class="fas fa-tag"></i>
+                            ${roster.type}
+                        </div>
+                    </div>
+                    <div class="users-grid">
+                        ${roster.users.length > 0 ? roster.users.map(user => `
+                            <div class="user-profile">
+                                <div class="user-avatar">${user.charAt(0).toUpperCase()}</div>
+                                <div class="user-profile-name">${user}</div>
+                            </div>
+                        `).join('') : `
+                            <div style="grid-column: 1 / -1; text-align: center; color: var(--teal); padding: 20px;">
+                                <i class="fas fa-user-times" style="margin-bottom: 8px;"></i>
+                                <p>No users assigned</p>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function closeModal() {
+            document.getElementById('thisMonthModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    </script>
+</body>
+</html>

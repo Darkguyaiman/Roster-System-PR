@@ -1,0 +1,3156 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+      :root {
+        --dark-teal: #001219;
+        --teal: #005F73;
+        --turquoise: #0A9396;
+        --light-teal: #94D2BD;
+        --cream: #E9D8A6;
+        --orange: #EE9B00;
+        --burnt-orange: #CA6702;
+        --rust: #BB3E03;
+        --red: #AE2012;
+        --dark-red: #9B2226;
+
+        --anim-duration-fast: 0.2s;
+        --anim-duration-medium: 0.3s;
+        --anim-duration-slow: 0.5s;
+        
+        --sidebar-width: 250px;
+        --sidebar-bg: var(--dark-teal);
+        --sidebar-text: white;
+        --sidebar-hover: var(--turquoise);
+        --sidebar-active: var(--turquoise);
+        --sidebar-icon-size: 20px;
+        --sidebar-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: var(--dark-teal);
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(135deg, var(--cream) 0%, var(--light-teal) 100%);
+        min-height: 100vh;
+        display: flex;
+      }
+      
+
+      .page-loading-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--cream) 0%, var(--light-teal) 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 500; 
+        transition: opacity 0.5s ease-out;
+      }
+      
+      .page-loading-content {
+        text-align: center;
+        color: var(--teal);
+        background: rgba(255, 255, 255, 0.9);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 18, 25, 0.2);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      
+      .page-loading-spinner {
+        width: 80px;
+        height: 80px;
+        border: 8px solid rgba(0, 95, 115, 0.2);
+        border-top: 8px solid var(--teal);
+        border-radius: 50%;
+        animation: pageSpinAnimation 1.2s linear infinite;
+        margin: 0 auto 30px;
+      }
+      
+      @keyframes pageSpinAnimation {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .page-loading-text {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 15px;
+        color: var(--dark-teal);
+      }
+      
+      .page-loading-subtext {
+        font-size: 18px;
+        opacity: 0.8;
+        color: var(--teal);
+      }
+      
+
+      .sidebar {
+        width: var(--sidebar-width);
+        height: 100vh;
+        background-color: var(--sidebar-bg);
+        color: var(--sidebar-text);
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 1000; 
+        transition: var(--sidebar-transition);
+        overflow-x: hidden;
+        overflow-y: auto;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        transform: translateX(0);
+      }
+      
+      .sidebar.hidden {
+        transform: translateX(-100%);
+      }
+      
+      .sidebar-header {
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        position: sticky;
+        top: 0;
+        background-color: var(--sidebar-bg);
+        z-index: 10;
+      }
+      
+      .sidebar-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      
+      .sidebar-logo i {
+        font-size: 24px;
+        color: var(--orange);
+      }
+      
+      .sidebar-logo h2 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--sidebar-text);
+        margin: 0;
+      }
+      
+      .sidebar-menu {
+        padding: 20px 0;
+        list-style: none;
+      }
+      
+      .sidebar-menu-item {
+        position: relative;
+      }
+      
+      .sidebar-menu-link {
+        display: flex;
+        align-items: center;
+        padding: 15px 20px;
+        text-decoration: none;
+        color: var(--sidebar-text);
+        transition: var(--sidebar-transition);
+        white-space: nowrap;
+        overflow: hidden;
+        position: relative;
+      }
+      
+      .sidebar-menu-link::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background-color: var(--sidebar-active);
+        transform: scaleY(0);
+        transition: transform var(--sidebar-transition);
+      }
+      
+      .sidebar-menu-link:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: var(--sidebar-hover);
+      }
+      
+      .sidebar-menu-link.active {
+        background-color: rgba(255, 255, 255, 0.05);
+        color: var(--sidebar-active);
+      }
+      
+      .sidebar-menu-link.active::before {
+        transform: scaleY(1);
+      }
+      
+      .sidebar-menu-icon {
+        font-size: var(--sidebar-icon-size);
+        min-width: 30px;
+        display: flex;
+        justify-content: center;
+      }
+      
+      .sidebar-menu-text {
+        margin-left: 10px;
+      }
+      
+
+      .main-content {
+        flex: 1;
+        margin-left: var(--sidebar-width);
+        transition: var(--sidebar-transition);
+        padding: 20px;
+        width: calc(100% - var(--sidebar-width));
+        min-height: 100vh;
+      }
+      
+      .main-content.sidebar-hidden {
+        margin-left: 0;
+        width: 100%;
+      }
+      
+      .sidebar-toggle {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1001; 
+        background-color: var(--teal);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        width: 44px;
+        height: 44px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transition: var(--sidebar-transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+      }
+      
+      .sidebar-toggle:hover {
+        background-color: var(--turquoise);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+      }
+      
+      .sidebar-toggle:active {
+        transform: translateY(0);
+      }
+      
+      .sidebar-toggle.sidebar-open {
+        left: calc(var(--sidebar-width) + 20px);
+      }
+      
+      .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999; 
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity var(--sidebar-transition), visibility var(--sidebar-transition);
+      }
+      
+      .sidebar-overlay.active {
+        opacity: 1;
+        visibility: visible;
+      }
+      
+
+      .container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 15px;
+      }
+      
+      header {
+        background: linear-gradient(135deg, var(--teal), var(--turquoise));
+        color: white;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 18, 25, 0.2);
+      }
+      
+      header h1 {
+        margin: 0;
+        font-size: clamp(20px, 4vw, 28px);
+        font-weight: 600;
+      }
+      
+      .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-top: 3px solid var(--orange);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+        vertical-align: middle;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .loading-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100; 
+        border-radius: 12px;
+        backdrop-filter: blur(2px);
+      }
+      
+      .loading-text {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        color: var(--teal);
+        font-size: 16px;
+      }
+      
+      .loading-text .loading-spinner {
+        margin-right: 10px;
+      }
+      
+      .primary-btn {
+        background: linear-gradient(135deg, var(--orange), var(--burnt-orange));
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+      }
+      
+      .primary-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(238, 155, 0, 0.3);
+      }
+      
+      .primary-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+      
+      .secondary-btn {
+        background: white;
+        color: var(--teal);
+        border: 2px solid var(--light-teal);
+        padding: 10px 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .secondary-btn:hover {
+        background: var(--light-teal);
+        color: var(--dark-teal);
+        transform: translateY(-1px);
+      }
+      
+      .danger-btn {
+        background: linear-gradient(135deg, var(--red), var(--dark-red));
+        color: white;
+        border: none;
+        padding: 8px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .danger-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 10px rgba(174, 32, 18, 0.3);
+      }
+      
+      .save-btn {
+        background: linear-gradient(135deg, var(--turquoise), var(--teal));
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        margin: 10px 0;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .save-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(10, 147, 150, 0.3);
+      }
+      
+      .save-btn:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+      
+      .filters-container, .roster-info, .user-management, .roster-table-container {
+        background: rgba(255, 255, 255, 0.9);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 20px rgba(0, 18, 25, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        position: relative;
+      }
+      
+      .filters-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        align-items: end;
+        z-index: 1;
+      }
+      
+      .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        position: relative;
+      }
+      
+      .filter-group label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--teal);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .custom-select {
+        position: relative;
+        width: 100%;
+      }
+      
+      .select-trigger {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--light-teal);
+        border-radius: 8px;
+        background: white;
+        color: var(--dark-teal);
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+        font-size: 16px;
+        min-height: 48px;
+        position: relative;
+      }
+      
+      .select-trigger:hover {
+        border-color: var(--turquoise);
+      }
+      
+      .select-trigger.active {
+        border-color: var(--turquoise);
+        box-shadow: 0 0 0 3px rgba(10, 147, 150, 0.1);
+      }
+      
+      .select-arrow {
+        transition: transform 0.3s ease;
+        color: var(--teal);
+        font-size: 14px;
+      }
+      
+      .select-trigger.active .select-arrow {
+        transform: rotate(180deg);
+      }
+      
+      .select-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 18, 25, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 800; 
+        backdrop-filter: blur(3px);
+      }
+      
+      .select-modal.show {
+        display: flex;
+      }
+      
+      .select-modal-content {
+        background: white;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 400px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 40px rgba(0, 18, 25, 0.3);
+        animation: modalFadeIn 0.2s ease-out;
+      }
+      
+      @keyframes modalFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      
+      .select-modal-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--light-teal);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 1;
+        border-radius: 12px 12px 0 0;
+      }
+      
+      .select-modal-title {
+        font-weight: 600;
+        color: var(--teal);
+        margin: 0;
+      }
+      
+      .select-modal-close {
+        background: none;
+        border: none;
+        color: var(--teal);
+        cursor: pointer;
+        font-size: 18px;
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        transition: all 0.2s ease;
+      }
+      
+      .select-modal-close:hover {
+        background: rgba(10, 147, 150, 0.1);
+      }
+      
+      .select-modal-body {
+        padding: 10px 0;
+      }
+      
+      .select-option {
+        padding: 16px 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid var(--light-teal);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        min-height: 52px;
+      }
+      
+      .select-option:hover {
+        background: var(--light-teal);
+        color: var(--dark-teal);
+      }
+      
+      .select-option:last-child {
+        border-bottom: none;
+      }
+      
+      .select-option.selected {
+        background: var(--turquoise);
+        color: white;
+      }
+      
+      .month-picker {
+        position: relative;
+      }
+      
+      .month-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--light-teal);
+        border-radius: 8px;
+        background: white;
+        color: var(--dark-teal);
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        min-height: 48px;
+      }
+      
+      .month-input:focus {
+        outline: none;
+        border-color: var(--turquoise);
+        box-shadow: 0 0 0 3px rgba(10, 147, 150, 0.1);
+      }
+      
+      .clear-filters-btn {
+        background: var(--rust);
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        justify-self: center;
+      }
+      
+      .clear-filters-btn:hover {
+        background: var(--red);
+        transform: translateY(-1px);
+      }
+      
+      #roster-cards-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 20px;
+        position: relative;
+        z-index: 1;
+      }
+      
+      .roster-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 18, 25, 0.1);
+        padding: 24px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        z-index: 2;
+      }
+      
+      .roster-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0, 18, 25, 0.15);
+        z-index: 3;
+      }
+      
+      .roster-card h3 {
+        margin-top: 0;
+        color: var(--teal);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 18px;
+        font-weight: 600;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      
+      .roster-type-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+      
+      .user-chips-container {
+        border: 2px solid var(--light-teal);
+        border-radius: 8px;
+        padding: 10px;
+        min-height: 45px;
+        background: white;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        cursor: text;
+        transition: all 0.3s ease;
+      }
+      
+      .user-chips-container:focus-within {
+        border-color: var(--turquoise);
+        box-shadow: 0 0 0 3px rgba(10, 147, 150, 0.1);
+      }
+      
+      .user-chip {
+        background: linear-gradient(135deg, var(--light-teal), var(--turquoise));
+        color: white;
+        border-radius: 20px;
+        padding: 8px 16px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 500;
+      }
+      
+      .user-chip .remove {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-weight: bold;
+        padding: 2px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+      }
+      
+      .user-chip .remove:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+      }
+      
+      .user-input {
+        border: none;
+        outline: none;
+        flex: 1;
+        min-width: 120px;
+        padding: 8px;
+        font-size: 16px;
+        background: transparent;
+      }
+      
+      .user-select-container {
+        position: relative;
+      }
+      
+      .roster-table-wrapper {
+        width: 100%;
+        overflow: auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 18, 25, 0.1);
+        max-height: 70vh;
+        position: relative;
+      }
+      
+      .roster-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        min-width: 800px;
+        background: white;
+        position: relative;
+      }
+      
+      .roster-table th,
+      .roster-table td {
+        border: 1px solid var(--light-teal);
+        padding: 12px 8px;
+        text-align: center;
+        vertical-align: middle;
+        min-width: 80px;
+        white-space: nowrap;
+      }
+      
+      .roster-table thead th {
+        background: linear-gradient(135deg, var(--teal), var(--turquoise));
+        color: white;
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        font-size: 11px;
+        line-height: 1.2;
+        border-bottom: 2px solid var(--dark-teal);
+      }
+      
+      .roster-table th:first-child,
+      .roster-table td:first-child {
+        position: sticky;
+        left: 0;
+        z-index: 15;
+        min-width: 150px;
+        max-width: 150px;
+        font-size: 13px;
+        background: white;
+        border-right: 2px solid var(--teal);
+      }
+      
+      .roster-table th:first-child {
+        background: linear-gradient(135deg, var(--dark-teal), var(--teal));
+        z-index: 25;
+        font-size: 14px;
+      }
+      
+      .roster-table td:first-child {
+        background: rgba(148, 210, 189, 0.1);
+        font-weight: 600;
+        color: var(--teal);
+      }
+      
+      .day-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+      }
+      
+      .day-number {
+        font-size: 14px;
+        font-weight: bold;
+      }
+      
+      .day-name {
+        font-size: 10px;
+        opacity: 0.8;
+      }
+      
+      .status-cell {
+        padding: 12px 8px;
+        min-height: 50px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 14px;
+        font-weight: 500;
+        position: relative;
+      }
+      
+      .status-cell:hover {
+        background: rgba(10, 147, 150, 0.1);
+        transform: scale(1.05);
+      }
+      
+      .status-cell.empty {
+        color: #999;
+        font-style: italic;
+      }
+      
+      .status-select-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 18, 25, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 800;
+        backdrop-filter: blur(3px);
+      }
+      
+      .status-select-modal.show {
+        display: flex;
+      }
+      
+      .status-select-content {
+        background: white;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 300px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 40px rgba(0, 18, 25, 0.3);
+        animation: modalFadeIn 0.2s ease-out;
+      }
+      
+      .status-select-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--light-teal);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 1;
+        border-radius: 12px 12px 0 0;
+      }
+      
+      .status-select-title {
+        font-weight: 600;
+        color: var(--teal);
+        margin: 0;
+      }
+      
+      .status-select-close {
+        background: none;
+        border: none;
+        color: var(--teal);
+        cursor: pointer;
+        font-size: 18px;
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        transition: all 0.2s ease;
+      }
+      
+      .status-select-close:hover {
+        background: rgba(10, 147, 150, 0.1);
+      }
+      
+      .status-select-body {
+        padding: 10px 0;
+      }
+      
+      .status-option {
+        padding: 16px 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid var(--light-teal);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        min-height: 52px;
+      }
+      
+      .status-option:hover {
+        background: var(--light-teal);
+        color: var(--dark-teal);
+      }
+      
+      .status-option:last-child {
+        border-bottom: none;
+      }
+      
+      .status-option.selected {
+        background: var(--turquoise);
+        color: white;
+      }
+      
+      .weekend {
+       background-color: #fff5f5 !important;
+      }
+      
+      .weekend.roster-table th {
+        background: linear-gradient(135deg, var(--rust), var(--red)) !important;
+      }
+      
+      .user-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--light-teal);
+        transition: all 0.2s ease;
+      }
+      
+      .user-row:hover {
+        background: rgba(148, 210, 189, 0.05);
+        border-radius: 6px;
+        padding-left: 8px;
+        padding-right: 8px;
+      }
+      
+      .user-row:last-child {
+        border-bottom: none;
+      }
+      
+      .user-info {
+        flex: 1;
+        font-weight: 500;
+        color: var(--teal);
+        font-size: 16px;
+      }
+      
+      .error, .success, .changes-indicator {
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin: 15px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 500;
+      }
+      
+      .error {
+        background: linear-gradient(135deg, rgba(174, 32, 18, 0.1), rgba(155, 34, 38, 0.1));
+        color: var(--dark-red);
+        border-left: 4px solid var(--red);
+      }
+      
+      .success {
+        background: linear-gradient(135deg, rgba(10, 147, 150, 0.1), rgba(0, 95, 115, 0.1));
+        color: var(--teal);
+        border-left: 4px solid var(--turquoise);
+      }
+      
+      .changes-indicator {
+        background: linear-gradient(135deg, rgba(238, 155, 0, 0.1), rgba(202, 103, 2, 0.1));
+        color: var(--burnt-orange);
+        border-left: 4px solid var(--orange);
+        display: none;
+      }
+      
+      .changes-indicator.show {
+        display: flex;
+      }
+      
+      .empty-message, .loading {
+        text-align: center;
+        padding: 40px 20px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 18, 25, 0.1);
+        color: var(--teal);
+        font-size: 16px;
+      }
+      
+      .access-denied {
+        background: linear-gradient(135deg, rgba(174, 32, 18, 0.1), rgba(155, 34, 38, 0.1));
+        color: var(--dark-red);
+        padding: 20px;
+        border-radius: 12px;
+        margin: 20px 0;
+        text-align: center;
+        font-weight: 600;
+        border: 2px solid var(--red);
+      }
+      
+      .form-group {
+        margin-bottom: 20px;
+      }
+      
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 15px;
+        align-items: end;
+      }
+      
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: var(--teal);
+        font-size: 14px;
+      }
+      
+      input, select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid var(--light-teal);
+        border-radius: 8px;
+        font-size: 16px;
+        box-sizing: border-box;
+        background: white;
+        color: var(--dark-teal);
+        transition: all 0.3s ease;
+      }
+      
+      input:focus, select:focus {
+        outline: none;
+        border-color: var(--turquoise);
+        box-shadow: 0 0 0 3px rgba(10, 147, 150, 0.1);
+      }
+      
+      .form-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+        gap: 15px;
+        flex-wrap: wrap;
+      }
+      
+      .action-bar {
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+      
+      .action-bar h2 {
+        color: var(--teal);
+        margin: 0;
+        font-size: clamp(20px, 4vw, 24px);
+      }
+      
+      .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+      
+      .detail-header h2 {
+        color: var(--teal);
+        margin: 0;
+        font-size: clamp(18px, 4vw, 22px);
+      }
+      
+      .table-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+      
+      .table-header h3 {
+        color: var(--teal);
+        margin: 0;
+      }
+      
+      .view-only-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.05);
+        z-index: 50;
+        pointer-events: none;
+        border-radius: 12px;
+      }
+      
+      .admin-only {
+        display: block;
+      }
+      
+      .view-only .admin-only {
+        display: none !important;
+      }
+      
+      .view-only .status-cell {
+        cursor: default !important;
+        pointer-events: none;
+      }
+      
+      .view-only .user-chip .remove {
+        display: none;
+      }
+      
+      .view-only .user-input {
+        pointer-events: none;
+        background: #f5f5f5;
+      }
+
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 18, 25, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 800; 
+        backdrop-filter: blur(5px);
+      }
+
+      .modal {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        max-width: 500px;
+        width: 90%;
+        box-shadow: 0 10px 40px rgba(0, 18, 25, 0.3);
+        animation: modalSlideIn 0.3s ease-out;
+      }
+
+      @keyframes modalSlideIn {
+        from {
+          opacity: 0;
+          transform: translateY(-50px) scale(0.9);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      .modal-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid var(--light-teal);
+      }
+
+      .modal-icon {
+        font-size: 24px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-icon.success {
+        background: var(--turquoise);
+        color: white;
+      }
+
+      .modal-icon.error {
+        background: var(--red);
+        color: white;
+      }
+
+      .modal-icon.warning {
+        background: var(--orange);
+        color: white;
+      }
+
+      .modal-icon.info {
+        background: var(--teal);
+        color: white;
+      }
+
+      .modal-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--dark-teal);
+        margin: 0;
+      }
+
+      .modal-body {
+        margin-bottom: 25px;
+        color: var(--teal);
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      .modal-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+      }
+
+      .modal-btn {
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+      }
+
+      .modal-btn.primary {
+        background: linear-gradient(135deg, var(--orange), var(--burnt-orange));
+        color: white;
+      }
+
+      .modal-btn.secondary {
+        background: white;
+        color: var(--teal);
+        border: 2px solid var(--light-teal);
+      }
+
+      .modal-btn.danger {
+        background: linear-gradient(135deg, var(--red), var(--dark-red));
+        color: white;
+      }
+
+      .modal-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+      
+
+      .user-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 18, 25, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 800; 
+        backdrop-filter: blur(3px);
+      }
+      
+      .user-modal.show {
+        display: flex;
+      }
+      
+      .user-modal-content {
+        background: white;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 400px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 40px rgba(0, 18, 25, 0.3);
+        animation: modalFadeIn 0.2s ease-out;
+      }
+      
+      .user-modal-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--light-teal);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 1;
+        border-radius: 12px 12px 0 0;
+      }
+      
+      .user-modal-title {
+        font-weight: 600;
+        color: var(--teal);
+        margin: 0;
+      }
+      
+      .user-modal-close {
+        background: none;
+        border: none;
+        color: var(--teal);
+        cursor: pointer;
+        font-size: 18px;
+        padding: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        transition: all 0.2s ease;
+      }
+      
+      .user-modal-close:hover {
+        background: rgba(10, 147, 150, 0.1);
+      }
+      
+      .user-modal-body {
+        padding: 10px 0;
+      }
+      
+      .user-modal-search {
+        padding: 10px 20px;
+        position: sticky;
+        top: 51px;
+        background: white;
+        z-index: 1;
+        border-bottom: 1px solid var(--light-teal);
+      }
+      
+      .user-modal-search input {
+        width: 100%;
+        padding: 10px 15px;
+        border: 2px solid var(--light-teal);
+        border-radius: 8px;
+        font-size: 16px;
+      }
+      
+      .user-modal-search input:focus {
+        outline: none;
+        border-color: var(--turquoise);
+        box-shadow: 0 0 0 3px rgba(10, 147, 150, 0.1);
+      }
+      
+      .user-option {
+        padding: 16px 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border-bottom: 1px solid var(--light-teal);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 16px;
+        min-height: 52px;
+      }
+      
+      .user-option:hover {
+        background: var(--light-teal);
+        color: var(--dark-teal);
+      }
+      
+      .user-option:last-child {
+        border-bottom: none;
+      }
+      
+      @media (max-width: 768px) {
+        .container {
+          padding: 10px;
+        }
+        
+        header {
+          padding: 15px;
+          flex-direction: column;
+          gap: 10px;
+          text-align: center;
+        }
+        
+        .filters-container {
+          grid-template-columns: 1fr;
+          gap: 15px;
+        }
+        
+        .clear-filters-btn {
+          justify-self: stretch;
+        }
+        
+        #roster-cards-container {
+          grid-template-columns: 1fr;
+        }
+        
+        .roster-card h3 {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+        
+        .roster-type-badge {
+          align-self: flex-start;
+        }
+        
+        .action-bar, .detail-header, .table-header {
+          flex-direction: column;
+          align-items: stretch;
+          text-align: center;
+        }
+        
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+        
+        .form-buttons {
+          flex-direction: column;
+        }
+        
+        .roster-table-wrapper {
+          max-height: 60vh;
+        }
+        
+        .roster-table th:first-child,
+        .roster-table td:first-child {
+          min-width: 120px;
+          max-width: 120px;
+        }
+        
+        .user-row {
+          flex-direction: column;
+          align-items: stretch;
+          gap: 10px;
+          text-align: center;
+        }
+
+        .modal {
+          margin: 20px;
+          padding: 20px;
+        }
+
+        .modal-buttons {
+          flex-direction: column;
+        }
+
+        .user-management, .roster-info, .roster-table-container {
+          padding: 15px;
+        }
+        
+        .select-trigger, .select-option, .user-option {
+          font-size: 16px;
+          min-height: 48px;
+          padding: 12px 16px;
+        }
+        
+        .status-cell {
+          min-height: 48px;
+          font-size: 16px;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .roster-card {
+          padding: 16px;
+        }
+        
+        .filters-container, .roster-info, .user-management, .roster-table-container {
+          padding: 15px;
+        }
+
+        .roster-table th,
+        .roster-table td {
+          padding: 8px 4px;
+          font-size: 12px;
+        }
+
+        .roster-table th:first-child,
+        .roster-table td:first-child {
+          min-width: 100px;
+          max-width: 100px;
+          font-size: 11px;
+        }
+        
+        .status-cell {
+          min-height: 44px;
+          font-size: 14px;
+        }
+      }
+
+      .roster-table-wrapper::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      .roster-table-wrapper::-webkit-scrollbar-track {
+        background: var(--light-teal);
+        border-radius: 4px;
+      }
+
+      .roster-table-wrapper::-webkit-scrollbar-thumb {
+        background: var(--turquoise);
+        border-radius: 4px;
+      }
+
+      .roster-table-wrapper::-webkit-scrollbar-thumb:hover {
+        background: var(--teal);
+      }
+    </style>
+  </head>
+  <body>
+            <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+
+            <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+            <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">
+            <i class="fas fa-feather"></i>
+            <h2>Roster System</h2>
+          </div>
+        </div>
+        <ul class="sidebar-menu">
+          <li class="sidebar-menu-item">
+            <a class="sidebar-menu-link" href="YOUR_DASHBOARD_DEPLOYEMENT_LINK" target="_blank">
+              <span class="sidebar-menu-icon"><i class="fas fa-chart-line"></i></span>
+              <span class="sidebar-menu-text">Dashboard</span>
+            </a>
+          </li>
+          <li class="sidebar-menu-item">
+            <a class="sidebar-menu-link active">
+              <span class="sidebar-menu-icon"><i class="fas fa-calendar-alt"></i></span>
+              <span class="sidebar-menu-text">Roosters</span>
+            </a>
+          </li>
+          <li class="sidebar-menu-item">
+            <a class="sidebar-menu-link" href="YOUR_SETTINGS_DEPLOYMENT_LINK" target="_blank">
+              <span class="sidebar-menu-icon"><i class="fas fa-cog"></i></span>
+              <span class="sidebar-menu-text">Settings</span>
+            </a>
+          </li>
+        </ul>
+      </aside>
+
+        <div id="page-loading-overlay" class="page-loading-overlay">
+      <div class="page-loading-content">
+        <div class="page-loading-spinner"></div>
+        <div class="page-loading-text">Loading Roster Tab</div>
+        <div class="page-loading-subtext">Please wait while the tab is being initialized...</div>
+      </div>
+    </div>
+
+<main class="main-content" id="mainContent">
+    <div class="container">
+      <header>
+        <h1><i class="fas fa-calendar-alt"></i> Roster Tab</h1>
+      </header>
+      
+      <div id="access-denied-message" class="access-denied" style="display: none;">
+        <i class="fas fa-exclamation-triangle"></i>
+        Access denied. You don't have permission to access this system.
+      </div>
+
+      <div id="main-content" style="display: none;">
+        <div id="roster-list-view">
+          <div class="filters-container">
+            <div class="filter-group">
+              <label for="filter-type"><i class="fas fa-filter"></i> Filter by Type:</label>
+              <div class="custom-select">
+                <div class="select-trigger" data-target="filter-type">
+                  <span class="select-text">All Types</span>
+                  <i class="fas fa-chevron-down select-arrow"></i>
+                </div>
+              </div>
+            </div>
+            <div class="filter-group">
+              <label for="filter-month"><i class="fas fa-calendar"></i> Filter by Month:</label>
+              <div class="custom-select">
+                <div class="select-trigger" data-target="filter-month">
+                  <span class="select-text">All Months</span>
+                  <i class="fas fa-chevron-down select-arrow"></i>
+                </div>
+              </div>
+            </div>
+            <button id="clear-filters" class="clear-filters-btn">
+              <i class="fas fa-times"></i> Clear Filters
+            </button>
+          </div>
+          
+          <div class="action-bar">
+            <h2><i class="fas fa-list"></i> All Rosters</h2>
+            <button id="create-roster-btn" class="primary-btn admin-only">
+              <i class="fas fa-plus"></i> Create New Roster
+            </button>
+          </div>
+          
+          <div id="roster-cards-container">
+            <div class="loading-overlay">
+              <div class="loading-text">
+                <div class="loading-spinner"></div>
+                Loading rosters...
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div id="create-roster-view" style="display: none;">
+          <h2><i class="fas fa-plus-circle"></i> Create New Roster</h2>
+          
+          <form id="create-roster-form">
+            <div class="form-group">
+              <label for="month-year"><i class="fas fa-calendar-alt"></i> Month and Year:</label>
+              <div class="month-picker">
+                <input type="month" id="month-year" class="month-input" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="roster-type"><i class="fas fa-tags"></i> Roster Type:</label>
+              <div class="custom-select">
+                <div class="select-trigger" data-target="roster-type">
+                  <span class="select-text">Select a roster type</span>
+                  <i class="fas fa-chevron-down select-arrow"></i>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-buttons">
+              <button type="button" id="cancel-create" class="secondary-btn">
+                <i class="fas fa-times"></i> Cancel
+              </button>
+              <button type="submit" class="primary-btn">
+                <i class="fas fa-check"></i> Create Roster
+              </button>
+            </div>
+          </form>
+        </div>
+        
+        <div id="roster-detail-view" style="display: none;">
+          <div class="detail-header">
+            <h2 id="roster-detail-title">Roster Details</h2>
+            <button id="back-to-list" class="secondary-btn">
+              <i class="fas fa-arrow-left"></i> Back to List
+            </button>
+          </div>
+          
+          <div class="roster-info">
+            <div class="loading-overlay" id="roster-info-loading" style="display: none;">
+              <div class="loading-text">
+                <div class="loading-spinner"></div>
+                Loading roster details...
+              </div>
+            </div>
+            <p><strong><i class="fas fa-id-badge"></i> Roster ID:</strong> <span id="detail-roster-id"></span></p>
+            <p><strong><i class="fas fa-calendar"></i> Month/Year:</strong> <span id="detail-month-year"></span></p>
+            <p><strong><i class="fas fa-tag"></i> Type:</strong> <span id="detail-roster-type"></span></p>
+          </div>
+          
+          <div class="user-management">
+            <div class="loading-overlay" id="user-management-loading" style="display: none;">
+              <div class="loading-text">
+                <div class="loading-spinner"></div>
+                Loading users...
+              </div>
+            </div>
+            <h3><i class="fas fa-users"></i> Manage Users</h3>
+            <div id="users-list">
+              <p class="loading">Loading users...</p>
+            </div>
+            
+            <div class="add-user-form admin-only">
+              <h4><i class="fas fa-user-plus"></i> Add New Users</h4>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="new-users-select"><i class="fas fa-search"></i> Users:</label>
+                  <div class="user-select-container">
+                    <div class="user-chips-container" id="user-chips-container">
+                      <input type="text" class="user-input" id="user-input" placeholder="Type to search users...">
+                    </div>
+                  </div>
+                </div>
+                <button type="button" id="add-users-btn" class="primary-btn">
+                  <i class="fas fa-plus"></i> Add Selected Users
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="roster-table-container">
+            <div class="loading-overlay" id="roster-table-loading" style="display: none;">
+              <div class="loading-text">
+                <div class="loading-spinner"></div>
+                Loading schedule...
+              </div>
+            </div>
+            <div class="table-header">
+              <h3><i class="fas fa-table"></i> Shift Schedule</h3>
+              <button id="save-all-changes" class="save-btn admin-only" disabled>
+                <i class="fas fa-save"></i> Save All Changes
+              </button>
+            </div>
+            
+            <div id="changes-indicator" class="changes-indicator">
+              <i class="fas fa-exclamation-circle"></i>
+              You have unsaved changes. Click "Save All Changes" to save them.
+            </div>
+            
+            <div class="roster-table-wrapper">
+              <div id="roster-table-content">
+                <p class="loading">Loading schedule...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+        <div id="modal-container"></div>
+    <div id="select-modal-container"></div>
+    <div id="status-select-modal-container"></div>
+    <div id="user-modal-container"></div>
+</main>    
+    <script>
+      function hidePageLoading() {
+        const overlay = document.getElementById('page-loading-overlay');
+        if (overlay) {
+          overlay.style.opacity = '0';
+          setTimeout(() => {
+            overlay.style.display = 'none';
+          }, 500);
+        }
+      }
+
+      const Modal = {
+        show: function(options) {
+          const {
+            title = 'Alert',
+            message = '',
+            type = 'info',
+            buttons = [{ text: 'OK', action: () => Modal.hide() }]
+          } = options;
+
+          const iconMap = {
+            success: 'fas fa-check-circle',
+            error: 'fas fa-exclamation-circle',
+            warning: 'fas fa-exclamation-triangle',
+            info: 'fas fa-info-circle'
+          };
+
+          const modalHTML = `
+            <div class="modal-overlay" onclick="Modal.hide()">
+              <div class="modal" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                  <div class="modal-icon ${type}">
+                    <i class="${iconMap[type]}"></i>
+                  </div>
+                  <h3 class="modal-title">${title}</h3>
+                </div>
+                <div class="modal-body">${message}</div>
+                <div class="modal-buttons">
+                  ${buttons.map((btn, index) => 
+                    `<button class="modal-btn ${btn.class || (index === 0 ? 'primary' : 'secondary')}" 
+                             onclick="Modal.executeAction(${index})">
+                       ${btn.icon ? `<i class="${btn.icon}"></i>` : ''} ${btn.text}
+                     </button>`
+                  ).join('')}
+                </div>
+              </div>
+            </div>
+          `;
+
+          const container = document.getElementById('modal-container');
+          container.innerHTML = modalHTML;
+          
+          Modal.currentActions = buttons.map(btn => btn.action || (() => Modal.hide()));
+        },
+
+        hide: function() {
+          const container = document.getElementById('modal-container');
+          container.innerHTML = '';
+          Modal.currentActions = [];
+        },
+
+        executeAction: function(index) {
+          if (Modal.currentActions && Modal.currentActions[index]) {
+            Modal.currentActions[index]();
+          }
+        },
+
+        alert: function(message, title = 'Alert') {
+          Modal.show({
+            title,
+            message,
+            type: 'info',
+            buttons: [{ text: 'OK', action: () => Modal.hide() }]
+          });
+        },
+
+        confirm: function(message, title = 'Confirm', onConfirm = () => {}, onCancel = () => {}) {
+          Modal.show({
+            title,
+            message,
+            type: 'warning',
+            buttons: [
+              { 
+                text: 'Cancel', 
+                class: 'secondary',
+                icon: 'fas fa-times',
+                action: () => { Modal.hide(); onCancel(); }
+              },
+              { 
+                text: 'Confirm', 
+                class: 'danger',
+                icon: 'fas fa-check',
+                action: () => { Modal.hide(); onConfirm(); }
+              }
+            ]
+          });
+        },
+
+        success: function(message, title = 'Success') {
+          Modal.show({
+            title,
+            message,
+            type: 'success',
+            buttons: [{ text: 'OK', action: () => Modal.hide() }]
+          });
+        },
+
+        error: function(message, title = 'Error') {
+          Modal.show({
+            title,
+            message,
+            type: 'error',
+            buttons: [{ text: 'OK', action: () => Modal.hide() }]
+          });
+        }
+      };
+
+      const CustomSelect = {
+        init: function() {
+          document.querySelectorAll('.custom-select').forEach(select => {
+            const trigger = select.querySelector('.select-trigger');
+            
+            trigger.addEventListener('click', function(e) {
+              e.stopPropagation();
+              const targetId = this.dataset.target;
+              CustomSelect.showModal(targetId);
+            });
+          });
+        },
+        
+        showModal: function(selectId) {
+          const select = document.querySelector(`[data-target="${selectId}"]`).parentElement;
+          const trigger = select.querySelector('.select-trigger');
+          const selectedText = trigger.querySelector('.select-text').textContent;
+          
+          const options = CustomSelect.getOptions(selectId);
+          
+          const modalHTML = `
+            <div class="select-modal" id="select-modal-${selectId}">
+              <div class="select-modal-content">
+                <div class="select-modal-header">
+                  <h3 class="select-modal-title">Select ${selectId.replace('filter-', '').replace('-', ' ')}</h3>
+                  <button class="select-modal-close" onclick="CustomSelect.hideModal('${selectId}')">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+                <div class="select-modal-body">
+                  ${options.map(option => 
+                    `<div class="select-option ${option.text === selectedText ? 'selected' : ''}" 
+                          data-value="${option.value}" 
+                          data-select-id="${selectId}" 
+                          onclick="CustomSelect.selectOption('${selectId}', '${option.value}', '${option.text}')">
+                      ${option.text}
+                    </div>`
+                  ).join('')}
+                </div>
+              </div>
+            </div>
+          `;
+          
+          const container = document.getElementById('select-modal-container');
+          container.innerHTML = modalHTML;
+          
+          setTimeout(() => {
+            document.getElementById(`select-modal-${selectId}`).classList.add('show');
+          }, 10);
+        },
+        
+        hideModal: function(selectId) {
+          const modal = document.getElementById(`select-modal-${selectId}`);
+          if (modal) {
+            modal.classList.remove('show');
+            setTimeout(() => {
+              const container = document.getElementById('select-modal-container');
+              container.innerHTML = '';
+            }, 200);
+          }
+        },
+        
+        selectOption: function(selectId, value, text) {
+          const select = document.querySelector(`[data-target="${selectId}"]`).parentElement;
+          const trigger = select.querySelector('.select-trigger');
+          
+          trigger.querySelector('.select-text').textContent = text;
+          
+          CustomSelect.hideModal(selectId);
+          
+          const changeEvent = new CustomEvent('selectChange', {
+            detail: { value, text, target: selectId }
+          });
+          document.dispatchEvent(changeEvent);
+        },
+        
+        getOptions: function(selectId) {
+          if (globalCache && globalCache[`${selectId}Options`]) {
+            return globalCache[`${selectId}Options`];
+          }
+          
+          return [{ value: '', text: 'All' }];
+        },
+        
+        populateOptions: function(selectId, options) {
+          globalCache[`${selectId}Options`] = options;
+        },
+        
+        setValue: function(selectId, value) {
+          const options = CustomSelect.getOptions(selectId);
+          const option = options.find(opt => opt.value === value);
+          
+          if (option) {
+            const select = document.querySelector(`[data-target="${selectId}"]`).parentElement;
+            const trigger = select.querySelector('.select-trigger');
+            trigger.querySelector('.select-text').textContent = option.text;
+          }
+        },
+        
+        getValue: function(selectId) {
+          const select = document.querySelector(`[data-target="${selectId}"]`).parentElement;
+          const trigger = select.querySelector('.select-trigger');
+          const text = trigger.querySelector('.select-text').textContent;
+          
+          const options = CustomSelect.getOptions(selectId);
+          const option = options.find(opt => opt.text === text);
+          
+          return option ? option.value : '';
+        }
+      };
+
+      window.alert = Modal.alert;
+      window.confirm = function(message) {
+        return new Promise((resolve) => {
+          Modal.confirm(message, 'Confirm', () => resolve(true), () => resolve(false));
+        });
+      };
+
+      const globalCache = {
+        rosters: null,
+        users: null,
+        statuses: null,
+        rosterTypesWithColors: null,
+        rosterData: new Map(),
+        monthDetails: new Map(),
+        userAccess: null,
+        pendingChangesByRoster: new Map()
+      };
+      
+      let currentRoster = null;
+      let currentRosterUsers = [];
+      let pendingChanges = new Map();
+      let originalData = new Map();
+      let monthDetails = { daysInMonth: 31, dayDetails: [] };
+      let selectedUsers = new Set();
+      let filteredRosters = [];
+      
+      document.addEventListener('DOMContentLoaded', function() {
+        CustomSelect.init();
+        checkUserAccess();
+        setupCustomSelectEvents();
+        initializeSidebar();
+      });
+
+      function setupCustomSelectEvents() {
+        document.addEventListener('selectChange', function(e) {
+          const { value, target } = e.detail;
+          
+          if (target === 'filter-type' || target === 'filter-month') {
+            applyFilters();
+          } else if (target === 'roster-type') {
+          }
+        });
+      }
+
+
+    fun
+      function initializeSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const mainContent = document.getElementById('mainContent');
+        const menuLinks = document.querySelectorAll('.sidebar-menu-link');
+        
+        let isOpen = true;
+        let isMobile = window.innerWidth <= 768;
+        
+        function checkMobile() {
+          const wasMobile = isMobile;
+          isMobile = window.innerWidth <= 768;
+          
+          if (wasMobile !== isMobile) {
+            initializeSidebarState();
+          }
+        }
+        
+        function initializeSidebarState() {
+          if (isMobile) {
+            isOpen = false;
+            sidebar.classList.remove('open');
+            sidebar.classList.add('hidden');
+            mainContent.classList.add('sidebar-hidden');
+            sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            sidebarToggle.classList.remove('sidebar-open');
+          } else {
+            isOpen = true;
+            sidebar.classList.remove('hidden', 'open');
+            mainContent.classList.remove('sidebar-hidden');
+            sidebarToggle.innerHTML = '<i class="fas fa-times"></i>';
+            sidebarToggle.classList.add('sidebar-open');
+          }
+        }
+        
+        function openSidebar() {
+          isOpen = true;
+          
+          if (isMobile) {
+            sidebar.classList.add('open');
+            sidebar.classList.remove('hidden');
+            sidebarOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+          } else {
+            sidebar.classList.remove('hidden');
+            mainContent.classList.remove('sidebar-hidden');
+            sidebarToggle.classList.add('sidebar-open');
+          }
+          
+          sidebarToggle.innerHTML = '<i class="fas fa-times"></i>';
+        }
+        
+        function closeSidebar() {
+          isOpen = false;
+          
+          if (isMobile) {
+            sidebar.classList.remove('open');
+            sidebar.classList.add('hidden');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+          } else {
+            sidebar.classList.add('hidden');
+            mainContent.classList.add('sidebar-hidden');
+            sidebarToggle.classList.remove('sidebar-open');
+          }
+          
+          sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        }
+        
+        function toggleSidebar() {
+          if (isOpen) {
+            closeSidebar();
+          } else {
+            openSidebar();
+          }
+        }
+        
+        sidebarToggle.addEventListener('click', function(e) {
+          e.stopPropagation();
+          toggleSidebar();
+        });
+        
+        sidebarOverlay.addEventListener('click', function() {
+          if (isMobile) {
+            closeSidebar();
+          }
+        });
+        
+        menuLinks.forEach(link => {
+          link.addEventListener('click', function() {
+            if (isMobile && isOpen) {
+              closeSidebar();
+            }
+          });
+        });
+        
+        window.addEventListener('resize', function() {
+          checkMobile();
+        });
+        
+        document.addEventListener('keydown', function(event) {
+          if (event.key === 'Escape' && isOpen) {
+            closeSidebar();
+          }
+        });
+        
+        sidebar.addEventListener('click', function(e) {
+          e.stopPropagation();
+        });
+        
+        initializeSidebarState();
+      }
+
+      function checkUserAccess() {
+        document.getElementById('main-content').style.display = 'block';
+        loadInitialData();
+      }
+
+      function getContrastColor(hexColor) {
+        hexColor = hexColor.replace('#', '');
+        
+        const r = parseInt(hexColor.substr(0, 2), 16);
+        const g = parseInt(hexColor.substr(2, 2), 16);
+        const b = parseInt(hexColor.substr(4, 2), 16);
+        
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        
+        return luminance > 0.5 ? '#000000' : '#ffffff';
+      }
+      
+      function createRosterTypeBadge(type, color) {
+        const badge = document.createElement('span');
+        badge.className = 'roster-type-badge';
+        badge.innerHTML = `<i class="fas fa-tag"></i> ${type}`;
+        badge.style.backgroundColor = color;
+        badge.style.color = getContrastColor(color);
+        return badge;
+      }
+      
+      function loadInitialData() {
+        google.script.run
+          .withSuccessHandler(function(data) {
+            globalCache.rosters = data.rosters || [];
+            globalCache.users = data.users || [];
+            globalCache.statuses = data.statuses || [];
+            globalCache.rosterTypesWithColors = data.rosterTypesWithColors || [];
+            globalCache.userAccess = data.userAccess;
+
+            if (globalCache.userAccess && globalCache.userAccess.accessLevel === 'admin') {
+            } else if (globalCache.userAccess && globalCache.userAccess.accessLevel === 'view') {
+              document.body.classList.add('view-only');
+            } else {
+              document.getElementById('access-denied-message').style.display = 'block';
+              hidePageLoading();
+              return;
+            }
+
+            filteredRosters = [...globalCache.rosters];
+            setupFilters();
+            displayRosters();
+            setupEventListeners();
+            hidePageLoading();
+
+            const firstRoster = globalCache.rosters[0];
+            if (firstRoster) {
+              currentRoster = firstRoster;
+              loadRosterData(firstRoster.id);
+            }
+          })
+          .withFailureHandler(function(error) {
+            console.error('Error loading initial data:', error);
+            const container = document.getElementById('roster-cards-container');
+            if (container) {
+              container.innerHTML = '<p class="error"><i class="fas fa-exclamation-triangle"></i> Error loading data: ' + (error ? error.message : 'Unknown error') + '</p>';
+            }
+            hidePageLoading();
+          })
+          .getInitialData();
+      }
+
+      function loadRosterData(rosterId) {
+        showLoading('roster-info-loading');
+        showLoading('user-management-loading');
+        showLoading('roster-table-loading');
+
+        if (globalCache.rosterData.has(rosterId)) {
+          const cachedData = globalCache.rosterData.get(rosterId);
+          currentRosterUsers = cachedData.users;
+          monthDetails = cachedData.monthDetails;
+
+          hideLoading('roster-info-loading');
+          hideLoading('user-management-loading');
+          hideLoading('roster-table-loading');
+          setupRosterView();
+          return;
+        }
+
+        Promise.all([
+          new Promise((resolve, reject) => {
+            google.script.run
+              .withSuccessHandler(resolve)
+              .withFailureHandler(reject)
+              .getUsersForRoster(rosterId);
+          }),
+          new Promise((resolve, reject) => {
+            google.script.run
+              .withSuccessHandler(resolve)
+              .withFailureHandler(reject)
+              .getMonthDetails(currentRoster.monthYear);
+          })
+        ]).then(([rosterUsers, monthData]) => {
+          currentRosterUsers = rosterUsers || [];
+          monthDetails = monthData || { daysInMonth: 31, dayDetails: [] };
+
+          globalCache.rosterData.set(rosterId, {
+            users: currentRosterUsers,
+            monthDetails: monthDetails
+          });
+
+          hideLoading('roster-info-loading');
+          hideLoading('user-management-loading');
+          hideLoading('roster-table-loading');
+          setupRosterView();
+        }).catch(error => {
+          console.error('Error loading roster data:', error);
+          hideLoading('roster-info-loading');
+          hideLoading('user-management-loading');
+          hideLoading('roster-table-loading');
+          Modal.error('Error loading roster data: ' + (error ? error.message : 'Unknown error'));
+        });
+      }
+
+
+   
+      function setupFilters() {
+        const uniqueTypes = [...new Set(globalCache.rosters.map(r => r.type))];
+        const typeOptions = [
+          { value: '', text: 'All Types' },
+          ...uniqueTypes.map(type => ({ value: type, text: type }))
+        ];
+        CustomSelect.populateOptions('filter-type', typeOptions);
+        
+        const uniqueMonths = [...new Set(globalCache.rosters.map(r => r.monthYear))];
+        const monthOptions = [
+          { value: '', text: 'All Months' },
+          ...uniqueMonths.sort().map(month => ({ value: month, text: month }))
+        ];
+        CustomSelect.populateOptions('filter-month', monthOptions);
+        
+        document.getElementById('clear-filters').addEventListener('click', clearFilters);
+      }
+      
+      function applyFilters() {
+        const typeFilter = CustomSelect.getValue('filter-type');
+        const monthFilter = CustomSelect.getValue('filter-month');
+        
+        filteredRosters = globalCache.rosters.filter(roster => {
+          const typeMatch = !typeFilter || roster.type === typeFilter;
+          const monthMatch = !monthFilter || roster.monthYear === monthFilter;
+          return typeMatch && monthMatch;
+        });
+        
+        displayRosters();
+      }
+      
+      function clearFilters() {
+        CustomSelect.setValue('filter-type', '');
+        CustomSelect.setValue('filter-month', '');
+        filteredRosters = [...globalCache.rosters];
+        displayRosters();
+      }
+      
+      function displayRosters() {
+        const container = document.getElementById('roster-cards-container');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        if (!filteredRosters || filteredRosters.length === 0) {
+          container.innerHTML = '<div class="empty-message"><i class="fas fa-inbox"></i><br>No rosters found matching the current filters.</div>';
+          return;
+        }
+        
+        const fragment = document.createDocumentFragment();
+        filteredRosters.forEach(function(roster) {
+          if (roster && roster.id) {
+            const card = createRosterCard(roster);
+            fragment.appendChild(card);
+          }
+        });
+        container.appendChild(fragment);
+      }
+      
+      function createRosterCard(roster) {
+        if (!roster || !roster.id) return null;
+        
+        const card = document.createElement('div');
+        card.className = 'roster-card';
+        card.dataset.rosterId = roster.id;
+        
+        const typeInfo = globalCache.rosterTypesWithColors.find(t => t.type === roster.type);
+        const typeColor = typeInfo ? typeInfo.color : 'var(--orange)';
+        
+        const typeBadge = createRosterTypeBadge(roster.type || 'Unknown Type', typeColor);
+        
+        card.innerHTML = `
+          <h3>
+            <span><i class="fas fa-calendar-alt"></i> ${roster.monthYear || 'Unknown Month/Year'}</span>
+            ${typeBadge.outerHTML}
+          </h3>
+          <p><strong><i class="fas fa-id-badge"></i> ID:</strong> ${roster.id}</p>
+        `;
+        
+        card.addEventListener('click', () => viewRosterDetails(roster));
+        
+        return card;
+      }
+      
+      function setupEventListeners() {
+        const createRosterBtn = document.getElementById('create-roster-btn');
+        if (createRosterBtn && globalCache.userAccess && globalCache.userAccess.accessLevel === 'admin') {
+          createRosterBtn.addEventListener('click', showCreateRosterView);
+        }
+        
+        const cancelCreateBtn = document.getElementById('cancel-create');
+        if (cancelCreateBtn) {
+          cancelCreateBtn.addEventListener('click', showRosterListView);
+        }
+        
+        const createRosterForm = document.getElementById('create-roster-form');
+        if (createRosterForm) {
+          createRosterForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            handleCreateRoster();
+          });
+        }
+        
+        const backToListBtn = document.getElementById('back-to-list');
+        if (backToListBtn) {
+          backToListBtn.addEventListener('click', async function() {
+            if (hasRealChanges() && globalCache.userAccess.accessLevel === 'admin') {
+              const confirmed = await window.confirm('You have unsaved changes. Are you sure you want to leave without saving?');
+              if (!confirmed) {
+                return;
+              }
+            }
+            showRosterListView();
+          });
+        }
+        
+        const addUsersBtn = document.getElementById('add-users-btn');
+        if (addUsersBtn && globalCache.userAccess.accessLevel === 'admin') {
+          addUsersBtn.addEventListener('click', handleAddUsers);
+        }
+        
+        const saveAllBtn = document.getElementById('save-all-changes');
+        if (saveAllBtn && globalCache.userAccess.accessLevel === 'admin') {
+          saveAllBtn.addEventListener('click', saveAllPendingChanges);
+        }
+        
+        const monthYearInput = document.getElementById('month-year');
+        if (monthYearInput) {
+          monthYearInput.addEventListener('change', updateAvailableRosterTypes);
+        }
+        
+        if (globalCache.userAccess.accessLevel === 'admin') {
+          setupMultiSelectUsers();
+        }
+      }
+      
+      function setupMultiSelectUsers() {
+        const userInput = document.getElementById('user-input');
+        const chipsContainer = document.getElementById('user-chips-container');
+        
+        if (!userInput || !chipsContainer) return;
+        
+        userInput.addEventListener('focus', function() {
+          showUserModal();
+        });
+        
+        chipsContainer.addEventListener('click', function() {
+          showUserModal();
+        });
+      }
+      
+      function showUserModal() {
+        const usedUsernames = new Set(currentRosterUsers.map(user => user.username));
+        const availableUsers = globalCache.users.filter(user => 
+          !usedUsernames.has(user) && !selectedUsers.has(user)
+        );
+        
+        const modalHTML = `
+          <div class="user-modal" id="user-modal">
+            <div class="user-modal-content">
+              <div class="user-modal-header">
+                <h3 class="user-modal-title">Select Users</h3>
+                <button class="user-modal-close" onclick="hideUserModal()">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <div class="user-modal-search">
+                <input type="text" id="user-search" placeholder="Search users..." onkeyup="filterUserOptions(this.value)">
+              </div>
+              <div class="user-modal-body" id="user-options-container">
+                ${availableUsers.map(user => 
+                  `<div class="user-option" onclick="addUserChip('${user}')">
+                    <i class="fas fa-user"></i> ${user}
+                  </div>`
+                ).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+        
+        const container = document.getElementById('user-modal-container');
+        container.innerHTML = modalHTML;
+        
+        setTimeout(() => {
+          document.getElementById('user-modal').classList.add('show');
+        }, 10);
+      }
+      
+      function hideUserModal() {
+        const modal = document.getElementById('user-modal');
+        if (modal) {
+          modal.classList.remove('show');
+          setTimeout(() => {
+            const container = document.getElementById('user-modal-container');
+            container.innerHTML = '';
+          }, 200);
+        }
+      }
+      
+      function filterUserOptions(searchTerm) {
+        const usedUsernames = new Set(currentRosterUsers.map(user => user.username));
+        const availableUsers = globalCache.users.filter(user => 
+          !usedUsernames.has(user) && 
+          !selectedUsers.has(user) &&
+          user.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        
+        const container = document.getElementById('user-options-container');
+        if (container) {
+          container.innerHTML = availableUsers.map(user => 
+            `<div class="user-option" onclick="addUserChip('${user}')">
+              <i class="fas fa-user"></i> ${user}
+            </div>`
+          ).join('');
+          
+          if (availableUsers.length === 0) {
+            container.innerHTML = '<div class="user-option"><i class="fas fa-user-slash"></i> No users found</div>';
+          }
+        }
+      }
+      
+      function addUserChip(username) {
+        selectedUsers.add(username);
+        
+        const chipsContainer = document.getElementById('user-chips-container');
+        const userInput = document.getElementById('user-input');
+        
+        const chip = document.createElement('div');
+        chip.className = 'user-chip';
+        chip.innerHTML = `
+          <i class="fas fa-user"></i>
+          <span>${username}</span>
+          <button class="remove" onclick="removeUserChip('${username}')">
+            <i class="fas fa-user-minus"></i>
+          </button>
+        `;
+        
+        chipsContainer.insertBefore(chip, userInput);
+        hideUserModal();
+        showUserModal();
+      }
+      
+      function removeUserChip(username) {
+        selectedUsers.delete(username);
+        
+        const chips = document.querySelectorAll('.user-chip');
+        chips.forEach(chip => {
+          if (chip.textContent.includes(username)) {
+            chip.remove();
+          }
+        });
+      }
+      
+      function showLoading(elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.style.display = 'flex';
+        }
+      }
+      
+      function hideLoading(elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+          element.style.display = 'none';
+        }
+      }
+      
+      function hasRealChanges() {
+        if (pendingChanges.size === 0) return false;
+        
+        for (let [username, currentStatuses] of pendingChanges) {
+          const originalStatuses = originalData.get(username) || [];
+          
+          if (currentStatuses.length !== originalStatuses.length) return true;
+          
+          for (let i = 0; i < currentStatuses.length; i++) {
+            if (currentStatuses[i] !== originalStatuses[i]) return true;
+          }
+        }
+        
+        return false;
+      }
+      
+      function showCreateRosterView() {
+        if (globalCache.userAccess.accessLevel !== 'admin') {
+          Modal.error('Access denied. Only administrators can create rosters.');
+          return;
+        }
+        
+        hideAllViews();
+        const createView = document.getElementById('create-roster-view');
+        if (createView) createView.style.display = 'block';
+        
+        populateRosterTypesDropdown();
+      }
+      
+      function populateRosterTypesDropdown() {
+        if (!globalCache.rosterTypesWithColors) return;
+        
+        const options = [
+          { value: '', text: 'Select a roster type' },
+          ...globalCache.rosterTypesWithColors.map(typeInfo => ({
+            value: typeInfo.type,
+            text: typeInfo.type
+          }))
+        ];
+        
+        if (globalCache.rosterTypesWithColors.length === 0) {
+          options.push({ value: 'Default', text: 'Default' });
+        }
+        
+        CustomSelect.populateOptions('roster-type', options);
+      }
+      
+      function updateAvailableRosterTypes() {
+        const monthYearInput = document.getElementById('month-year');
+        
+        if (!monthYearInput || !monthYearInput.value) return;
+        
+        const date = new Date(monthYearInput.value + '-01');
+        const formattedMonthYear = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+        
+        const usedTypes = globalCache.rosters
+          .filter(roster => roster.monthYear === formattedMonthYear)
+          .map(roster => roster.type);
+        
+        const availableTypes = globalCache.rosterTypesWithColors.filter(typeInfo => !usedTypes.includes(typeInfo.type));
+        
+        const options = [
+          { value: '', text: 'Select a roster type' },
+          ...availableTypes.map(typeInfo => ({
+            value: typeInfo.type,
+            text: typeInfo.type
+          }))
+        ];
+        
+        if (availableTypes.length === 0) {
+          options.push({ value: '', text: 'No available types for this month' });
+        }
+        
+        CustomSelect.populateOptions('roster-type', options);
+      }
+      
+      function showRosterListView() {
+        if (currentRoster && hasRealChanges()) {
+          globalCache.pendingChangesByRoster.set(currentRoster.id, {
+            pendingChanges: new Map(pendingChanges),
+            originalData: new Map(originalData)
+          });
+        }
+        
+        hideAllViews();
+        const listView = document.getElementById('roster-list-view');
+        if (listView) listView.style.display = 'block';
+        
+        currentRoster = null;
+        pendingChanges = new Map();
+        originalData = new Map();
+        selectedUsers.clear();
+        updateSaveButtonState();
+      }
+      
+      function hideAllViews() {
+        const views = ['roster-list-view', 'create-roster-view', 'roster-detail-view'];
+        views.forEach(viewId => {
+          const view = document.getElementById(viewId);
+          if (view) view.style.display = 'none';
+        });
+      }
+      
+      function handleCreateRoster() {
+        if (globalCache.userAccess.accessLevel !== 'admin') {
+          Modal.error('Access denied. Only administrators can create rosters.');
+          return;
+        }
+        
+        const monthYearInput = document.getElementById('month-year');
+        const rosterTypeValue = CustomSelect.getValue('roster-type');
+        
+        if (!monthYearInput) return;
+        
+        const monthYearValue = monthYearInput.value;
+        
+        if (!monthYearValue || !rosterTypeValue) {
+          Modal.error('Please fill in all fields');
+          return;
+        }
+        
+        try {
+          const date = new Date(monthYearValue + '-01');
+          const formattedMonthYear = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+          
+          google.script.run
+            .withSuccessHandler(function(newRoster) {
+              Modal.success('Roster created successfully!');
+              
+              globalCache.rosters.push(newRoster);
+              filteredRosters = [...globalCache.rosters];
+              
+              showRosterListView();
+              displayRosters();
+            })
+            .withFailureHandler(function(error) {
+              Modal.error('Error creating roster: ' + (error ? error.message : 'Unknown error'));
+            })
+            .createRoster(formattedMonthYear, rosterTypeValue);
+        } catch (e) {
+          Modal.error('Error formatting date: ' + e.message);
+        }
+      }
+      
+      function viewRosterDetails(roster) {
+        if (!roster || !roster.id) return;
+        
+        if (currentRoster && currentRoster.id !== roster.id && hasRealChanges()) {
+          globalCache.pendingChangesByRoster.set(currentRoster.id, {
+            pendingChanges: new Map(pendingChanges),
+            originalData: new Map(originalData)
+          });
+        }
+        
+        currentRoster = roster;
+        pendingChanges = new Map();
+        originalData = new Map();
+        selectedUsers.clear();
+        
+        const detailRosterId = document.getElementById('detail-roster-id');
+        const detailMonthYear = document.getElementById('detail-month-year');
+        const detailRosterType = document.getElementById('detail-roster-type');
+        const rosterDetailTitle = document.getElementById('roster-detail-title');
+        
+        if (detailRosterId) detailRosterId.textContent = roster.id;
+        if (detailMonthYear) detailMonthYear.textContent = roster.monthYear || 'Unknown';
+        if (detailRosterType) {
+          const typeInfo = globalCache.rosterTypesWithColors.find(t => t.type === roster.type);
+          const typeColor = typeInfo ? typeInfo.color : 'var(--orange)';
+          const typeBadge = createRosterTypeBadge(roster.type || 'Unknown', typeColor);
+          detailRosterType.innerHTML = typeBadge.outerHTML;
+        }
+        if (rosterDetailTitle) rosterDetailTitle.innerHTML = `<i class="fas fa-calendar-check"></i> Roster: ${roster.monthYear || 'Unknown'} (${roster.type || 'Unknown'})`;
+        
+        hideAllViews();
+        const detailView = document.getElementById('roster-detail-view');
+        if (detailView) detailView.style.display = 'block';
+        
+        loadRosterData(roster.id);
+      }
+           
+      function setupRosterView() {
+        const savedChanges = globalCache.pendingChangesByRoster.get(currentRoster.id);
+        
+        if (savedChanges) {
+          pendingChanges = new Map(savedChanges.pendingChanges);
+          originalData = new Map(savedChanges.originalData);
+        } else {
+          currentRosterUsers.forEach(user => {
+            const dayStatuses = user.dayStatuses || [];
+            while (dayStatuses.length < monthDetails.daysInMonth) {
+              dayStatuses.push('');
+            }
+            originalData.set(user.username, [...dayStatuses]);
+            pendingChanges.set(user.username, [...dayStatuses]);
+          });
+        }
+        
+        displayCurrentUsers();
+        generateRosterTable();
+        updateSaveButtonState();
+        
+        if (hasRealChanges()) {
+          showChangesIndicator();
+        }
+      }
+      
+      function displayCurrentUsers() {
+        const usersList = document.getElementById('users-list');
+        if (!usersList) return;
+        
+        if (currentRosterUsers.length === 0) {
+          usersList.innerHTML = '<p><i class="fas fa-info-circle"></i> No users assigned to this roster.</p>';
+          return;
+        }
+        
+        const fragment = document.createDocumentFragment();
+        currentRosterUsers.forEach(user => {
+          const userRow = document.createElement('div');
+          userRow.className = 'user-row';
+          
+          const removeButton = globalCache.userAccess.accessLevel === 'admin' 
+            ? `<button class="danger-btn admin-only" onclick="removeUser('${user.username}')">
+                 <i class="fas fa-user-minus"></i>
+               </button>`
+            : '';
+          
+          userRow.innerHTML = `
+            <div class="user-info">
+              <i class="fas fa-user"></i> <strong>${user.username}</strong>
+            </div>
+            ${removeButton}
+          `;
+          fragment.appendChild(userRow);
+        });
+        
+        usersList.innerHTML = '';
+        usersList.appendChild(fragment);
+      }
+      
+      function handleAddUsers() {
+        if (globalCache.userAccess.accessLevel !== 'admin') {
+          Modal.error('Access denied. Only administrators can add users.');
+          return;
+        }
+        
+        if (selectedUsers.size === 0) {
+          Modal.error('Please select at least one user');
+          return;
+        }
+        
+        const usernames = Array.from(selectedUsers);
+        const addBtn = document.getElementById('add-users-btn');
+        
+        if (addBtn) {
+          addBtn.disabled = true;
+          addBtn.innerHTML = '<div class="loading-spinner"></div>Adding Users...';
+        }
+        
+        google.script.run
+          .withSuccessHandler(function(newUsers) {
+            if (addBtn) {
+              addBtn.disabled = false;
+              addBtn.innerHTML = '<i class="fas fa-plus"></i> Add Selected Users';
+            }
+            
+            Modal.success(`Successfully added ${newUsers.length} users!`);
+            
+            currentRosterUsers.push(...newUsers);
+            globalCache.rosterData.set(currentRoster.id, {
+              users: currentRosterUsers,
+              monthDetails: monthDetails
+            });
+            
+            selectedUsers.clear();
+            const chips = document.querySelectorAll('.user-chip');
+            chips.forEach(chip => chip.remove());
+            
+            setupRosterView();
+          })
+          .withFailureHandler(function(error) {
+            if (addBtn) {
+              addBtn.disabled = false;
+              addBtn.innerHTML = '<i class="fas fa-plus"></i> Add Selected Users';
+            }
+            Modal.error('Error adding users: ' + (error ? error.message : 'Unknown error'));
+          })
+          .addUsersToRoster(currentRoster.id, usernames);
+      }
+      
+      function removeUser(username) {
+        if (globalCache.userAccess.accessLevel !== 'admin') {
+          Modal.error('Access denied. Only administrators can remove users.');
+          return;
+        }
+        
+        Modal.confirm(
+          `Are you sure you want to remove ${username} from this roster?`,
+          'Remove User',
+          () => {
+            google.script.run
+              .withSuccessHandler(function() {
+                Modal.success('User removed successfully!');
+                
+                currentRosterUsers = currentRosterUsers.filter(user => user.username !== username);
+                globalCache.rosterData.set(currentRoster.id, {
+                  users: currentRosterUsers,
+                  monthDetails: monthDetails
+                });
+                
+                pendingChanges.delete(username);
+                originalData.delete(username);
+                
+                setupRosterView();
+              })
+              .withFailureHandler(function(error) {
+                Modal.error('Error removing user: ' + (error ? error.message : 'Unknown error'));
+              })
+              .removeUserFromRoster(currentRoster.id, username);
+          }
+        );
+      }
+      
+      function generateRosterTable() {
+        const tableContent = document.getElementById('roster-table-content');
+        if (!tableContent) return;
+        
+        if (currentRosterUsers.length === 0) {
+          tableContent.innerHTML = '<p><i class="fas fa-info-circle"></i> No users assigned to this roster. Add users above to create the schedule.</p>';
+          return;
+        }
+        
+        const table = document.createElement('table');
+        table.className = 'roster-table';
+        
+        const thead = document.createElement('thead');
+        const headerRow = document.createElement('tr');
+        
+        const userHeader = document.createElement('th');
+        userHeader.innerHTML = '<i class="fas fa-users"></i> User';
+        headerRow.appendChild(userHeader);
+        
+        monthDetails.dayDetails.forEach(dayDetail => {
+          const dayHeader = document.createElement('th');
+          dayHeader.innerHTML = `
+            <div class="day-header">
+              <div class="day-number">${dayDetail.day}</div>
+              <div class="day-name">${dayDetail.dayName}</div>
+            </div>
+          `;
+          
+          const date = new Date(currentRoster.monthYear.split(' ')[1], 
+                               ['January', 'February', 'March', 'April', 'May', 'June',
+                                'July', 'August', 'September', 'October', 'November', 'December']
+                               .indexOf(currentRoster.monthYear.split(' ')[0]), dayDetail.day);
+          
+          if (date.getDay() === 0 || date.getDay() === 6) {
+            dayHeader.classList.add('weekend');
+          }
+          
+          headerRow.appendChild(dayHeader);
+        });
+        
+        thead.appendChild(headerRow);
+        table.appendChild(thead);
+        
+        const tbody = document.createElement('tbody');
+        currentRosterUsers.forEach(user => {
+          const userRow = document.createElement('tr');
+          
+          const userCell = document.createElement('td');
+          userCell.innerHTML = `<i class="fas fa-user"></i> ${user.username}`;
+          userRow.appendChild(userCell);
+          
+          const userStatuses = pendingChanges.get(user.username) || [];
+          
+          for (let day = 0; day < monthDetails.daysInMonth; day++) {
+            const dayCell = document.createElement('td');
+            const currentStatus = userStatuses[day] || '';
+            
+            dayCell.className = 'status-cell';
+            dayCell.textContent = currentStatus || '-';
+            dayCell.dataset.username = user.username;
+            dayCell.dataset.day = day;
+            
+            if (!currentStatus) {
+              dayCell.classList.add('empty');
+            }
+            
+            const date = new Date(currentRoster.monthYear.split(' ')[1], 
+                                 ['January', 'February', 'March', 'April', 'May', 'June',
+                                  'July', 'August', 'September', 'October', 'November', 'December']
+                                 .indexOf(currentRoster.monthYear.split(' ')[0]), day + 1);
+            
+            if (date.getDay() === 0 || date.getDay() === 6) {
+              dayCell.classList.add('weekend');
+            }
+            
+            if (globalCache.userAccess.accessLevel === 'admin') {
+              dayCell.addEventListener('click', function() {
+                showStatusModal(user.username, day, currentStatus);
+              });
+            }
+            
+            userRow.appendChild(dayCell);
+          }
+          
+          tbody.appendChild(userRow);
+        });
+        
+        table.appendChild(tbody);
+        tableContent.innerHTML = '';
+        tableContent.appendChild(table);
+      }
+      
+      function showStatusModal(username, dayIndex, currentStatus) {
+        if (globalCache.userAccess.accessLevel !== 'admin') return;
+        
+        const modalHTML = `
+          <div class="status-select-modal" id="status-select-modal">
+            <div class="status-select-content">
+              <div class="status-select-header">
+                <h3 class="status-select-title">Select Status for ${username}</h3>
+                <button class="status-select-close" onclick="hideStatusModal()">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <div class="status-select-body">
+                <div class="status-option ${!currentStatus ? 'selected' : ''}" 
+                     onclick="selectStatus('${username}', ${dayIndex}, '')">
+                  <i class="fas fa-minus"></i> No Status
+                </div>
+                ${globalCache.statuses.map(status => 
+                  `<div class="status-option ${status === currentStatus ? 'selected' : ''}" 
+                        onclick="selectStatus('${username}', ${dayIndex}, '${status}')">
+                    <i class="fas fa-check"></i> ${status}
+                  </div>`
+                ).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+        
+        const container = document.getElementById('status-select-modal-container');
+        container.innerHTML = modalHTML;
+        
+        setTimeout(() => {
+          document.getElementById('status-select-modal').classList.add('show');
+        }, 10);
+      }
+      
+      function hideStatusModal() {
+        const modal = document.getElementById('status-select-modal');
+        if (modal) {
+          modal.classList.remove('show');
+          setTimeout(() => {
+            const container = document.getElementById('status-select-modal-container');
+            container.innerHTML = '';
+          }, 200);
+        }
+      }
+      
+      function selectStatus(username, dayIndex, status) {
+        updatePendingStatus(username, dayIndex, status);
+        hideStatusModal();
+        generateRosterTable();
+      }
+      
+      function updatePendingStatus(username, dayIndex, status) {
+        if (!pendingChanges.has(username)) {
+          const dayStatuses = new Array(monthDetails.daysInMonth).fill('');
+          pendingChanges.set(username, dayStatuses);
+        }
+        
+        const userStatuses = pendingChanges.get(username);
+        userStatuses[dayIndex] = status;
+        
+        const cachedData = globalCache.rosterData.get(currentRoster.id);
+        if (cachedData) {
+          const userIndex = cachedData.users.findIndex(u => u.username === username);
+          if (userIndex !== -1) {
+            cachedData.users[userIndex].dayStatuses = [...userStatuses];
+          }
+        }
+        
+        updateSaveButtonState();
+        if (hasRealChanges()) {
+          showChangesIndicator();
+        } else {
+          hideChangesIndicator();
+        }
+      }
+      
+      function updateSaveButtonState() {
+        const saveBtn = document.getElementById('save-all-changes');
+        if (saveBtn && globalCache.userAccess.accessLevel === 'admin') {
+          saveBtn.disabled = !hasRealChanges();
+        }
+      }
+      
+      function showChangesIndicator() {
+        const indicator = document.getElementById('changes-indicator');
+        if (indicator && globalCache.userAccess.accessLevel === 'admin') {
+          indicator.classList.add('show');
+        }
+      }
+      
+      function hideChangesIndicator() {
+        const indicator = document.getElementById('changes-indicator');
+        if (indicator) {
+          indicator.classList.remove('show');
+        }
+      }
+      
+      function saveAllPendingChanges() {
+        if (!hasRealChanges() || globalCache.userAccess.accessLevel !== 'admin') return;
+        
+        const saveBtn = document.getElementById('save-all-changes');
+        if (saveBtn) {
+          saveBtn.disabled = true;
+          saveBtn.innerHTML = '<div class="loading-spinner"></div>Saving...';
+        }
+        
+        const updates = [];
+        pendingChanges.forEach((dayStatuses, username) => {
+          const originalStatuses = originalData.get(username) || [];
+          
+          let hasChanges = false;
+          for (let i = 0; i < dayStatuses.length; i++) {
+            if (dayStatuses[i] !== (originalStatuses[i] || '')) {
+              hasChanges = true;
+              break;
+            }
+          }
+          
+          if (hasChanges) {
+            updates.push({
+              rosterId: currentRoster.id,
+              username: username,
+              dayStatuses: dayStatuses
+            });
+          }
+        });
+        
+        if (updates.length === 0) {
+          if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<i class="fas fa-save"></i> Save All Changes';
+          }
+          return;
+        }
+        
+        google.script.run
+          .withSuccessHandler(function(updatedCount) {
+            if (saveBtn) {
+              saveBtn.disabled = false;
+              saveBtn.innerHTML = '<i class="fas fa-save"></i> Save All Changes';
+            }
+            hideChangesIndicator();
+            Modal.success(`Successfully saved changes for ${updatedCount} users!`);
+            
+            updates.forEach(update => {
+              originalData.set(update.username, [...update.dayStatuses]);
+            });
+            
+            globalCache.pendingChangesByRoster.delete(currentRoster.id);
+            
+            updateSaveButtonState();
+          })
+          .withFailureHandler(function(error) {
+            if (saveBtn) {
+              saveBtn.disabled = false;
+              saveBtn.innerHTML = '<i class="fas fa-save"></i> Save All Changes';
+            }
+            Modal.error('Error saving changes: ' + (error ? error.message : 'Unknown error'));
+          })
+          .batchUpdateUserStatuses(updates);
+      }
+    </script>
+  </body>
+</html>

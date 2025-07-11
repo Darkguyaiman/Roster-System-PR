@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+      :root {
+        --dark-teal: #001219;
+        --teal: #005F73;
+        --turquoise: #0A9396;
+        --light-teal: #94D2BD;
+        --cream: #E9D8A6;
+        --orange: #EE9B00;
+        --burnt-orange: #CA6702;
+        --rust: #BB3E03;
+        --red: #AE2012;
+        --dark-red: #9B2226;
+      }
+      
+      body {
+        font-family: 'Poppins', Arial, sans-serif;
+        background: linear-gradient(135deg, #e9d8a6 0%, #94d2bd 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        color: var(--dark-teal);
+      }
+      
+      .unauthorized-container {
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 15px;
+        box-shadow: 0 8px 30px rgba(0, 18, 25, 0.1);
+        padding: 40px;
+        backdrop-filter: blur(10px);
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+      }
+      
+      .icon-container {
+        font-size: 4rem;
+        color: var(--red);
+        margin-bottom: 20px;
+      }
+      
+      h1 {
+        color: var(--dark-red);
+        font-weight: 600;
+        margin-bottom: 20px;
+      }
+      
+      p {
+        color: var(--dark-teal);
+        margin-bottom: 30px;
+        font-size: 1.1rem;
+      }
+      
+      .btn-primary {
+        background-color: var(--teal);
+        border-color: var(--teal);
+        box-shadow: 0 4px 6px rgba(0, 95, 115, 0.2);
+        transition: all 0.3s ease;
+        padding: 10px 20px;
+        font-weight: 500;
+      }
+      
+      .btn-primary:hover {
+        background-color: var(--turquoise);
+        border-color: var(--turquoise);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(0, 95, 115, 0.3);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="unauthorized-container">
+      <div class="icon-container">
+        <i class="fas fa-lock"></i>
+      </div>
+      <h1>Unauthorized Access</h1>
+      <p>You do not have permission to access this application. Please use an authorized account or contact the administrator for access.</p>
+      <a href="https://mail.google.com" class="btn btn-primary">
+        <i class="fas fa-envelope me-2"></i>Go to Gmail
+      </a>
+    </div>
+  </body>
+</html>
