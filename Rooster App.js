@@ -233,31 +233,22 @@ function createRoster(monthYear, rosterType) {
   if (userAccess.accessLevel !== 'admin') {
     throw new Error('Access denied. Only administrators can create rosters.');
   }
-  
+
   if (checkRosterTypeExists(monthYear, rosterType)) {
     throw new Error(`A roster of type "${rosterType}" already exists for ${monthYear}. Each month can only have one roster of each type.`);
   }
-  
+
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   let rosterSheet = ss.getSheetByName('Rosters');
-  
+
   if (!rosterSheet) {
     rosterSheet = ss.insertSheet('Rosters');
-    rosterSheet.getRange(3, 2).setValue("Roster ID");
-    rosterSheet.getRange(3, 3).setValue("Month/Year");
-    rosterSheet.getRange(3, 4).setValue("Roster Type");
+    rosterSheet.getRange(3, 2, 1, 3).setValues([["Roster ID", "Month/Year", "Roster Type"]]);
   }
-  
+
   const rosterId = generateRosterId();
-  let nextRow = 4;
-  while (nextRow <= rosterSheet.getLastRow() && rosterSheet.getRange(nextRow, 2).getValue() !== '') {
-    nextRow++;
-  }
-  
-  rosterSheet.getRange(nextRow, 2).setValue(rosterId);
-  rosterSheet.getRange(nextRow, 3).setValue(monthYear);
-  rosterSheet.getRange(nextRow, 4).setValue(rosterType);
-  
+  rosterSheet.appendRow(['', rosterId, monthYear, rosterType]);
+
   return {
     id: rosterId,
     monthYear: monthYear,
@@ -265,38 +256,38 @@ function createRoster(monthYear, rosterType) {
   };
 }
 
+
+
 function getUsersForRoster(rosterId) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const usersRosterSheet = ss.getSheetByName('Users Rosters');
   
-  if (!usersRosterSheet || usersRosterSheet.getLastRow() < 4) {
-    return [];
-  }
-  
-  const dataRange = usersRosterSheet.getRange(4, 2, Math.max(1, usersRosterSheet.getLastRow() - 3), 3);
-  const data = dataRange.getValues();
-  const users = [];
-  
-  for (let i = 0; i < data.length; i++) {
-    if (data[i][0] === rosterId) {
-      let dayStatuses = [];
+  if (!usersRosterSheet) return [];
+
+  const lastRow = usersRosterSheet.getLastRow();
+  if (lastRow < 4) return [];
+
+  const data = usersRosterSheet.getRange(4, 2, lastRow - 3, 3).getValues();
+
+  return data
+    .map((row, index) => {
+      if (row[0] !== rosterId) return null;
+      let dayStatuses;
       try {
-        dayStatuses = data[i][2] ? JSON.parse(data[i][2]) : [];
-      } catch (e) {
+        dayStatuses = row[2] ? JSON.parse(row[2]) : [];
+      } catch {
         dayStatuses = [];
       }
-      
-      users.push({
-        rosterId: data[i][0],
-        username: data[i][1],
-        dayStatuses: dayStatuses,
-        rowIndex: i + 4
-      });
-    }
-  }
-  
-  return users;
+      return {
+        rosterId: row[0],
+        username: row[1],
+        dayStatuses,
+        rowIndex: index + 4
+      };
+    })
+    .filter(user => user !== null);
 }
+
 
 function addUsersToRoster(rosterId, usernames) {
   const userAccess = getCurrentUserAccess();
@@ -430,35 +421,34 @@ function removeUserFromRoster(rosterId, username) {
 }
 
 function getMonthDetails(monthYear) {
-  if (!monthYear) {
-    return { daysInMonth: 31, dayDetails: [] };
-  }
-  
-  const [month, year] = monthYear.split(' ');
-  const monthIndex = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ].indexOf(month);
-  
-  if (monthIndex === -1 || !year) {
-    return { daysInMonth: 31, dayDetails: [] };
-  }
-  
-  const daysInMonth = new Date(parseInt(year), monthIndex + 1, 0).getDate();
+  if (!monthYear) return { daysInMonth: 31, dayDetails: [] };
+
+  const [month, yearStr] = monthYear.split(' ');
+  const year = parseInt(yearStr, 10);
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+                      'July', 'August', 'September', 'October', 'November', 'December'];
+  const monthIndex = monthNames.indexOf(month);
+
+  if (monthIndex === -1 || isNaN(year)) return { daysInMonth: 31, dayDetails: [] };
+
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
   const dayDetails = [];
-  
+
+  const formatter = new Intl.DateTimeFormat('en-US', { weekday: 'short' });
+
   for (let day = 1; day <= daysInMonth; day++) {
-    const date = new Date(parseInt(year), monthIndex, day);
-    const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+    const date = new Date(year, monthIndex, day);
+    const dayName = formatter.format(date);
     dayDetails.push({
-      day: day,
-      dayName: dayName,
+      day,
+      dayName,
       date: `${day}/${monthIndex + 1}`
     });
   }
-  
+
   return { daysInMonth, dayDetails };
 }
+
 
 function getAvailableRosterTypesForMonth(monthYear) {
   const allTypes = getRosterTypes();
