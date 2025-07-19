@@ -15,28 +15,37 @@ function getDashboardData() {
       usersRosters: ss.getSheetByName('Users Rosters'),
       settings: ss.getSheetByName('Settings')
     };
-    
+
     if (!sheets.rawDashboard) throw new Error('Raw dashboard sheet not found');
-    
+
     const dashboardCounts = sheets.rawDashboard.getRange('C3:C4').getValues();
-    
-    const [recentRosters, userStats] = [
-      sheets.rosters ? getRecentRostersOptimized(sheets.rosters) : [],
-      (sheets.settings && sheets.usersRosters) ? getUserStatsOptimized(sheets.settings, sheets.usersRosters) : []
-    ];
-    
-    return {
-      thisMonthCount: dashboardCounts[0][0] || 0,
-      totalAssignedCount: dashboardCounts[1][0] || 0,
-      recentRosters,
-      userStats
-    };
-    
+
+    const recentRostersPromise = sheets.rosters 
+      ? Promise.resolve(getRecentRostersOptimized(sheets.rosters)) 
+      : Promise.resolve([]);
+
+    const userStatsPromise = (sheets.settings && sheets.usersRosters) 
+      ? Promise.resolve(getUserStatsOptimized(sheets.settings, sheets.usersRosters)) 
+      : Promise.resolve([]);
+
+    return Promise.all([recentRostersPromise, userStatsPromise])
+      .then(([recentRosters, userStats]) => ({
+        thisMonthCount: dashboardCounts[0][0] || 0,
+        totalAssignedCount: dashboardCounts[1][0] || 0,
+        recentRosters,
+        userStats
+      }))
+      .catch(error => {
+        console.error('getDashboardData promise error:', error);
+        throw new Error('Failed to load dashboard: ' + error.message);
+      });
+
   } catch (error) {
     console.error('getDashboardData error:', error);
     throw new Error('Failed to load dashboard: ' + error.message);
   }
 }
+
 
 function getRecentRostersOptimized(rostersSheet) {
   const lastRow = rostersSheet.getLastRow();
