@@ -1706,8 +1706,10 @@
               <button type="button" id="cancel-create" class="secondary-btn">
                 <i class="fas fa-times"></i> Cancel
               </button>
-              <button type="submit" class="primary-btn">
-                <i class="fas fa-check"></i> Create Roster
+              <button type="submit" id="submit-roster-btn" class="primary-btn">
+                <i class="fas fa-check"></i>
+                <span class="btn-text">Create Roster</span>
+                <span class="loading-spinner" style="display: none;"></span>
               </button>
             </div>
           </form>
@@ -2069,8 +2071,6 @@
         });
       }
 
-
-    fun
       function initializeSidebar() {
         const sidebar = document.getElementById('sidebar');
         const sidebarToggle = document.getElementById('sidebarToggle');
@@ -2676,46 +2676,76 @@
         });
       }
       
-      function handleCreateRoster() {
-        if (globalCache.userAccess.accessLevel !== 'admin') {
-          Modal.error('Access denied. Only administrators can create rosters.');
-          return;
-        }
-        
-        const monthYearInput = document.getElementById('month-year');
-        const rosterTypeValue = CustomSelect.getValue('roster-type');
-        
-        if (!monthYearInput) return;
-        
-        const monthYearValue = monthYearInput.value;
-        
-        if (!monthYearValue || !rosterTypeValue) {
-          Modal.error('Please fill in all fields');
-          return;
-        }
-        
-        try {
-          const date = new Date(monthYearValue + '-01');
-          const formattedMonthYear = date.toLocaleString('default', { month: 'long', year: 'numeric' });
-          
-          google.script.run
-            .withSuccessHandler(function(newRoster) {
-              Modal.success('Roster created successfully!');
-              
-              globalCache.rosters.push(newRoster);
-              filteredRosters = [...globalCache.rosters];
-              
-              showRosterListView();
-              displayRosters();
-            })
-            .withFailureHandler(function(error) {
-              Modal.error('Error creating roster: ' + (error ? error.message : 'Unknown error'));
-            })
-            .createRoster(formattedMonthYear, rosterTypeValue);
-        } catch (e) {
-          Modal.error('Error formatting date: ' + e.message);
-        }
-      }
+function handleCreateRoster() {
+  if (globalCache.userAccess.accessLevel !== 'admin') {
+    Modal.error('Access denied. Only administrators can create rosters.');
+    return;
+  }
+
+  const btn = document.getElementById('submit-roster-btn');
+  const spinner = btn.querySelector('.loading-spinner');
+  const btnText = btn.querySelector('.btn-text');
+
+
+  btn.disabled = true;
+  btnText.style.display = 'none';
+  spinner.style.display = 'inline-block';
+
+  const monthYearInput = document.getElementById('month-year');
+  const rosterTypeValue = CustomSelect.getValue('roster-type');
+
+  if (!monthYearInput) return;
+
+  const monthYearValue = monthYearInput.value;
+
+  if (!monthYearValue || !rosterTypeValue) {
+    Modal.error('Please fill in all fields');
+
+
+    btn.disabled = false;
+    btnText.style.display = 'inline';
+    spinner.style.display = 'none';
+    return;
+  }
+
+  try {
+    const date = new Date(monthYearValue + '-01');
+    const formattedMonthYear = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+    google.script.run
+      .withSuccessHandler(function(newRoster) {
+        Modal.success('Roster created successfully!');
+
+        globalCache.rosters.push(newRoster);
+        filteredRosters = [...globalCache.rosters];
+
+        showRosterListView();
+        displayRosters();
+
+
+        btn.disabled = false;
+        btnText.style.display = 'inline';
+        spinner.style.display = 'none';
+      })
+      .withFailureHandler(function(error) {
+        Modal.error('Error creating roster: ' + (error ? error.message : 'Unknown error'));
+
+
+        btn.disabled = false;
+        btnText.style.display = 'inline';
+        spinner.style.display = 'none';
+      })
+      .createRoster(formattedMonthYear, rosterTypeValue);
+  } catch (e) {
+    Modal.error('Error formatting date: ' + e.message);
+
+
+    btn.disabled = false;
+    btnText.style.display = 'inline';
+    spinner.style.display = 'none';
+  }
+}
+
       
       function viewRosterDetails(roster) {
         if (!roster || !roster.id) return;
