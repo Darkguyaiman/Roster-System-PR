@@ -5,7 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Settings</title>
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
       :root {
@@ -568,7 +570,7 @@
           margin-left: 0;
         }
       }
-
+      /* Scrollbar Styles */
       ::-webkit-scrollbar {
         width: 10px;
         height: 10px;
@@ -589,6 +591,7 @@
         background: var(--turquoise);
       }
 
+      /* Sidebar CSS - Reusable across pages */
     :root {
       --dark-teal: #001219;
       --teal: #005F73;
@@ -596,6 +599,7 @@
       --light-teal: #94D2BD;
       --orange: #EE9B00;
       
+      /* Sidebar variables */
       --sidebar-width: 250px;
       --sidebar-bg: var(--dark-teal);
       --sidebar-text: white;
@@ -605,7 +609,7 @@
       --sidebar-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-
+    /* Sidebar Styles */
     .sidebar {
       width: var(--sidebar-width);
       height: 100vh;
@@ -717,7 +721,7 @@
       margin-left: 10px;
     }
 
-    
+    /* Main Content Styles */
     .main-content {
       flex: 1;
       margin-left: var(--sidebar-width);
@@ -732,7 +736,7 @@
       width: 100%;
     }
 
-    
+    /* Universal Sidebar Toggle */
     .sidebar-toggle {
       position: fixed;
       top: 20px;
@@ -763,12 +767,12 @@
       transform: translateY(0);
     }
 
-    
+    /* Adjust toggle position when sidebar is open on desktop */
     .sidebar-toggle.sidebar-open {
       left: calc(var(--sidebar-width) + 20px);
     }
 
-    
+    /* Sidebar Overlay for Mobile */
     .sidebar-overlay {
       position: fixed;
       top: 0;
@@ -787,7 +791,7 @@
       visibility: visible;
     }
 
-    
+    /* Responsive Styles */
     @media (max-width: 768px) {
       .sidebar {
         transform: translateX(-100%);
@@ -817,15 +821,15 @@
     </style>
   </head>
   <body>
-
+<!-- Universal Sidebar Toggle Button -->
 <button class="sidebar-toggle" id="sidebarToggle">
   <i class="fas fa-bars"></i>
 </button>
 
-
+<!-- Sidebar Overlay for Mobile -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-
+<!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <div class="sidebar-logo">
@@ -855,7 +859,7 @@
       </ul>
     </aside>
 
-
+<!-- Main Content Container -->
 <main class="main-content" id="mainContent">
     <div class="container">
       <h1><i class="fas fa-cogs"></i> Settings</h1>
@@ -875,7 +879,7 @@
       <div id="success" class="success" style="display: none;"><i class="fas fa-check-circle"></i> <span id="success-message"></span></div>
       
       <div id="content" style="display: none;">
-        
+        <!-- Users Section -->
         <h2 class="section-title"><i class="fas fa-users"></i> Users</h2>
         <div class="subsection-title">
           <span>User Accounts</span>
@@ -885,7 +889,7 @@
         </div>
         <div id="users-container" class="card-container"></div>
         
-        
+        <!-- Calendar Preferences Section -->
         <h2 class="section-title"><i class="fas fa-calendar-alt"></i> Calendar Preferences</h2>
         
         <div class="subsection-title">
@@ -897,14 +901,6 @@
         <div id="rosters-container" class="card-container"></div>
         
         <div class="subsection-title">
-          <span><i class="fas fa-tag"></i> Statuses</span>
-          <div id="status-actions" class="section-actions" style="display: none;">
-            <button id="add-status-btn" class="btn"><i class="fas fa-plus"></i> Add Status</button>
-          </div>
-        </div>
-        <div id="statuses-container" class="card-container"></div>
-        
-        <div class="subsection-title">
           <span><i class="fas fa-clock"></i> Staff Shifts</span>
           <div id="shift-actions" class="section-actions" style="display: none;">
             <button id="add-shift-btn" class="btn"><i class="fas fa-plus"></i> Add Staff Shift</button>
@@ -912,14 +908,14 @@
         </div>
         <div id="shifts-container" class="card-container"></div>
         
-        
+        <!-- Admin Users Section -->
         <h2 class="section-title"><i class="fas fa-user-shield"></i> Admin Users</h2>
         <div id="admins-container" class="card-container"></div>
       </div>
     </div>
     
-    
-    
+    <!-- Modals -->
+    <!-- Add/Edit Roster Type Modal -->
     <div id="roster-modal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
@@ -958,7 +954,7 @@
       </div>
     </div>
     
-    
+    <!-- Add/Edit User Modal -->
     <div id="user-modal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
@@ -983,28 +979,7 @@
       </div>
     </div>
     
-    
-    <div id="status-modal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 id="status-modal-title" class="modal-title"><i class="fas fa-tag"></i> Add Status</h3>
-          <span class="close" id="close-status-modal">&times;</span>
-        </div>
-        <div class="modal-body">
-          <input type="hidden" id="status-row-index">
-          <div class="form-group">
-            <label for="status"><i class="fas fa-info-circle"></i> Status</label>
-            <input type="text" id="status" class="form-control" placeholder="Enter status">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button id="cancel-status-btn" class="btn btn-danger"><i class="fas fa-times"></i> Cancel</button>
-          <button id="save-status-btn" class="btn btn-success"><i class="fas fa-save"></i> Save</button>
-        </div>
-      </div>
-    </div>
-    
-    
+    <!-- Add/Edit Staff Shift Modal -->
     <div id="shift-modal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
@@ -1025,7 +1000,7 @@
       </div>
     </div>
     
-    
+    <!-- Confirmation Modal -->
     <div id="confirm-modal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
@@ -1048,178 +1023,193 @@
 
       document.addEventListener('DOMContentLoaded', loadData);
 
-class SidebarManager {
-  constructor() {
-    this.sidebar = document.getElementById('sidebar');
-    this.mainContent = document.getElementById('mainContent');
-    this.sidebarToggle = document.getElementById('sidebarToggle');
-    this.sidebarOverlay = document.getElementById('sidebarOverlay');
-    this.menuLinks = document.querySelectorAll('.sidebar-menu-link');
-    
-    this.isOpen = true;
-    this.isMobile = window.innerWidth <= 768;
-    
-    this.init();
-  }
-  
-  init() {
-    this.bindEvents();
-    this.initializeSidebar();
-  }
+      class SidebarManager {
+        constructor() {
+          this.sidebar = document.getElementById('sidebar');
+          this.mainContent = document.getElementById('mainContent');
+          this.sidebarToggle = document.getElementById('sidebarToggle');
+          this.sidebarOverlay = document.getElementById('sidebarOverlay');
+          this.menuLinks = document.querySelectorAll('.sidebar-menu-link');
+          
+          this.isOpen = true;
+          this.isMobile = window.innerWidth <= 768;
+          
+          this.init();
+        }
+        
+        init() {
+          this.bindEvents();
+          this.initializeSidebar();
+        }
 
-  initializeSidebar() {
-    if (this.isMobile) {
-      this.isOpen = false;
-      this.sidebar.classList.add('hidden');
-      this.mainContent.classList.add('sidebar-hidden');
-      this.sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
-      this.sidebarToggle.classList.remove('sidebar-open');
-    } else {
-      this.isOpen = true;
-      this.sidebar.classList.remove('hidden', 'open');
-      this.mainContent.classList.remove('sidebar-hidden');
-      this.sidebarToggle.innerHTML = '<i class="fas fa-times"></i>';
-      this.sidebarToggle.classList.add('sidebar-open');
-    }
-  }
+        initializeSidebar() {
+          if (this.isMobile) {
+            this.isOpen = false;
+            this.sidebar.classList.add('hidden');
+            this.mainContent.classList.add('sidebar-hidden');
+            this.sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            this.sidebarToggle.classList.remove('sidebar-open');
+          } else {
+            this.isOpen = true;
+            this.sidebar.classList.remove('hidden', 'open');
+            this.mainContent.classList.remove('sidebar-hidden');
+            this.sidebarToggle.innerHTML = '<i class="fas fa-times"></i>';
+            this.sidebarToggle.classList.add('sidebar-open');
+          }
+        }
 
-  checkMobile() {
-    const wasMobile = this.isMobile;
-    this.isMobile = window.innerWidth <= 768;
-    
-    if (wasMobile !== this.isMobile) {
-      this.initializeSidebar();
-    }
-  }
+        checkMobile() {
+          const wasMobile = this.isMobile;
+          this.isMobile = window.innerWidth <= 768;
+          
+          if (wasMobile !== this.isMobile) {
+            this.initializeSidebar();
+          }
+        }
 
-  openSidebar() {
-    this.isOpen = true;
-    
-    if (this.isMobile) {
-      this.sidebar.classList.add('open');
-      this.sidebar.classList.remove('hidden');
-      this.sidebarOverlay.classList.add('active');
-      document.body.style.overflow = 'hidden';
-    } else {
-      this.sidebar.classList.remove('hidden');
-      this.mainContent.classList.remove('sidebar-hidden');
-      this.sidebarToggle.classList.add('sidebar-open');
-    }
-    
-    this.sidebarToggle.innerHTML = '<i class="fas fa-times"></i>';
-  }
+        openSidebar() {
+          this.isOpen = true;
+          
+          if (this.isMobile) {
+            this.sidebar.classList.add('open');
+            this.sidebar.classList.remove('hidden');
+            this.sidebarOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+          } else {
+            this.sidebar.classList.remove('hidden');
+            this.mainContent.classList.remove('sidebar-hidden');
+            this.sidebarToggle.classList.add('sidebar-open');
+          }
+          
+          this.sidebarToggle.innerHTML = '<i class="fas fa-times"></i>';
+        }
 
-  closeSidebar() {
-    this.isOpen = false;
-    
-    if (this.isMobile) {
-      this.sidebar.classList.remove('open');
-      this.sidebar.classList.add('hidden');
-      this.sidebarOverlay.classList.remove('active');
-      document.body.style.overflow = '';
-    } else {
-      this.sidebar.classList.add('hidden');
-      this.mainContent.classList.add('sidebar-hidden');
-      this.sidebarToggle.classList.remove('sidebar-open');
-    }
-    
-    this.sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
-  }
+        closeSidebar() {
+          this.isOpen = false;
+          
+          if (this.isMobile) {
+            this.sidebar.classList.remove('open');
+            this.sidebar.classList.add('hidden');
+            this.sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+          } else {
+            this.sidebar.classList.add('hidden');
+            this.mainContent.classList.add('sidebar-hidden');
+            this.sidebarToggle.classList.remove('sidebar-open');
+          }
+          
+          this.sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        }
 
-  toggleSidebar() {
-    if (this.isOpen) {
-      this.closeSidebar();
-    } else {
-      this.openSidebar();
-    }
-  }
+        toggleSidebar() {
+          if (this.isOpen) {
+            this.closeSidebar();
+          } else {
+            this.openSidebar();
+          }
+        }
 
-  bindEvents() {
-    this.sidebarToggle.addEventListener('click', (e) => {
-      e.stopPropagation();
-      this.toggleSidebar();
-    });
+        bindEvents() {
+          this.sidebarToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            this.toggleSidebar();
+          });
 
-    this.sidebarOverlay.addEventListener('click', () => {
-      if (this.isMobile) {
-        this.closeSidebar();
+          this.sidebarOverlay.addEventListener('click', () => {
+            if (this.isMobile) {
+              this.closeSidebar();
+            }
+          });
+
+          this.menuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+              if (this.isMobile && this.isOpen) {
+                this.closeSidebar();
+              }
+            });
+          });
+
+          window.addEventListener('resize', () => {
+            this.checkMobile();
+          });
+
+          document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && this.isOpen) {
+              this.closeSidebar();
+            }
+          });
+
+          this.sidebar.addEventListener('click', (e) => {
+            e.stopPropagation();
+          });
+        }
       }
-    });
 
-    this.menuLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        if (this.isMobile && this.isOpen) {
-          this.closeSidebar();
+      document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('sidebar')) {
+          window.sidebarManager = new SidebarManager();
         }
       });
-    });
 
-    window.addEventListener('resize', () => {
-      this.checkMobile();
-    });
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && this.isOpen) {
-        this.closeSidebar();
+      if (typeof module !== 'undefined' && module.exports) {
+        module.exports = SidebarManager;
       }
-    });
-
-    this.sidebar.addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
-  }
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-  if (document.getElementById('sidebar')) {
-    window.sidebarManager = new SidebarManager();
-  }
-});
-
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = SidebarManager;
-}
 
       let isAdmin = false;
       let currentUserEmail = '';
+
       
       function loadData() {
-        const loadingElement = document.getElementById('loading');
-        const errorElement = document.getElementById('error');
-        const contentElement = document.getElementById('content');
-        
-        google.script.run
-          .withSuccessHandler(function(data) {
-            isAdmin = data.isAdmin;
-            currentUserEmail = data.currentUserEmail;
+          const loadingElement = document.getElementById('loading');
+          const errorElement = document.getElementById('error');
+          const contentElement = document.getElementById('content');
 
-            document.getElementById('current-user-email').textContent = currentUserEmail;
-            if (isAdmin) {
+          const cached = localStorage.getItem('settingsData');
+          if (cached) {
+              try {
+                  const data = JSON.parse(cached);
+                  displayData(data);
+                  loadingElement.style.display = 'none';
+                  contentElement.style.display = 'block';
+              } catch (e) {
+                  localStorage.removeItem('settingsData');
+              }
+          }
+
+          google.script.run
+              .withSuccessHandler(function(data) {
+                  localStorage.setItem('settingsData', JSON.stringify(data));
+                  displayData(data);
+                  loadingElement.style.display = 'none';
+                  contentElement.style.display = 'block';
+              })
+              .withFailureHandler(function(error) {
+                  loadingElement.style.display = 'none';
+                  document.getElementById('error-message').textContent = 'Error loading data: ' + error.message;
+                  errorElement.style.display = 'flex';
+              })
+              .getSettingsData();
+      }
+
+      function displayData(data) {
+          isAdmin = data.isAdmin;
+          currentUserEmail = data.currentUserEmail;
+
+          document.getElementById('current-user-email').textContent = currentUserEmail;
+          if (isAdmin) {
               document.getElementById('admin-badge').style.display = 'inline-flex';
               document.getElementById('user-actions').style.display = 'block';
               document.getElementById('roster-actions').style.display = 'block';
-              document.getElementById('status-actions').style.display = 'block';
               document.getElementById('shift-actions').style.display = 'block';
-            }
-            
-            renderUsers(data.users);
-            renderAdmins(data.admins);
-            renderRosters(data.rosters);
-            renderStatuses(data.statuses);
-            renderStaffShifts(data.staffShifts);
+          }
 
-            loadingElement.style.display = 'none';
-            contentElement.style.display = 'block';
-
-            setupEventListeners();
-          })
-          .withFailureHandler(function(error) {
-            loadingElement.style.display = 'none';
-            document.getElementById('error-message').textContent = 'Error loading data: ' + error.message;
-            errorElement.style.display = 'flex';
-          })
-          .getSettingsData();
+          renderUsers(data.users);
+          renderAdmins(data.admins);
+          renderRosters(data.rosters);
+          renderStaffShifts(data.staffShifts);
+          setupEventListeners();
       }
+
      
       function setupEventListeners() {
         document.getElementById('add-roster-btn').addEventListener('click', function() {
@@ -1238,13 +1228,6 @@ if (typeof module !== 'undefined' && module.exports) {
           document.getElementById('user-modal').style.display = 'block';
         });
 
-        document.getElementById('add-status-btn').addEventListener('click', function() {
-          document.getElementById('status-modal-title').innerHTML = '<i class="fas fa-tag"></i> Add Status';
-          document.getElementById('status-row-index').value = '';
-          document.getElementById('status').value = '';
-          document.getElementById('status-modal').style.display = 'block';
-        });
-
         document.getElementById('add-shift-btn').addEventListener('click', function() {
           document.getElementById('shift-modal-title').innerHTML = '<i class="fas fa-clock"></i> Add Staff Shift';
           document.getElementById('shift-row-index').value = '';
@@ -1258,10 +1241,6 @@ if (typeof module !== 'undefined' && module.exports) {
         
         document.getElementById('close-user-modal').addEventListener('click', function() {
           document.getElementById('user-modal').style.display = 'none';
-        });
-        
-        document.getElementById('close-status-modal').addEventListener('click', function() {
-          document.getElementById('status-modal').style.display = 'none';
         });
         
         document.getElementById('close-shift-modal').addEventListener('click', function() {
@@ -1280,10 +1259,6 @@ if (typeof module !== 'undefined' && module.exports) {
           document.getElementById('user-modal').style.display = 'none';
         });
         
-        document.getElementById('cancel-status-btn').addEventListener('click', function() {
-          document.getElementById('status-modal').style.display = 'none';
-        });
-        
         document.getElementById('cancel-shift-btn').addEventListener('click', function() {
           document.getElementById('shift-modal').style.display = 'none';
         });
@@ -1294,7 +1269,6 @@ if (typeof module !== 'undefined' && module.exports) {
 
         document.getElementById('save-roster-btn').addEventListener('click', saveRosterType);
         document.getElementById('save-user-btn').addEventListener('click', saveUser);
-        document.getElementById('save-status-btn').addEventListener('click', saveStatus);
         document.getElementById('save-shift-btn').addEventListener('click', saveStaffShift);
         document.getElementById('confirm-delete-btn').addEventListener('click', confirmDelete);
       }
@@ -1396,36 +1370,6 @@ if (typeof module !== 'undefined' && module.exports) {
         });
       }
       
-      function renderStatuses(statuses) {
-        const container = document.getElementById('statuses-container');
-        container.innerHTML = '';
-        
-        if (statuses.length === 0) {
-          container.innerHTML = '<p class="empty-message">No statuses found</p>';
-          return;
-        }
-        
-        statuses.forEach(status => {
-          const card = document.createElement('div');
-          card.className = 'card';
-          
-          let cardContent = `
-            <div class="card-title"><i class="fas fa-tag"></i> ${escapeHtml(status.status)}</div>
-            <div class="card-content"></div>
-          `;
-          
-          if (isAdmin) {
-            cardContent += `
-              <button class="btn btn-edit" onclick="editStatus(${status.rowIndex}, '${escapeHtml(status.status)}')"><i class="fas fa-edit"></i></button>
-              <button class="btn btn-danger btn-delete" onclick="deleteStatusConfirm(${status.rowIndex}, '${escapeHtml(status.status)}')"><i class="fas fa-trash-alt"></i></button>
-            `;
-          }
-          
-          card.innerHTML = cardContent;
-          container.appendChild(card);
-        });
-      }
-      
       function renderStaffShifts(shifts) {
         const container = document.getElementById('shifts-container');
         container.innerHTML = '';
@@ -1471,13 +1415,6 @@ if (typeof module !== 'undefined' && module.exports) {
         document.getElementById('email').value = email;
         document.getElementById('user-modal').style.display = 'block';
       }
-
-      function editStatus(rowIndex, status) {
-        document.getElementById('status-modal-title').innerHTML = '<i class="fas fa-tag"></i> Edit Status';
-        document.getElementById('status-row-index').value = rowIndex;
-        document.getElementById('status').value = status;
-        document.getElementById('status-modal').style.display = 'block';
-      }
       
       function editShift(rowIndex, staffShift) {
         document.getElementById('shift-modal-title').innerHTML = '<i class="fas fa-clock"></i> Edit Staff Shift';
@@ -1496,13 +1433,6 @@ if (typeof module !== 'undefined' && module.exports) {
       function deleteUserConfirm(rowIndex, username) {
         document.getElementById('confirm-message').textContent = `Are you sure you want to delete the user "${username}"?`;
         document.getElementById('confirm-type').value = 'user';
-        document.getElementById('confirm-row-index').value = rowIndex;
-        document.getElementById('confirm-modal').style.display = 'block';
-      }
-      
-      function deleteStatusConfirm(rowIndex, status) {
-        document.getElementById('confirm-message').textContent = `Are you sure you want to delete the status "${status}"?`;
-        document.getElementById('confirm-type').value = 'status';
         document.getElementById('confirm-row-index').value = rowIndex;
         document.getElementById('confirm-modal').style.display = 'block';
       }
@@ -1578,37 +1508,6 @@ if (typeof module !== 'undefined' && module.exports) {
         }
       }
       
-      function saveStatus() {
-        const rowIndex = document.getElementById('status-row-index').value;
-        const status = document.getElementById('status').value;
-        
-        if (!status) {
-          showError('Status cannot be empty');
-          return;
-        }
-        
-        document.getElementById('status-modal').style.display = 'none';
-        showLoading();
-        
-        if (rowIndex) {
-          google.script.run
-            .withSuccessHandler(function(result) {
-              showSuccess(result.message);
-              loadData();
-            })
-            .withFailureHandler(handleError)
-            .updateStatus(parseInt(rowIndex), status);
-        } else {
-          google.script.run
-            .withSuccessHandler(function(result) {
-              showSuccess(result.message);
-              loadData();
-            })
-            .withFailureHandler(handleError)
-            .addStatus(status);
-        }
-      }
-      
       function saveStaffShift() {
         const rowIndex = document.getElementById('shift-row-index').value;
         const staffShift = document.getElementById('staff-shift').value;
@@ -1665,15 +1564,6 @@ if (typeof module !== 'undefined' && module.exports) {
               })
               .withFailureHandler(handleError)
               .deleteUser(rowIndex);
-            break;
-          case 'status':
-            google.script.run
-              .withSuccessHandler(function(result) {
-                showSuccess(result.message);
-                loadData();
-              })
-              .withFailureHandler(handleError)
-              .deleteStatus(rowIndex);
             break;
           case 'shift':
             google.script.run
