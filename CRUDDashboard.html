@@ -1075,11 +1075,14 @@ if (typeof module !== 'undefined' && module.exports) {
             });
         }
 
+        let isDataFromCache = false;
+
         function loadDashboardData() {
             const cachedData = localStorage.getItem('dashboardData');
             if (cachedData) {
                 try {
                     const data = JSON.parse(cachedData);
+                    isDataFromCache = true;
                     onDashboardDataLoaded(data);
                 } catch (e) {
                     localStorage.removeItem('dashboardData');
@@ -1088,8 +1091,13 @@ if (typeof module !== 'undefined' && module.exports) {
 
             google.script.run
                 .withSuccessHandler(function (freshData) {
-                    onDashboardDataLoaded(freshData);
+                    const cachedDataAgain = localStorage.getItem('dashboardData');
+                    if (cachedDataAgain && JSON.stringify(freshData) === cachedDataAgain) {
+                        return;
+                    }
+                    isDataFromCache = false;
                     localStorage.setItem('dashboardData', JSON.stringify(freshData));
+                    onDashboardDataLoaded(freshData);
                 })
                 .withFailureHandler(onError)
                 .getDashboardData();
@@ -1097,7 +1105,7 @@ if (typeof module !== 'undefined' && module.exports) {
 
         function onDashboardDataLoaded(data) {
             dashboardData = data;
-            updateDashboard(data);
+            updateDashboard(data, isDataFromCache);
         }
 
         function onError(error) {
@@ -1113,15 +1121,16 @@ if (typeof module !== 'undefined' && module.exports) {
             });
         }
 
-        function updateDashboard(data) {
-            
-            animateCountUp('thisMonthCount', data.thisMonthCount);
-            animateCountUp('totalAssignedCount', data.totalAssignedCount);
+        function updateDashboard(data, animate = true) {
+            if (animate) {
+                animateCountUp('thisMonthCount', data.thisMonthCount);
+                animateCountUp('totalAssignedCount', data.totalAssignedCount);
+            } else {
+                document.getElementById('thisMonthCount').innerText = data.thisMonthCount;
+                document.getElementById('totalAssignedCount').innerText = data.totalAssignedCount;
+            }
 
-            
             updateRecentRosters(data.recentRosters);
-
-            
             updateUserStatistics(data.userStats);
         }
 
