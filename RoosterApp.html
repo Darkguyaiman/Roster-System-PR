@@ -639,17 +639,23 @@
         border-radius: 8px;
         background: white;
         color: var(--dark-teal);
-        cursor: pointer;
         font-size: 16px;
         transition: all 0.3s ease;
         min-height: 48px;
+        box-shadow: 0 2px 10px rgba(0, 18, 25, 0.05);
       }
-      
+
       .month-input:focus {
         outline: none;
         border-color: var(--turquoise);
-        box-shadow: 0 0 0 3px rgba(10, 147, 150, 0.1);
+        box-shadow: 0 0 0 3px rgba(10, 147, 150, 0.15);
       }
+
+      .month-input::-webkit-calendar-picker-indicator {
+        filter: invert(40%) sepia(100%) saturate(200%) hue-rotate(150deg);
+        cursor: pointer;
+      }
+
       
       .clear-filters-btn {
         background: var(--rust);
@@ -786,6 +792,70 @@
       .user-select-container {
         position: relative;
       }
+
+      /* Multi-select user filter */
+      .user-filter-chips-container {
+        border: 2px solid var(--light-teal);
+        border-radius: 8px;
+        padding: 10px;
+        min-height: 48px;
+        background: white;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      .user-filter-chips-container:hover {
+        border-color: var(--turquoise);
+      }
+      
+      .user-filter-chips-container.active {
+        border-color: var(--turquoise);
+        box-shadow: 0 0 0 3px rgba(10, 147, 150, 0.1);
+      }
+      
+      .user-filter-chip {
+        background: linear-gradient(135deg, var(--light-teal), var(--turquoise));
+        color: white;
+        border-radius: 20px;
+        padding: 6px 12px;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 500;
+      }
+      
+      .user-filter-chip .remove {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-weight: bold;
+        padding: 2px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        font-size: 10px;
+      }
+      
+      .user-filter-chip .remove:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+      }
+      
+      .user-filter-placeholder {
+        color: #999;
+        font-size: 16px;
+        flex: 1;
+      }
       
       .roster-table-wrapper {
         width: 100%;
@@ -846,7 +916,7 @@
       }
       
       .roster-table td:first-child {
-        background: rgba(148, 210, 189, 0.1);
+        background: white !important;
         font-weight: 600;
         color: var(--teal);
       }
@@ -876,6 +946,7 @@
         font-size: 14px;
         font-weight: 500;
         position: relative;
+        user-select: none;
       }
       
       .status-cell:hover {
@@ -886,6 +957,22 @@
       .status-cell.empty {
         color: #999;
         font-style: italic;
+      }
+      
+      .status-cell.selected {
+        background: rgba(59, 130, 246, 0.3) !important;
+        border: 2px solid #3b82f6 !important;
+        transform: scale(1.02);
+      }
+      
+      .status-cell.selecting {
+        background: rgba(59, 130, 246, 0.2) !important;
+      }
+
+      .status-cell.focused {
+        background: rgba(255, 193, 7, 0.3) !important;
+        border: 2px solid #ffc107 !important;
+        transform: scale(1.02);
       }
       
       .status-select-modal {
@@ -1443,7 +1530,212 @@
       .user-option:last-child {
         border-bottom: none;
       }
-      
+
+      /* Multi-select and Import Features */
+      .multi-select-controls {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 20px rgba(0, 18, 25, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        display: none;
+      }
+
+      .multi-select-controls.show {
+        display: block;
+      }
+
+      .multi-select-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .multi-select-title {
+        font-weight: 600;
+        color: var(--teal);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .selection-count {
+        background: var(--turquoise);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .multi-select-actions {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+
+      .action-group {
+        background: rgba(148, 210, 189, 0.1);
+        border-radius: 12px;
+        padding: 15px;
+        border: 1px solid var(--light-teal);
+      }
+
+      .action-group-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--teal);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .action-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 8px;
+      }
+
+      .mini-btn {
+        padding: 12px 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 44px;
+        text-align: center;
+      }
+
+      .mini-btn.copy {
+        background: var(--turquoise);
+        color: white;
+      }
+
+      .mini-btn.paste {
+        background: var(--orange);
+        color: white;
+      }
+
+      .mini-btn.cut {
+        background: var(--rust);
+        color: white;
+      }
+
+      .mini-btn.status {
+        background: var(--light-teal);
+        color: var(--dark-teal);
+      }
+
+      .mini-btn.clear {
+        background: #6c757d;
+        color: white;
+      }
+
+      .mini-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      }
+
+      .mini-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .clear-selection-btn {
+        background: var(--red);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .clear-selection-btn:hover {
+        background: var(--dark-red);
+        transform: translateY(-1px);
+      }
+
+      .import-controls {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 20px rgba(0, 18, 25, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .import-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+      }
+
+      .import-title {
+        font-weight: 600;
+        color: var(--teal);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .import-form {
+        display: flex;
+        gap: 15px;
+        align-items: end;
+        flex-wrap: wrap;
+      }
+
+      .import-select-group {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .clipboard-indicator {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--turquoise);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 18, 25, 0.2);
+        z-index: 1000;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .clipboard-indicator.show {
+        transform: translateX(0);
+      }
+
       @media (max-width: 768px) {
         .container {
           padding: 10px;
@@ -1533,6 +1825,35 @@
           min-height: 48px;
           font-size: 16px;
         }
+
+        .multi-select-controls {
+          padding: 15px;
+        }
+
+        .multi-select-header {
+          flex-direction: column;
+          align-items: stretch;
+          text-align: center;
+          gap: 15px;
+        }
+
+        .multi-select-title {
+          justify-content: center;
+        }
+
+        .action-buttons {
+          grid-template-columns: 1fr;
+        }
+
+        .mini-btn {
+          padding: 14px 16px;
+          font-size: 16px;
+          min-height: 48px;
+        }
+
+        .import-form {
+          flex-direction: column;
+        }
       }
       
       @media (max-width: 480px) {
@@ -1561,6 +1882,20 @@
           min-height: 44px;
           font-size: 14px;
         }
+
+        .multi-select-controls {
+          padding: 12px;
+        }
+
+        .action-group {
+          padding: 12px;
+        }
+
+        .mini-btn {
+          padding: 12px;
+          font-size: 14px;
+          min-height: 44px;
+        }
       }
 
       .roster-table-wrapper::-webkit-scrollbar {
@@ -1584,11 +1919,11 @@
     </style>
   </head>
   <body>
-            <button class="sidebar-toggle" id="sidebarToggle">
-        <i class="fas fa-bars"></i>
-      </button>
+    <button class="sidebar-toggle" id="sidebarToggle">
+      <i class="fas fa-bars"></i>
+    </button>
 
-            <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
             <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
@@ -1619,7 +1954,7 @@
         </ul>
       </aside>
 
-        <div id="page-loading-overlay" class="page-loading-overlay">
+    <div id="page-loading-overlay" class="page-loading-overlay">
       <div class="page-loading-content">
         <div class="page-loading-spinner"></div>
         <div class="page-loading-text">Loading Roster Tab</div>
@@ -1627,1560 +1962,2498 @@
       </div>
     </div>
 
-<main class="main-content" id="mainContent">
-    <div class="container">
-      <header>
-        <h1><i class="fas fa-calendar-alt"></i> Roster Tab</h1>
-      </header>
-      
-      <div id="access-denied-message" class="access-denied" style="display: none;">
-        <i class="fas fa-exclamation-triangle"></i>
-        Access denied. You don't have permission to access this system.
-      </div>
+    <main class="main-content" id="mainContent">
+      <div class="container">
+        <header>
+          <h1><i class="fas fa-calendar-alt"></i> Roster Tab</h1>
+        </header>
+        
+        <div id="access-denied-message" class="access-denied" style="display: none;">
+          <i class="fas fa-exclamation-triangle"></i>
+          Access denied. You don't have permission to access this system.
+        </div>
 
-      <div id="main-content" style="display: none;">
-        <div id="roster-list-view">
-          <div class="filters-container">
-            <div class="filter-group">
-              <label for="filter-type"><i class="fas fa-filter"></i> Filter by Type:</label>
-              <div class="custom-select">
-                <div class="select-trigger" data-target="filter-type">
-                  <span class="select-text">All Types</span>
-                  <i class="fas fa-chevron-down select-arrow"></i>
+        <div id="main-content" style="display: none;">
+          <div id="roster-list-view">
+            <div class="filters-container">
+              <div class="filter-group">
+                <label for="filter-type"><i class="fas fa-filter"></i> Filter by Type:</label>
+                <div class="custom-select">
+                  <div class="select-trigger" data-target="filter-type">
+                    <span class="select-text">All Types</span>
+                    <i class="fas fa-chevron-down select-arrow"></i>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="filter-group">
-              <label for="filter-month"><i class="fas fa-calendar"></i> Filter by Month:</label>
-              <div class="custom-select">
-                <div class="select-trigger" data-target="filter-month">
-                  <span class="select-text">All Months</span>
-                  <i class="fas fa-chevron-down select-arrow"></i>
+              <div class="filter-group">
+                <label for="filter-month"><i class="fas fa-calendar"></i> Filter by Month:</label>
+                <div class="custom-select">
+                  <div class="select-trigger" data-target="filter-month">
+                    <span class="select-text">All Months</span>
+                    <i class="fas fa-chevron-down select-arrow"></i>
+                  </div>
                 </div>
               </div>
-            </div>
-            <button id="clear-filters" class="clear-filters-btn">
-              <i class="fas fa-times"></i> Clear Filters
-            </button>
-          </div>
-          
-          <div class="action-bar">
-            <h2><i class="fas fa-list"></i> All Rosters</h2>
-            <button id="create-roster-btn" class="primary-btn admin-only">
-              <i class="fas fa-plus"></i> Create New Roster
-            </button>
-          </div>
-          
-          <div id="roster-cards-container">
-            <div class="loading-overlay">
-              <div class="loading-text">
-                <div class="loading-spinner"></div>
-                Loading rosters...
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div id="create-roster-view" style="display: none;">
-          <h2><i class="fas fa-plus-circle"></i> Create New Roster</h2>
-          
-          <form id="create-roster-form">
-            <div class="form-group">
-              <label for="month-year"><i class="fas fa-calendar-alt"></i> Month and Year:</label>
-              <div class="month-picker">
-                <input type="month" id="month-year" class="month-input" required>
-              </div>
-            </div>
-            
-            <div class="form-group">
-              <label for="roster-type"><i class="fas fa-tags"></i> Roster Type:</label>
-              <div class="custom-select">
-                <div class="select-trigger" data-target="roster-type">
-                  <span class="select-text">Select a roster type</span>
-                  <i class="fas fa-chevron-down select-arrow"></i>
+              <div class="filter-group">
+                <label for="filter-users"><i class="fas fa-users"></i> Filter by Users:</label>
+                <div class="custom-select">
+                  <div class="select-trigger" data-target="filter-users">
+                    <span class="select-text">All Users</span>
+                    <i class="fas fa-chevron-down select-arrow"></i>
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            <div class="form-buttons">
-              <button type="button" id="cancel-create" class="secondary-btn">
-                <i class="fas fa-times"></i> Cancel
-              </button>
-              <button type="submit" id="submit-roster-btn" class="primary-btn">
-                <i class="fas fa-check"></i>
-                <span class="btn-text">Create Roster</span>
-                <span class="loading-spinner" style="display: none;"></span>
+              <button id="clear-filters" class="clear-filters-btn">
+                <i class="fas fa-times"></i> Clear Filters
               </button>
             </div>
-          </form>
-        </div>
-        
-        <div id="roster-detail-view" style="display: none;">
-          <div class="detail-header">
-            <h2 id="roster-detail-title">Roster Details</h2>
-            <button id="back-to-list" class="secondary-btn">
-              <i class="fas fa-arrow-left"></i> Back to List
-            </button>
-          </div>
-          
-          <div class="roster-info">
-            <div class="loading-overlay" id="roster-info-loading" style="display: none;">
-              <div class="loading-text">
-                <div class="loading-spinner"></div>
-                Loading roster details...
-              </div>
-            </div>
-            <p><strong><i class="fas fa-id-badge"></i> Roster ID:</strong> <span id="detail-roster-id"></span></p>
-            <p><strong><i class="fas fa-calendar"></i> Month/Year:</strong> <span id="detail-month-year"></span></p>
-            <p><strong><i class="fas fa-tag"></i> Type:</strong> <span id="detail-roster-type"></span></p>
-          </div>
-          
-          <div class="user-management">
-            <div class="loading-overlay" id="user-management-loading" style="display: none;">
-              <div class="loading-text">
-                <div class="loading-spinner"></div>
-                Loading users...
-              </div>
-            </div>
-            <h3><i class="fas fa-users"></i> Manage Users</h3>
-            <div id="users-list">
-              <p class="loading">Loading users...</p>
+            
+            <div class="action-bar">
+              <h2><i class="fas fa-list"></i> All Rosters</h2>
+              <button id="create-roster-btn" class="primary-btn admin-only">
+                <i class="fas fa-plus"></i> Create New Roster
+              </button>
             </div>
             
-            <div class="add-user-form admin-only">
-              <h4><i class="fas fa-user-plus"></i> Add New Users</h4>
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="new-users-select"><i class="fas fa-search"></i> Users:</label>
-                  <div class="user-select-container">
-                    <div class="user-chips-container" id="user-chips-container">
-                      <input type="text" class="user-input" id="user-input" placeholder="Type to search users...">
+            <div id="roster-cards-container">
+              <div class="loading-overlay">
+                <div class="loading-text">
+                  <div class="loading-spinner"></div>
+                  Loading rosters...
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div id="create-roster-view" style="display: none;">
+            <h2><i class="fas fa-plus-circle"></i> Create New Roster</h2>
+            
+            <form id="create-roster-form">
+              <div class="form-group">
+                <label for="month-year"><i class="fas fa-calendar-alt"></i> Month and Year:</label>
+                <div class="month-picker">
+                  <input type="month" id="month-year" class="month-input" required>
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="roster-type"><i class="fas fa-tags"></i> Roster Type:</label>
+                <div class="custom-select">
+                  <div class="select-trigger" data-target="roster-type">
+                    <span class="select-text">Select a roster type</span>
+                    <i class="fas fa-chevron-down select-arrow"></i>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="form-buttons">
+                <button type="button" id="cancel-create" class="secondary-btn">
+                  <i class="fas fa-times"></i> Cancel
+                </button>
+                <button type="submit" id="submit-roster-btn" class="primary-btn">
+                  <i class="fas fa-check"></i>
+                  <span class="btn-text">Create Roster</span>
+                  <span class="loading-spinner" style="display: none;"></span>
+                </button>
+              </div>
+            </form>
+          </div>
+          
+          <div id="roster-detail-view" style="display: none;">
+            <div class="detail-header">
+              <h2 id="roster-detail-title">Roster Details</h2>
+              <button id="back-to-list" class="secondary-btn">
+                <i class="fas fa-arrow-left"></i> Back to List
+              </button>
+            </div>
+            
+            <div class="roster-info">
+              <div class="loading-overlay" id="roster-info-loading" style="display: none;">
+                <div class="loading-text">
+                  <div class="loading-spinner"></div>
+                  Loading roster details...
+                </div>
+              </div>
+              <p><strong><i class="fas fa-id-badge"></i> Roster ID:</strong> <span id="detail-roster-id"></span></p>
+              <p><strong><i class="fas fa-calendar"></i> Month/Year:</strong> <span id="detail-month-year"></span></p>
+              <p><strong><i class="fas fa-tag"></i> Type:</strong> <span id="detail-roster-type"></span></p>
+            </div>
+
+            <!-- Import Controls -->
+            <div class="import-controls admin-only">
+              <div class="import-header">
+                <h3 class="import-title">
+                  <i class="fas fa-download"></i>
+                  Import from Previous Roster
+                </h3>
+              </div>
+              <div class="import-form">
+                <div class="import-select-group">
+                  <label for="import-source-roster">Select Source Roster:</label>
+                  <div class="custom-select">
+                    <div class="select-trigger" data-target="import-source-roster">
+                      <span class="select-text">Select a roster to import from</span>
+                      <i class="fas fa-chevron-down select-arrow"></i>
                     </div>
                   </div>
                 </div>
-                <button type="button" id="add-users-btn" class="primary-btn">
-                  <i class="fas fa-plus"></i> Add Selected Users
+                <button id="import-roster-btn" class="primary-btn" disabled>
+                  <i class="fas fa-download"></i> Import Statuses
                 </button>
               </div>
             </div>
-          </div>
-          
-          <div class="roster-table-container">
-            <div class="loading-overlay" id="roster-table-loading" style="display: none;">
-              <div class="loading-text">
-                <div class="loading-spinner"></div>
-                Loading schedule...
+            
+            <div class="user-management">
+              <div class="loading-overlay" id="user-management-loading" style="display: none;">
+                <div class="loading-text">
+                  <div class="loading-spinner"></div>
+                  Loading users...
+                </div>
+              </div>
+              <h3><i class="fas fa-users"></i> Manage Users</h3>
+              <div id="users-list">
+                <p class="loading">Loading users...</p>
+              </div>
+              
+              <div class="add-user-form admin-only">
+                <h4><i class="fas fa-user-plus"></i> Add New Users</h4>
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="new-users-select"><i class="fas fa-search"></i> Users:</label>
+                    <div class="user-select-container">
+                      <div class="user-chips-container" id="user-chips-container">
+                        <input type="text" class="user-input" id="user-input" placeholder="Type to search users...">
+                      </div>
+                    </div>
+                  </div>
+                  <button type="button" id="add-users-btn" class="primary-btn">
+                    <i class="fas fa-plus"></i> Add Selected Users
+                  </button>
+                </div>
               </div>
             </div>
-            <div class="table-header">
-              <h3><i class="fas fa-table"></i> Shift Schedule</h3>
-              <button id="save-all-changes" class="save-btn admin-only" disabled>
-                <i class="fas fa-save"></i> Save All Changes
-              </button>
+
+            <!-- Multi-Select Controls -->
+            <div id="multi-select-controls" class="multi-select-controls">
+              <div class="multi-select-header">
+                <h3 class="multi-select-title">
+                  <i class="fas fa-mouse-pointer"></i>
+                  Multi-Select Actions
+                  <span id="selection-count" class="selection-count">0 cells selected</span>
+                </h3>
+                <button id="clear-selection-btn" class="clear-selection-btn">
+                  <i class="fas fa-times"></i> Clear Selection
+                </button>
+              </div>
+              <div class="multi-select-actions">
+                <div class="action-group">
+                  <div class="action-group-label">
+                    <i class="fas fa-clipboard"></i>
+                    Clipboard Actions
+                  </div>
+                  <div class="action-buttons">
+                    <button id="copy-btn" class="mini-btn copy" disabled>
+                      <i class="fas fa-copy"></i>
+                      Copy
+                    </button>
+                    <button id="paste-btn" class="mini-btn paste" disabled>
+                      <i class="fas fa-paste"></i>
+                      Paste
+                    </button>
+                    <button id="cut-btn" class="mini-btn cut" disabled>
+                      <i class="fas fa-cut"></i>
+                      Cut
+                    </button>
+                  </div>
+                </div>
+                <div class="action-group">
+                  <div class="action-group-label">
+                    <i class="fas fa-edit"></i>
+                    Set Status
+                  </div>
+                  <div class="action-buttons" id="status-buttons-container">
+                    <!-- Status buttons will be populated dynamically -->
+                  </div>
+                  <div class="action-buttons">
+                    <button id="clear-status-btn" class="mini-btn clear">
+                      <i class="fas fa-eraser"></i>
+                      Clear Status
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
             
-            <div id="changes-indicator" class="changes-indicator">
-              <i class="fas fa-exclamation-circle"></i>
-              You have unsaved changes. Click "Save All Changes" to save them.
-            </div>
-            
-            <div class="roster-table-wrapper">
-              <div id="roster-table-content">
-                <p class="loading">Loading schedule...</p>
+            <div class="roster-table-container">
+              <div class="loading-overlay" id="roster-table-loading" style="display: none;">
+                <div class="loading-text">
+                  <div class="loading-spinner"></div>
+                  Loading schedule...
+                </div>
+              </div>
+              <div class="table-header">
+                <h3><i class="fas fa-table"></i> Shift Schedule</h3>
+                <button id="save-all-changes" class="save-btn admin-only" disabled>
+                  <i class="fas fa-save"></i> Save All Changes
+                </button>
+              </div>
+              
+              <div id="changes-indicator" class="changes-indicator">
+                <i class="fas fa-exclamation-circle"></i>
+                You have unsaved changes. Click "Save All Changes" to save them.
+              </div>
+              
+              <div class="roster-table-wrapper" id="roster-table-wrapper">
+                <div id="roster-table-content">
+                  <p class="loading">Loading schedule...</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
-        <div id="modal-container"></div>
-    <div id="select-modal-container"></div>
-    <div id="status-select-modal-container"></div>
-    <div id="user-modal-container"></div>
-</main>    
-    <script>
-      function hidePageLoading() {
-        const overlay = document.getElementById('page-loading-overlay');
-        if (overlay) {
-          overlay.style.opacity = '0';
-          setTimeout(() => {
-            overlay.style.display = 'none';
-          }, 500);
-        }
+      <!-- Clipboard Indicator -->
+      <div id="clipboard-indicator" class="clipboard-indicator">
+        <i class="fas fa-clipboard"></i>
+        <span id="clipboard-text">Status copied!</span>
+      </div>
+
+      <div id="modal-container"></div>
+      <div id="select-modal-container"></div>
+      <div id="status-select-modal-container"></div>
+      <div id="user-modal-container"></div>
+      <div id="user-filter-modal-container"></div>
+    </main>    
+    
+<script>
+  function hidePageLoading() {
+    const overlay = document.getElementById('page-loading-overlay');
+    if (overlay) {
+      overlay.style.opacity = '0';
+      setTimeout(() => {
+        overlay.style.display = 'none';
+      }, 500);
+    }
+  }
+
+  const Modal = {
+    show: function(options) {
+      const {
+        title = 'Alert',
+        message = '',
+        type = 'info',
+        buttons = [{ text: 'OK', action: () => Modal.hide() }]
+      } = options;
+
+      const iconMap = {
+        success: 'fas fa-check-circle',
+        error: 'fas fa-exclamation-circle',
+        warning: 'fas fa-exclamation-triangle',
+        info: 'fas fa-info-circle'
+      };
+
+      const modalHTML = `
+        <div class="modal-overlay" onclick="Modal.hide()">
+          <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+              <div class="modal-icon ${type}">
+                <i class="${iconMap[type]}"></i>
+              </div>
+              <h3 class="modal-title">${title}</h3>
+            </div>
+            <div class="modal-body">${message}</div>
+            <div class="modal-buttons">
+              ${buttons.map((btn, index) => 
+                `<button class="modal-btn ${btn.class || (index === 0 ? 'primary' : 'secondary')}" 
+                         onclick="Modal.executeAction(${index})">
+                   ${btn.icon ? `<i class="${btn.icon}"></i>` : ''} ${btn.text}
+                 </button>`
+              ).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+
+      const container = document.getElementById('modal-container');
+      container.innerHTML = modalHTML;
+      
+      Modal.currentActions = buttons.map(btn => btn.action || (() => Modal.hide()));
+    },
+
+    hide: function() {
+      const container = document.getElementById('modal-container');
+      container.innerHTML = '';
+      Modal.currentActions = [];
+    },
+
+    executeAction: function(index) {
+      if (Modal.currentActions && Modal.currentActions[index]) {
+        Modal.currentActions[index]();
       }
+    },
 
-      const Modal = {
-        show: function(options) {
-          const {
-            title = 'Alert',
-            message = '',
-            type = 'info',
-            buttons = [{ text: 'OK', action: () => Modal.hide() }]
-          } = options;
-
-          const iconMap = {
-            success: 'fas fa-check-circle',
-            error: 'fas fa-exclamation-circle',
-            warning: 'fas fa-exclamation-triangle',
-            info: 'fas fa-info-circle'
-          };
-
-          const modalHTML = `
-            <div class="modal-overlay" onclick="Modal.hide()">
-              <div class="modal" onclick="event.stopPropagation()">
-                <div class="modal-header">
-                  <div class="modal-icon ${type}">
-                    <i class="${iconMap[type]}"></i>
-                  </div>
-                  <h3 class="modal-title">${title}</h3>
-                </div>
-                <div class="modal-body">${message}</div>
-                <div class="modal-buttons">
-                  ${buttons.map((btn, index) => 
-                    `<button class="modal-btn ${btn.class || (index === 0 ? 'primary' : 'secondary')}" 
-                             onclick="Modal.executeAction(${index})">
-                       ${btn.icon ? `<i class="${btn.icon}"></i>` : ''} ${btn.text}
-                     </button>`
-                  ).join('')}
-                </div>
-              </div>
-            </div>
-          `;
-
-          const container = document.getElementById('modal-container');
-          container.innerHTML = modalHTML;
-          
-          Modal.currentActions = buttons.map(btn => btn.action || (() => Modal.hide()));
-        },
-
-        hide: function() {
-          const container = document.getElementById('modal-container');
-          container.innerHTML = '';
-          Modal.currentActions = [];
-        },
-
-        executeAction: function(index) {
-          if (Modal.currentActions && Modal.currentActions[index]) {
-            Modal.currentActions[index]();
-          }
-        },
-
-        alert: function(message, title = 'Alert') {
-          Modal.show({
-            title,
-            message,
-            type: 'info',
-            buttons: [{ text: 'OK', action: () => Modal.hide() }]
-          });
-        },
-
-        confirm: function(message, title = 'Confirm', onConfirm = () => {}, onCancel = () => {}) {
-          Modal.show({
-            title,
-            message,
-            type: 'warning',
-            buttons: [
-              { 
-                text: 'Cancel', 
-                class: 'secondary',
-                icon: 'fas fa-times',
-                action: () => { Modal.hide(); onCancel(); }
-              },
-              { 
-                text: 'Confirm', 
-                class: 'danger',
-                icon: 'fas fa-check',
-                action: () => { Modal.hide(); onConfirm(); }
-              }
-            ]
-          });
-        },
-
-        success: function(message, title = 'Success') {
-          Modal.show({
-            title,
-            message,
-            type: 'success',
-            buttons: [{ text: 'OK', action: () => Modal.hide() }]
-          });
-        },
-
-        error: function(message, title = 'Error') {
-          Modal.show({
-            title,
-            message,
-            type: 'error',
-            buttons: [{ text: 'OK', action: () => Modal.hide() }]
-          });
-        }
-      };
-
-      const CustomSelect = {
-        init: function() {
-          document.querySelectorAll('.custom-select').forEach(select => {
-            const trigger = select.querySelector('.select-trigger');
-            
-            trigger.addEventListener('click', function(e) {
-              e.stopPropagation();
-              const targetId = this.dataset.target;
-              CustomSelect.showModal(targetId);
-            });
-          });
-        },
-        
-        showModal: function(selectId) {
-          const select = document.querySelector(`[data-target="${selectId}"]`).parentElement;
-          const trigger = select.querySelector('.select-trigger');
-          const selectedText = trigger.querySelector('.select-text').textContent;
-          
-          const options = CustomSelect.getOptions(selectId);
-          
-          const modalHTML = `
-            <div class="select-modal" id="select-modal-${selectId}">
-              <div class="select-modal-content">
-                <div class="select-modal-header">
-                  <h3 class="select-modal-title">Select ${selectId.replace('filter-', '').replace('-', ' ')}</h3>
-                  <button class="select-modal-close" onclick="CustomSelect.hideModal('${selectId}')">
-                    <i class="fas fa-times"></i>
-                  </button>
-                </div>
-                <div class="select-modal-body">
-                  ${options.map(option => 
-                    `<div class="select-option ${option.text === selectedText ? 'selected' : ''}" 
-                          data-value="${option.value}" 
-                          data-select-id="${selectId}" 
-                          onclick="CustomSelect.selectOption('${selectId}', '${option.value}', '${option.text}')">
-                      ${option.text}
-                    </div>`
-                  ).join('')}
-                </div>
-              </div>
-            </div>
-          `;
-          
-          const container = document.getElementById('select-modal-container');
-          container.innerHTML = modalHTML;
-          
-          setTimeout(() => {
-            document.getElementById(`select-modal-${selectId}`).classList.add('show');
-          }, 10);
-        },
-        
-        hideModal: function(selectId) {
-          const modal = document.getElementById(`select-modal-${selectId}`);
-          if (modal) {
-            modal.classList.remove('show');
-            setTimeout(() => {
-              const container = document.getElementById('select-modal-container');
-              container.innerHTML = '';
-            }, 200);
-          }
-        },
-        
-        selectOption: function(selectId, value, text) {
-          const select = document.querySelector(`[data-target="${selectId}"]`).parentElement;
-          const trigger = select.querySelector('.select-trigger');
-          
-          trigger.querySelector('.select-text').textContent = text;
-          
-          CustomSelect.hideModal(selectId);
-          
-          const changeEvent = new CustomEvent('selectChange', {
-            detail: { value, text, target: selectId }
-          });
-          document.dispatchEvent(changeEvent);
-        },
-        
-        getOptions: function(selectId) {
-          if (globalCache && globalCache[`${selectId}Options`]) {
-            return globalCache[`${selectId}Options`];
-          }
-          
-          return [{ value: '', text: 'All' }];
-        },
-        
-        populateOptions: function(selectId, options) {
-          globalCache[`${selectId}Options`] = options;
-        },
-        
-        setValue: function(selectId, value) {
-          const options = CustomSelect.getOptions(selectId);
-          const option = options.find(opt => opt.value === value);
-          
-          if (option) {
-            const select = document.querySelector(`[data-target="${selectId}"]`).parentElement;
-            const trigger = select.querySelector('.select-trigger');
-            trigger.querySelector('.select-text').textContent = option.text;
-          }
-        },
-        
-        getValue: function(selectId) {
-          const select = document.querySelector(`[data-target="${selectId}"]`).parentElement;
-          const trigger = select.querySelector('.select-trigger');
-          const text = trigger.querySelector('.select-text').textContent;
-          
-          const options = CustomSelect.getOptions(selectId);
-          const option = options.find(opt => opt.text === text);
-          
-          return option ? option.value : '';
-        }
-      };
-
-      window.alert = Modal.alert;
-      window.confirm = function(message) {
-        return new Promise((resolve) => {
-          Modal.confirm(message, 'Confirm', () => resolve(true), () => resolve(false));
-        });
-      };
-
-      const globalCache = {
-        rosters: null,
-        users: null,
-        statuses: null,
-        rosterTypesWithColors: null,
-        rosterData: new Map(),
-        monthDetails: new Map(),
-        userAccess: null,
-        pendingChangesByRoster: new Map()
-      };
-      
-      let currentRoster = null;
-      let currentRosterUsers = [];
-      let pendingChanges = new Map();
-      let originalData = new Map();
-      let monthDetails = { daysInMonth: 31, dayDetails: [] };
-      let selectedUsers = new Set();
-      let filteredRosters = [];
-      
-      document.addEventListener('DOMContentLoaded', function() {
-        CustomSelect.init();
-        checkUserAccess();
-        setupCustomSelectEvents();
-        initializeSidebar();
+    alert: function(message, title = 'Alert') {
+      Modal.show({
+        title,
+        message,
+        type: 'info',
+        buttons: [{ text: 'OK', action: () => Modal.hide() }]
       });
+    },
 
-      function setupCustomSelectEvents() {
-        document.addEventListener('selectChange', function(e) {
-          const { value, target } = e.detail;
-          
-          if (target === 'filter-type' || target === 'filter-month') {
-            applyFilters();
-          } else if (target === 'roster-type') {
+    confirm: function(message, title = 'Confirm', onConfirm = () => {}, onCancel = () => {}) {
+      Modal.show({
+        title,
+        message,
+        type: 'warning',
+        buttons: [
+          { 
+            text: 'Cancel', 
+            class: 'secondary',
+            icon: 'fas fa-times',
+            action: () => { Modal.hide(); onCancel(); }
+          },
+          { 
+            text: 'Confirm', 
+            class: 'danger',
+            icon: 'fas fa-check',
+            action: () => { Modal.hide(); onConfirm(); }
           }
-        });
-      }
+        ]
+      });
+    },
 
-      function initializeSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        const mainContent = document.getElementById('mainContent');
-        const menuLinks = document.querySelectorAll('.sidebar-menu-link');
+    success: function(message, title = 'Success') {
+      Modal.show({
+        title,
+        message,
+        type: 'success',
+        buttons: [{ text: 'OK', action: () => Modal.hide() }]
+      });
+    },
+
+    error: function(message, title = 'Error') {
+      Modal.show({
+        title,
+        message,
+        type: 'error',
+        buttons: [{ text: 'OK', action: () => Modal.hide() }]
+      });
+    }
+  };
+
+  const CustomSelect = {
+    init: function() {
+      document.querySelectorAll('.custom-select').forEach(select => {
+        const trigger = select.querySelector('.select-trigger');
         
-        let isOpen = true;
-        let isMobile = window.innerWidth <= 768;
-        
-        function checkMobile() {
-          const wasMobile = isMobile;
-          isMobile = window.innerWidth <= 768;
-          
-          if (wasMobile !== isMobile) {
-            initializeSidebarState();
-          }
-        }
-        
-        function initializeSidebarState() {
-          if (isMobile) {
-            isOpen = false;
-            sidebar.classList.remove('open');
-            sidebar.classList.add('hidden');
-            mainContent.classList.add('sidebar-hidden');
-            sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
-            sidebarToggle.classList.remove('sidebar-open');
-          } else {
-            isOpen = true;
-            sidebar.classList.remove('hidden', 'open');
-            mainContent.classList.remove('sidebar-hidden');
-            sidebarToggle.innerHTML = '<i class="fas fa-times"></i>';
-            sidebarToggle.classList.add('sidebar-open');
-          }
-        }
-        
-        function openSidebar() {
-          isOpen = true;
-          
-          if (isMobile) {
-            sidebar.classList.add('open');
-            sidebar.classList.remove('hidden');
-            sidebarOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-          } else {
-            sidebar.classList.remove('hidden');
-            mainContent.classList.remove('sidebar-hidden');
-            sidebarToggle.classList.add('sidebar-open');
-          }
-          
-          sidebarToggle.innerHTML = '<i class="fas fa-times"></i>';
-        }
-        
-        function closeSidebar() {
-          isOpen = false;
-          
-          if (isMobile) {
-            sidebar.classList.remove('open');
-            sidebar.classList.add('hidden');
-            sidebarOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-          } else {
-            sidebar.classList.add('hidden');
-            mainContent.classList.add('sidebar-hidden');
-            sidebarToggle.classList.remove('sidebar-open');
-          }
-          
-          sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
-        }
-        
-        function toggleSidebar() {
-          if (isOpen) {
-            closeSidebar();
-          } else {
-            openSidebar();
-          }
-        }
-        
-        sidebarToggle.addEventListener('click', function(e) {
+        trigger.addEventListener('click', function(e) {
           e.stopPropagation();
-          toggleSidebar();
+          const targetId = this.dataset.target;
+          CustomSelect.showModal(targetId);
         });
-        
-        sidebarOverlay.addEventListener('click', function() {
-          if (isMobile) {
-            closeSidebar();
-          }
-        });
-        
-        menuLinks.forEach(link => {
-          link.addEventListener('click', function() {
-            if (isMobile && isOpen) {
-              closeSidebar();
-            }
-          });
-        });
-        
-        window.addEventListener('resize', function() {
-          checkMobile();
-        });
-        
-        document.addEventListener('keydown', function(event) {
-          if (event.key === 'Escape' && isOpen) {
-            closeSidebar();
-          }
-        });
-        
-        sidebar.addEventListener('click', function(e) {
-          e.stopPropagation();
-        });
-        
-        initializeSidebarState();
-      }
-
-      function checkUserAccess() {
-        document.getElementById('main-content').style.display = 'block';
-        loadInitialData();
-      }
-
-      function getContrastColor(hexColor) {
-        hexColor = hexColor.replace('#', '');
-        
-        const r = parseInt(hexColor.substr(0, 2), 16);
-        const g = parseInt(hexColor.substr(2, 2), 16);
-        const b = parseInt(hexColor.substr(4, 2), 16);
-        
-        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-        
-        return luminance > 0.5 ? '#000000' : '#ffffff';
-      }
+      });
+    },
+    
+    showModal: function(selectId) {
+      const select = document.querySelector(`[data-target="${selectId}"]`).parentElement;
+      const trigger = select.querySelector('.select-trigger');
+      const selectedText = trigger.querySelector('.select-text').textContent;
       
-      function createRosterTypeBadge(type, color) {
-        const badge = document.createElement('span');
-        badge.className = 'roster-type-badge';
-        badge.innerHTML = `<i class="fas fa-tag"></i> ${type}`;
-        badge.style.backgroundColor = color;
-        badge.style.color = getContrastColor(color);
-        return badge;
-      }
+      const options = CustomSelect.getOptions(selectId);
+      const isMultiSelect = selectId === 'filter-users';
+      const selectedValues = isMultiSelect ? globalCache.selectedUserFilters : new Set([CustomSelect.getValue(selectId)]);
       
-      function loadInitialData() {
-        google.script.run
-          .withSuccessHandler(function(data) {
-            globalCache.rosters = data.rosters || [];
-            globalCache.users = data.users || [];
-            globalCache.statuses = data.statuses || [];
-            globalCache.rosterTypesWithColors = data.rosterTypesWithColors || [];
-            globalCache.userAccess = data.userAccess;
-
-            if (globalCache.userAccess && globalCache.userAccess.accessLevel === 'admin') {
-            } else if (globalCache.userAccess && globalCache.userAccess.accessLevel === 'view') {
-              document.body.classList.add('view-only');
-            } else {
-              document.getElementById('access-denied-message').style.display = 'block';
-              hidePageLoading();
-              return;
-            }
-
-            filteredRosters = [...globalCache.rosters];
-            setupFilters();
-            displayRosters();
-            setupEventListeners();
-            hidePageLoading();
-
-            const firstRoster = globalCache.rosters[0];
-            if (firstRoster) {
-              currentRoster = firstRoster;
-              loadRosterData(firstRoster.id);
-            }
-          })
-          .withFailureHandler(function(error) {
-            console.error('Error loading initial data:', error);
-            const container = document.getElementById('roster-cards-container');
-            if (container) {
-              container.innerHTML = '<p class="error"><i class="fas fa-exclamation-triangle"></i> Error loading data: ' + (error ? error.message : 'Unknown error') + '</p>';
-            }
-            hidePageLoading();
-          })
-          .getInitialData();
-      }
-
-      function loadRosterData(rosterId) {
-        showLoading('roster-info-loading');
-        showLoading('user-management-loading');
-        showLoading('roster-table-loading');
-
-        if (globalCache.rosterData.has(rosterId)) {
-          const cachedData = globalCache.rosterData.get(rosterId);
-          currentRosterUsers = cachedData.users;
-          monthDetails = cachedData.monthDetails;
-
-          hideLoading('roster-info-loading');
-          hideLoading('user-management-loading');
-          hideLoading('roster-table-loading');
-          setupRosterView();
-          return;
-        }
-
-        Promise.all([
-          new Promise((resolve, reject) => {
-            google.script.run
-              .withSuccessHandler(resolve)
-              .withFailureHandler(reject)
-              .getUsersForRoster(rosterId);
-          }),
-          new Promise((resolve, reject) => {
-            google.script.run
-              .withSuccessHandler(resolve)
-              .withFailureHandler(reject)
-              .getMonthDetails(currentRoster.monthYear);
-          })
-        ]).then(([rosterUsers, monthData]) => {
-          currentRosterUsers = rosterUsers || [];
-          monthDetails = monthData || { daysInMonth: 31, dayDetails: [] };
-
-          globalCache.rosterData.set(rosterId, {
-            users: currentRosterUsers,
-            monthDetails: monthDetails
-          });
-
-          hideLoading('roster-info-loading');
-          hideLoading('user-management-loading');
-          hideLoading('roster-table-loading');
-          setupRosterView();
-        }).catch(error => {
-          console.error('Error loading roster data:', error);
-          hideLoading('roster-info-loading');
-          hideLoading('user-management-loading');
-          hideLoading('roster-table-loading');
-          Modal.error('Error loading roster data: ' + (error ? error.message : 'Unknown error'));
-        });
-      }
-
-
-   
-      function setupFilters() {
-        const uniqueTypes = [...new Set(globalCache.rosters.map(r => r.type))];
-        const typeOptions = [
-          { value: '', text: 'All Types' },
-          ...uniqueTypes.map(type => ({ value: type, text: type }))
-        ];
-        CustomSelect.populateOptions('filter-type', typeOptions);
-        
-        const uniqueMonths = [...new Set(globalCache.rosters.map(r => r.monthYear))];
-        const monthOptions = [
-          { value: '', text: 'All Months' },
-          ...uniqueMonths.sort().map(month => ({ value: month, text: month }))
-        ];
-        CustomSelect.populateOptions('filter-month', monthOptions);
-        
-        document.getElementById('clear-filters').addEventListener('click', clearFilters);
-      }
+      let modalContent = '';
       
-      function applyFilters() {
-        const typeFilter = CustomSelect.getValue('filter-type');
-        const monthFilter = CustomSelect.getValue('filter-month');
-        
-        filteredRosters = globalCache.rosters.filter(roster => {
-          const typeMatch = !typeFilter || roster.type === typeFilter;
-          const monthMatch = !monthFilter || roster.monthYear === monthFilter;
-          return typeMatch && monthMatch;
-        });
-        
-        displayRosters();
-      }
-      
-      function clearFilters() {
-        CustomSelect.setValue('filter-type', '');
-        CustomSelect.setValue('filter-month', '');
-        filteredRosters = [...globalCache.rosters];
-        displayRosters();
-      }
-      
-      function displayRosters() {
-        const container = document.getElementById('roster-cards-container');
-        if (!container) return;
-        
-        container.innerHTML = '';
-        
-        if (!filteredRosters || filteredRosters.length === 0) {
-          container.innerHTML = '<div class="empty-message"><i class="fas fa-inbox"></i><br>No rosters found matching the current filters.</div>';
-          return;
-        }
-        
-        const fragment = document.createDocumentFragment();
-        filteredRosters.forEach(function(roster) {
-          if (roster && roster.id) {
-            const card = createRosterCard(roster);
-            fragment.appendChild(card);
-          }
-        });
-        container.appendChild(fragment);
-      }
-      
-      function createRosterCard(roster) {
-        if (!roster || !roster.id) return null;
-        
-        const card = document.createElement('div');
-        card.className = 'roster-card';
-        card.dataset.rosterId = roster.id;
-        
-        const typeInfo = globalCache.rosterTypesWithColors.find(t => t.type === roster.type);
-        const typeColor = typeInfo ? typeInfo.color : 'var(--orange)';
-        
-        const typeBadge = createRosterTypeBadge(roster.type || 'Unknown Type', typeColor);
-        
-        card.innerHTML = `
-          <h3>
-            <span><i class="fas fa-calendar-alt"></i> ${roster.monthYear || 'Unknown Month/Year'}</span>
-            ${typeBadge.outerHTML}
-          </h3>
-          <p><strong><i class="fas fa-id-badge"></i> ID:</strong> ${roster.id}</p>
-        `;
-        
-        card.addEventListener('click', () => viewRosterDetails(roster));
-        
-        return card;
-      }
-      
-      function setupEventListeners() {
-        const createRosterBtn = document.getElementById('create-roster-btn');
-        if (createRosterBtn && globalCache.userAccess && globalCache.userAccess.accessLevel === 'admin') {
-          createRosterBtn.addEventListener('click', showCreateRosterView);
-        }
-        
-        const cancelCreateBtn = document.getElementById('cancel-create');
-        if (cancelCreateBtn) {
-          cancelCreateBtn.addEventListener('click', showRosterListView);
-        }
-        
-        const createRosterForm = document.getElementById('create-roster-form');
-        if (createRosterForm) {
-          createRosterForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            handleCreateRoster();
-          });
-        }
-        
-        const backToListBtn = document.getElementById('back-to-list');
-        if (backToListBtn) {
-          backToListBtn.addEventListener('click', async function() {
-            if (hasRealChanges() && globalCache.userAccess.accessLevel === 'admin') {
-              const confirmed = await window.confirm('You have unsaved changes. Are you sure you want to leave without saving?');
-              if (!confirmed) {
-                return;
-              }
-            }
-            showRosterListView();
-          });
-        }
-        
-        const addUsersBtn = document.getElementById('add-users-btn');
-        if (addUsersBtn && globalCache.userAccess.accessLevel === 'admin') {
-          addUsersBtn.addEventListener('click', handleAddUsers);
-        }
-        
-        const saveAllBtn = document.getElementById('save-all-changes');
-        if (saveAllBtn && globalCache.userAccess.accessLevel === 'admin') {
-          saveAllBtn.addEventListener('click', saveAllPendingChanges);
-        }
-        
-        const monthYearInput = document.getElementById('month-year');
-        if (monthYearInput) {
-          monthYearInput.addEventListener('change', updateAvailableRosterTypes);
-        }
-        
-        if (globalCache.userAccess.accessLevel === 'admin') {
-          setupMultiSelectUsers();
-        }
-      }
-      
-      function setupMultiSelectUsers() {
-        const userInput = document.getElementById('user-input');
-        const chipsContainer = document.getElementById('user-chips-container');
-        
-        if (!userInput || !chipsContainer) return;
-        
-        userInput.addEventListener('focus', function() {
-          showUserModal();
-        });
-        
-        chipsContainer.addEventListener('click', function() {
-          showUserModal();
-        });
-      }
-      
-      function showUserModal() {
-        const usedUsernames = new Set(currentRosterUsers.map(user => user.username));
-        const availableUsers = globalCache.users.filter(user => 
-          !usedUsernames.has(user) && !selectedUsers.has(user)
-        );
-        
-        const modalHTML = `
-          <div class="user-modal" id="user-modal">
-            <div class="user-modal-content">
-              <div class="user-modal-header">
-                <h3 class="user-modal-title">Select Users</h3>
-                <button class="user-modal-close" onclick="hideUserModal()">
+      if (isMultiSelect) {
+        modalContent = `
+          <div class="select-modal" id="select-modal-${selectId}">
+            <div class="select-modal-content">
+              <div class="select-modal-header">
+                <h3 class="select-modal-title">Select Users (${selectedValues.size} selected)</h3>
+                <button class="select-modal-close" onclick="CustomSelect.hideModal('${selectId}')">
                   <i class="fas fa-times"></i>
                 </button>
               </div>
-              <div class="user-modal-search">
-                <input type="text" id="user-search" placeholder="Search users..." onkeyup="filterUserOptions(this.value)">
+              <div class="select-modal-body">
+                <div class="select-option" onclick="CustomSelect.clearAllUsers()">
+                  <i class="fas fa-times-circle"></i> Clear All
+                </div>
+                ${options.slice(1).map(option => 
+                  `<div class="select-option ${selectedValues.has(option.value) ? 'selected' : ''}" 
+                        data-value="${option.value}" 
+                        onclick="CustomSelect.toggleUserSelection('${option.value}', '${option.text}')">
+                    <i class="fas ${selectedValues.has(option.value) ? 'fa-check-square' : 'fa-square'}"></i> ${option.text}
+                  </div>`
+                ).join('')}
               </div>
-              <div class="user-modal-body" id="user-options-container">
-                ${availableUsers.map(user => 
-                  `<div class="user-option" onclick="addUserChip('${user}')">
-                    <i class="fas fa-user"></i> ${user}
+              <div class="select-modal-footer" style="padding: 15px 20px; border-top: 1px solid var(--light-teal); text-align: center;">
+                <button class="primary-btn" onclick="CustomSelect.applyUserFilter()">
+                  <i class="fas fa-check"></i> Apply Filter
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        modalContent = `
+          <div class="select-modal" id="select-modal-${selectId}">
+            <div class="select-modal-content">
+              <div class="select-modal-header">
+                <h3 class="select-modal-title">Select ${selectId.replace('filter-', '').replace('-', ' ')}</h3>
+                <button class="select-modal-close" onclick="CustomSelect.hideModal('${selectId}')">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <div class="select-modal-body">
+                ${options.map(option => 
+                  `<div class="select-option ${option.text === selectedText ? 'selected' : ''}" 
+                        data-value="${option.value}" 
+                        data-select-id="${selectId}" 
+                        onclick="CustomSelect.selectOption('${selectId}', '${option.value}', '${option.text}')">
+                    ${option.text}
                   </div>`
                 ).join('')}
               </div>
             </div>
           </div>
         `;
-        
-        const container = document.getElementById('user-modal-container');
-        container.innerHTML = modalHTML;
-        
+      }
+      
+      const container = document.getElementById('select-modal-container');
+      container.innerHTML = modalContent;
+      
+      setTimeout(() => {
+        document.getElementById(`select-modal-${selectId}`).classList.add('show');
+      }, 10);
+    },
+    
+    hideModal: function(selectId) {
+      const modal = document.getElementById(`select-modal-${selectId}`);
+      if (modal) {
+        modal.classList.remove('show');
         setTimeout(() => {
-          document.getElementById('user-modal').classList.add('show');
-        }, 10);
+          const container = document.getElementById('select-modal-container');
+          container.innerHTML = '';
+        }, 200);
+      }
+    },
+    
+    selectOption: function(selectId, value, text) {
+      const select = document.querySelector(`[data-target="${selectId}"]`).parentElement;
+      const trigger = select.querySelector('.select-trigger');
+      
+      trigger.querySelector('.select-text').textContent = text;
+      
+      CustomSelect.hideModal(selectId);
+      
+      const changeEvent = new CustomEvent('selectChange', {
+        detail: { value, text, target: selectId }
+      });
+      document.dispatchEvent(changeEvent);
+    },
+    
+    toggleUserSelection: function(value, text) {
+      if (globalCache.selectedUserFilters.has(value)) {
+        globalCache.selectedUserFilters.delete(value);
+      } else {
+        globalCache.selectedUserFilters.add(value);
       }
       
-      function hideUserModal() {
-        const modal = document.getElementById('user-modal');
-        if (modal) {
-          modal.classList.remove('show');
-          setTimeout(() => {
-            const container = document.getElementById('user-modal-container');
-            container.innerHTML = '';
-          }, 200);
+
+      const option = document.querySelector(`[data-value="${value}"]`);
+      if (option) {
+        const icon = option.querySelector('i');
+        if (globalCache.selectedUserFilters.has(value)) {
+          option.classList.add('selected');
+          icon.className = 'fas fa-check-square';
+        } else {
+          option.classList.remove('selected');
+          icon.className = 'fas fa-square';
         }
       }
       
-      function filterUserOptions(searchTerm) {
-        const usedUsernames = new Set(currentRosterUsers.map(user => user.username));
-        const availableUsers = globalCache.users.filter(user => 
-          !usedUsernames.has(user) && 
-          !selectedUsers.has(user) &&
-          user.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        
-        const container = document.getElementById('user-options-container');
-        if (container) {
-          container.innerHTML = availableUsers.map(user => 
-            `<div class="user-option" onclick="addUserChip('${user}')">
-              <i class="fas fa-user"></i> ${user}
-            </div>`
-          ).join('');
-          
-          if (availableUsers.length === 0) {
-            container.innerHTML = '<div class="user-option"><i class="fas fa-user-slash"></i> No users found</div>';
+
+      const header = document.querySelector('.select-modal-title');
+      if (header) {
+        header.textContent = `Select Users (${globalCache.selectedUserFilters.size} selected)`;
+      }
+    },
+    
+    clearAllUsers: function() {
+      globalCache.selectedUserFilters.clear();
+      
+
+      document.querySelectorAll('.select-option[data-value]').forEach(option => {
+        option.classList.remove('selected');
+        const icon = option.querySelector('i');
+        if (icon && icon.classList.contains('fa-check-square')) {
+          icon.className = 'fas fa-square';
+        }
+      });
+      
+
+      const header = document.querySelector('.select-modal-title');
+      if (header) {
+        header.textContent = `Select Users (0 selected)`;
+      }
+    },
+    
+    applyUserFilter: function() {
+
+      const select = document.querySelector(`[data-target="filter-users"]`).parentElement;
+      const trigger = select.querySelector('.select-trigger');
+      
+      if (globalCache.selectedUserFilters.size === 0) {
+        trigger.querySelector('.select-text').textContent = 'All Users';
+      } else if (globalCache.selectedUserFilters.size === 1) {
+        const selectedUser = Array.from(globalCache.selectedUserFilters)[0];
+        trigger.querySelector('.select-text').textContent = selectedUser;
+      } else {
+        trigger.querySelector('.select-text').textContent = `${globalCache.selectedUserFilters.size} users selected`;
+      }
+      
+      CustomSelect.hideModal('filter-users');
+      
+
+      const changeEvent = new CustomEvent('selectChange', {
+        detail: { value: Array.from(globalCache.selectedUserFilters), text: '', target: 'filter-users' }
+      });
+      document.dispatchEvent(changeEvent);
+    },
+    
+    getOptions: function(selectId) {
+      if (globalCache && globalCache[`${selectId}Options`]) {
+        return globalCache[`${selectId}Options`];
+      }
+      
+      return [{ value: '', text: 'All' }];
+    },
+    
+    populateOptions: function(selectId, options) {
+      globalCache[`${selectId}Options`] = options;
+    },
+    
+    setValue: function(selectId, value) {
+      const selectElement = document.querySelector(`[data-target="${selectId}"]`);
+      if (!selectElement || !selectElement.parentElement) {
+        console.warn(`Select element with target "${selectId}" not found`);
+        return;
+      }
+      
+      const options = CustomSelect.getOptions(selectId);
+      const option = options.find(opt => opt.value === value);
+      
+      if (option) {
+        const select = selectElement.parentElement;
+        const trigger = select.querySelector('.select-trigger');
+        if (trigger) {
+          const selectText = trigger.querySelector('.select-text');
+          if (selectText) {
+            selectText.textContent = option.text;
           }
         }
       }
+    },
+    
+    getValue: function(selectId) {
+      const select = document.querySelector(`[data-target="${selectId}"]`).parentElement;
+      const trigger = select.querySelector('.select-trigger');
+      const text = trigger.querySelector('.select-text').textContent;
       
-      function addUserChip(username) {
-        selectedUsers.add(username);
-        
-        const chipsContainer = document.getElementById('user-chips-container');
-        const userInput = document.getElementById('user-input');
-        
-        const chip = document.createElement('div');
-        chip.className = 'user-chip';
-        chip.innerHTML = `
-          <i class="fas fa-user"></i>
-          <span>${username}</span>
-          <button class="remove" onclick="removeUserChip('${username}')">
-            <i class="fas fa-user-minus"></i>
-          </button>
-        `;
-        
-        chipsContainer.insertBefore(chip, userInput);
-        hideUserModal();
-        showUserModal();
-      }
+      const options = CustomSelect.getOptions(selectId);
+      const option = options.find(opt => opt.text === text);
       
-      function removeUserChip(username) {
-        selectedUsers.delete(username);
-        
-        const chips = document.querySelectorAll('.user-chip');
-        chips.forEach(chip => {
-          if (chip.textContent.includes(username)) {
-            chip.remove();
+      return option ? option.value : '';
+    }
+  };
+
+  window.alert = Modal.alert;
+  window.confirm = function(message) {
+    return new Promise((resolve) => {
+      Modal.confirm(message, 'Confirm', () => resolve(true), () => resolve(false));
+    });
+  };
+
+  const globalCache = {
+    rosters: null,
+    users: null,
+    statuses: null,
+    rosterTypesWithColors: null,
+    rosterData: new Map(),
+    monthDetails: new Map(),
+    userAccess: null,
+    pendingChangesByRoster: new Map(),
+    selectedUserFilters: new Set()
+  };
+  
+  let currentRoster = null;
+  let currentRosterUsers = [];
+  let pendingChanges = new Map();
+  let originalData = new Map();
+  let monthDetails = { daysInMonth: 31, dayDetails: [] };
+  let selectedUsers = new Set();
+  let filteredRosters = [];
+  
+
+  let selectedCells = new Set();
+  let isSelecting = false;
+  let selectionStartCell = null;
+  let copiedStatus = '';
+  let copiedCells = new Set();
+  
+
+  let focusedCell = null;
+  let lastClickTime = 0;
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    CustomSelect.init();
+    checkUserAccess();
+    setupCustomSelectEvents();
+    initializeSidebar();
+    setupMultiSelectFeatures();
+    setupKeyboardNavigation();
+  });
+
+  function setupKeyboardNavigation() {
+    document.addEventListener('keydown', function(e) {
+      if (!currentRoster || !focusedCell) return;
+      
+      const { username, day } = focusedCell;
+      let newUsername = username;
+      let newDay = day;
+      
+      switch(e.key) {
+        case 'ArrowUp':
+          e.preventDefault();
+          const currentUserIndex = currentRosterUsers.findIndex(u => u.username === username);
+          if (currentUserIndex > 0) {
+            newUsername = currentRosterUsers[currentUserIndex - 1].username;
           }
-        });
-      }
-      
-      function showLoading(elementId) {
-        const element = document.getElementById(elementId);
-        if (element) {
-          element.style.display = 'flex';
-        }
-      }
-      
-      function hideLoading(elementId) {
-        const element = document.getElementById(elementId);
-        if (element) {
-          element.style.display = 'none';
-        }
-      }
-      
-      function hasRealChanges() {
-        if (pendingChanges.size === 0) return false;
-        
-        for (let [username, currentStatuses] of pendingChanges) {
-          const originalStatuses = originalData.get(username) || [];
+          break;
           
-          if (currentStatuses.length !== originalStatuses.length) return true;
-          
-          for (let i = 0; i < currentStatuses.length; i++) {
-            if (currentStatuses[i] !== originalStatuses[i]) return true;
+        case 'ArrowDown':
+          e.preventDefault();
+          const nextUserIndex = currentRosterUsers.findIndex(u => u.username === username);
+          if (nextUserIndex < currentRosterUsers.length - 1) {
+            newUsername = currentRosterUsers[nextUserIndex + 1].username;
           }
-        }
-        
-        return false;
-      }
-      
-      function showCreateRosterView() {
-        if (globalCache.userAccess.accessLevel !== 'admin') {
-          Modal.error('Access denied. Only administrators can create rosters.');
+          break;
+          
+        case 'ArrowLeft':
+          e.preventDefault();
+          if (day > 0) {
+            newDay = day - 1;
+          }
+          break;
+          
+        case 'ArrowRight':
+          e.preventDefault();
+          if (day < monthDetails.daysInMonth - 1) {
+            newDay = day + 1;
+          }
+          break;
+          
+        case 'Enter':
+          e.preventDefault();
+          if (globalCache.userAccess?.accessLevel === 'admin') {
+            const currentStatus = getCurrentStatus(username, day);
+            showStatusModal(username, day, currentStatus);
+          }
+          break;
+          
+        default:
           return;
-        }
-        
-        hideAllViews();
-        const createView = document.getElementById('create-roster-view');
-        if (createView) createView.style.display = 'block';
-        
-        populateRosterTypesDropdown();
       }
       
-      function populateRosterTypesDropdown() {
-        if (!globalCache.rosterTypesWithColors) return;
-        
-        const options = [
-          { value: '', text: 'Select a roster type' },
-          ...globalCache.rosterTypesWithColors.map(typeInfo => ({
-            value: typeInfo.type,
-            text: typeInfo.type
-          }))
-        ];
-        
-        if (globalCache.rosterTypesWithColors.length === 0) {
-          options.push({ value: 'Default', text: 'Default' });
-        }
-        
-        CustomSelect.populateOptions('roster-type', options);
+      if (newUsername !== username || newDay !== day) {
+        setFocusedCell(newUsername, newDay);
       }
-      
-      function updateAvailableRosterTypes() {
-        const monthYearInput = document.getElementById('month-year');
-        
-        if (!monthYearInput || !monthYearInput.value) return;
-        
-        const date = new Date(monthYearInput.value + '-01');
-        const formattedMonthYear = date.toLocaleString('default', { month: 'long', year: 'numeric' });
-        
-        const usedTypes = globalCache.rosters
-          .filter(roster => roster.monthYear === formattedMonthYear)
-          .map(roster => roster.type);
-        
-        const availableTypes = globalCache.rosterTypesWithColors.filter(typeInfo => !usedTypes.includes(typeInfo.type));
-        
-        const options = [
-          { value: '', text: 'Select a roster type' },
-          ...availableTypes.map(typeInfo => ({
-            value: typeInfo.type,
-            text: typeInfo.type
-          }))
-        ];
-        
-        if (availableTypes.length === 0) {
-          options.push({ value: '', text: 'No available types for this month' });
-        }
-        
-        CustomSelect.populateOptions('roster-type', options);
-      }
-      
-      function showRosterListView() {
-        if (currentRoster && hasRealChanges()) {
-          globalCache.pendingChangesByRoster.set(currentRoster.id, {
-            pendingChanges: new Map(pendingChanges),
-            originalData: new Map(originalData)
-          });
-        }
-        
-        hideAllViews();
-        const listView = document.getElementById('roster-list-view');
-        if (listView) listView.style.display = 'block';
-        
-        currentRoster = null;
-        pendingChanges = new Map();
-        originalData = new Map();
-        selectedUsers.clear();
-        updateSaveButtonState();
-      }
-      
-      function hideAllViews() {
-        const views = ['roster-list-view', 'create-roster-view', 'roster-detail-view'];
-        views.forEach(viewId => {
-          const view = document.getElementById(viewId);
-          if (view) view.style.display = 'none';
-        });
-      }
-      
-function handleCreateRoster() {
-  if (globalCache.userAccess.accessLevel !== 'admin') {
-    Modal.error('Access denied. Only administrators can create rosters.');
-    return;
+    });
   }
 
-  const btn = document.getElementById('submit-roster-btn');
-  const spinner = btn.querySelector('.loading-spinner');
-  const btnText = btn.querySelector('.btn-text');
+  function setFocusedCell(username, day) {
 
+    document.querySelectorAll('.status-cell.focused').forEach(cell => {
+      cell.classList.remove('focused');
+    });
+    
 
-  btn.disabled = true;
-  btnText.style.display = 'none';
-  spinner.style.display = 'inline-block';
+    const cell = document.querySelector(`[data-username="${username}"][data-day="${day}"]`);
+    if (cell) {
+      cell.classList.add('focused');
+      focusedCell = { username, day };
+      
 
-  const monthYearInput = document.getElementById('month-year');
-  const rosterTypeValue = CustomSelect.getValue('roster-type');
-
-  if (!monthYearInput) return;
-
-  const monthYearValue = monthYearInput.value;
-
-  if (!monthYearValue || !rosterTypeValue) {
-    Modal.error('Please fill in all fields');
-
-
-    btn.disabled = false;
-    btnText.style.display = 'inline';
-    spinner.style.display = 'none';
-    return;
+      cell.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'nearest', 
+        inline: 'nearest' 
+      });
+    }
   }
 
-  try {
-    const date = new Date(monthYearValue + '-01');
-    const formattedMonthYear = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+  function setupMultiSelectFeatures() {
 
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && currentRoster && globalCache.userAccess?.accessLevel === 'admin') {
+        switch(e.key.toLowerCase()) {
+          case 'c':
+            if (!e.target.matches('input, textarea')) {
+              e.preventDefault();
+              handleCopyStatus();
+            }
+            break;
+          case 'v':
+            if (!e.target.matches('input, textarea')) {
+              e.preventDefault();
+              handlePasteStatus();
+            }
+            break;
+          case 'x':
+            if (!e.target.matches('input, textarea')) {
+              e.preventDefault();
+              handleCutStatus();
+            }
+            break;
+          case 'a':
+            if (e.target.closest('.roster-table')) {
+              e.preventDefault();
+              selectAllCells();
+            }
+            break;
+        }
+      }
+      
+      if (e.key === 'Escape') {
+        clearSelection();
+      }
+    });
+
+
+    document.getElementById('copy-btn')?.addEventListener('click', handleCopyStatus);
+    document.getElementById('paste-btn')?.addEventListener('click', handlePasteStatus);
+    document.getElementById('cut-btn')?.addEventListener('click', handleCutStatus);
+    document.getElementById('clear-selection-btn')?.addEventListener('click', clearSelection);
+    document.getElementById('clear-status-btn')?.addEventListener('click', () => setSelectedCellsStatus(''));
+    
+
+    document.getElementById('import-roster-btn')?.addEventListener('click', handleImportFromRoster);
+    
+
+    document.addEventListener('selectChange', function(e) {
+      if (e.detail.target === 'import-source-roster') {
+        const importBtn = document.getElementById('import-roster-btn');
+        if (importBtn) {
+          importBtn.disabled = !e.detail.value;
+        }
+      }
+    });
+  }
+
+  function getCellKey(username, day) {
+    return `${username}-${day}`;
+  }
+
+  function parseCellKey(cellKey) {
+    const parts = cellKey.split('-');
+    return {
+      username: parts.slice(0, -1).join('-'),
+      day: parseInt(parts[parts.length - 1])
+    };
+  }
+
+  function handleCellClick(username, day, event) {
+    if (globalCache.userAccess?.accessLevel !== 'admin') return;
+    
+    const currentTime = Date.now();
+    const cellKey = getCellKey(username, day);
+    
+
+    setFocusedCell(username, day);
+    
+
+    if (currentTime - lastClickTime < 300 && focusedCell && 
+        focusedCell.username === username && focusedCell.day === day) {
+
+      const currentStatus = getCurrentStatus(username, day);
+      showStatusModal(username, day, currentStatus);
+      lastClickTime = 0; 
+      return;
+    }
+    
+    lastClickTime = currentTime;
+    
+    if (event.ctrlKey || event.metaKey) {
+
+      if (selectedCells.has(cellKey)) {
+        selectedCells.delete(cellKey);
+      } else {
+        selectedCells.add(cellKey);
+      }
+    } else if (event.shiftKey && selectedCells.size > 0) {
+
+      const lastSelectedKey = Array.from(selectedCells)[selectedCells.size - 1];
+      const lastSelected = parseCellKey(lastSelectedKey);
+      
+      if (lastSelected.username === username) {
+
+        const startDay = Math.min(lastSelected.day, day);
+        const endDay = Math.max(lastSelected.day, day);
+        
+        for (let d = startDay; d <= endDay; d++) {
+          selectedCells.add(getCellKey(username, d));
+        }
+      } else {
+
+        const userIndex1 = currentRosterUsers.findIndex(u => u.username === lastSelected.username);
+        const userIndex2 = currentRosterUsers.findIndex(u => u.username === username);
+        
+        if (userIndex1 !== -1 && userIndex2 !== -1) {
+          const startUser = Math.min(userIndex1, userIndex2);
+          const endUser = Math.max(userIndex1, userIndex2);
+          
+          for (let u = startUser; u <= endUser; u++) {
+            selectedCells.add(getCellKey(currentRosterUsers[u].username, day));
+          }
+        }
+      }
+    } else {
+
+      if (!(selectedCells.has(cellKey) && selectedCells.size === 1)) {
+        selectedCells.clear();
+        selectedCells.add(cellKey);
+      }
+    }
+    
+    updateCellSelection();
+    updateMultiSelectControls();
+  }
+
+  function handleCellMouseDown(username, day, event) {
+    if (globalCache.userAccess?.accessLevel !== 'admin') return;
+    if (event.ctrlKey || event.metaKey || event.shiftKey) return;
+    
+    isSelecting = true;
+    selectionStartCell = { username, day };
+    
+    const cellKey = getCellKey(username, day);
+    selectedCells.clear();
+    selectedCells.add(cellKey);
+    
+    updateCellSelection();
+    updateMultiSelectControls();
+  }
+
+  function handleCellMouseEnter(username, day) {
+    if (!isSelecting || !selectionStartCell) return;
+    
+
+    selectedCells.clear();
+    
+
+    const startUserIndex = currentRosterUsers.findIndex(u => u.username === selectionStartCell.username);
+    const endUserIndex = currentRosterUsers.findIndex(u => u.username === username);
+    const startDay = Math.min(selectionStartCell.day, day);
+    const endDay = Math.max(selectionStartCell.day, day);
+    const startUser = Math.min(startUserIndex, endUserIndex);
+    const endUser = Math.max(startUserIndex, endUserIndex);
+    
+
+    for (let u = startUser; u <= endUser; u++) {
+      for (let d = startDay; d <= endDay; d++) {
+        selectedCells.add(getCellKey(currentRosterUsers[u].username, d));
+      }
+    }
+    
+    updateCellSelection();
+    updateMultiSelectControls();
+  }
+
+  function handleMouseUp() {
+    isSelecting = false;
+    selectionStartCell = null;
+  }
+
+  function updateCellSelection() {
+
+    document.querySelectorAll('.status-cell').forEach(cell => {
+      const username = cell.dataset.username;
+      const day = parseInt(cell.dataset.day);
+      const cellKey = getCellKey(username, day);
+      
+      if (selectedCells.has(cellKey)) {
+        cell.classList.add('selected');
+      } else {
+        cell.classList.remove('selected');
+      }
+    });
+  }
+
+  function updateMultiSelectControls() {
+    const controlsContainer = document.getElementById('multi-select-controls');
+    const selectionCount = document.getElementById('selection-count');
+    const copyBtn = document.getElementById('copy-btn');
+    const pasteBtn = document.getElementById('paste-btn');
+    const cutBtn = document.getElementById('cut-btn');
+    
+    if (selectedCells.size > 0) {
+      controlsContainer?.classList.add('show');
+      if (selectionCount) {
+        selectionCount.textContent = `${selectedCells.size} cell${selectedCells.size > 1 ? 's' : ''} selected`;
+      }
+      
+
+      if (copyBtn) copyBtn.disabled = selectedCells.size !== 1;
+      if (cutBtn) cutBtn.disabled = selectedCells.size === 0;
+      if (pasteBtn) pasteBtn.disabled = !copiedStatus || selectedCells.size === 0;
+    } else {
+      controlsContainer?.classList.remove('show');
+    }
+  }
+
+  function clearSelection() {
+    selectedCells.clear();
+    updateCellSelection();
+    updateMultiSelectControls();
+  }
+
+  function selectAllCells() {
+    selectedCells.clear();
+    currentRosterUsers.forEach(user => {
+      for (let day = 0; day < monthDetails.daysInMonth; day++) {
+        selectedCells.add(getCellKey(user.username, day));
+      }
+    });
+    updateCellSelection();
+    updateMultiSelectControls();
+  }
+
+  function getCurrentStatus(username, day) {
+    const userStatuses = pendingChanges.get(username) || [];
+    return userStatuses[day] || '';
+  }
+
+  function handleCopyStatus() {
+    if (selectedCells.size === 1) {
+      const cellKey = Array.from(selectedCells)[0];
+      const { username, day } = parseCellKey(cellKey);
+      const status = getCurrentStatus(username, day);
+      
+      copiedStatus = status;
+      copiedCells = new Set([cellKey]);
+      
+      showClipboardIndicator(`Copied: "${status || 'Empty'}"`);
+      updateMultiSelectControls();
+    }
+  }
+
+  function handlePasteStatus() {
+    if (copiedStatus !== '' && selectedCells.size > 0) {
+      setSelectedCellsStatus(copiedStatus);
+      showClipboardIndicator(`Pasted: "${copiedStatus}" to ${selectedCells.size} cells`);
+    }
+  }
+
+  function handleCutStatus() {
+    if (selectedCells.size > 0) {
+
+      if (selectedCells.size === 1) {
+        handleCopyStatus();
+      }
+      
+
+      setSelectedCellsStatus('');
+      showClipboardIndicator(`Cut ${selectedCells.size} cells`);
+    }
+  }
+
+  function setSelectedCellsStatus(status) {
+    selectedCells.forEach(cellKey => {
+      const { username, day } = parseCellKey(cellKey);
+      updatePendingStatus(username, day, status);
+    });
+    
+    generateRosterTable();
+    updateSaveButtonState();
+    
+    if (hasRealChanges()) {
+      showChangesIndicator();
+    } else {
+      hideChangesIndicator();
+    }
+  }
+
+  function showClipboardIndicator(message) {
+    const indicator = document.getElementById('clipboard-indicator');
+    const text = document.getElementById('clipboard-text');
+    
+    if (indicator && text) {
+      text.textContent = message;
+      indicator.classList.add('show');
+      
+      setTimeout(() => {
+        indicator.classList.remove('show');
+      }, 2000);
+    }
+  }
+
+  function setupImportControls() {
+    if (!currentRoster || !globalCache.rosters) return;
+    
+
+    const availableRosters = globalCache.rosters.filter(r => r.id !== currentRoster.id);
+    const importOptions = [
+      { value: '', text: 'Select a roster to import from' },
+      ...availableRosters.map(roster => ({
+        value: roster.id,
+        text: `${roster.monthYear} - ${roster.type}`
+      }))
+    ];
+    
+    CustomSelect.populateOptions('import-source-roster', importOptions);
+  }
+
+  function handleImportFromRoster() {
+    const sourceRosterId = CustomSelect.getValue('import-source-roster');
+    if (!sourceRosterId || !currentRoster) return;
+    
+    const sourceRoster = globalCache.rosters.find(r => r.id === sourceRosterId);
+    if (!sourceRoster) return;
+    
+    Modal.confirm(
+      `This will import user statuses from "${sourceRoster.monthYear} - ${sourceRoster.type}". Only matching users will be imported. Continue?`,
+      'Import Confirmation',
+      () => {
+        performClientSideImport(sourceRoster);
+      }
+    );
+  }
+
+  function performClientSideImport(sourceRoster) {
+    const importBtn = document.getElementById('import-roster-btn');
+    if (importBtn) {
+      importBtn.disabled = true;
+      importBtn.innerHTML = '<div class="loading-spinner"></div>Importing...';
+    }
+    
+
+    const cachedSourceData = globalCache.rosterData.get(sourceRoster.id);
+    
+    if (cachedSourceData) {
+
+      performImportWithData(sourceRoster, cachedSourceData.users);
+    } else {
+
+      google.script.run
+        .withSuccessHandler(function(sourceRosterData) {
+          if (!sourceRosterData || !sourceRosterData.users) {
+            Modal.error('Failed to load source roster data');
+            resetImportButton();
+            return;
+          }
+          
+
+          google.script.run
+            .withSuccessHandler(function(monthData) {
+              globalCache.rosterData.set(sourceRoster.id, {
+                users: sourceRosterData.users,
+                monthDetails: monthData || { daysInMonth: 31, dayDetails: [] }
+              });
+              
+              performImportWithData(sourceRoster, sourceRosterData.users);
+            })
+            .withFailureHandler(function(error) {
+              console.warn('Failed to load month details for source roster:', error);
+
+              globalCache.rosterData.set(sourceRoster.id, {
+                users: sourceRosterData.users,
+                monthDetails: { daysInMonth: 31, dayDetails: [] }
+              });
+              
+              performImportWithData(sourceRoster, sourceRosterData.users);
+            })
+            .getMonthDetails(sourceRoster.monthYear);
+        })
+        .withFailureHandler(function(error) {
+          Modal.error('Error loading source roster data: ' + (error?.message || 'Unknown error'));
+          resetImportButton();
+        })
+        .getUsersForRoster(sourceRoster.id);
+    }
+  }
+
+  function performImportWithData(sourceRoster, sourceUsers) {
+    let importedCount = 0;
+    
+    try {
+
+      currentRosterUsers.forEach(currentUser => {
+        const sourceUser = sourceUsers.find(su => su.username === currentUser.username);
+        if (sourceUser && sourceUser.dayStatuses) {
+          const daysToCopy = Math.min(monthDetails.daysInMonth, sourceUser.dayStatuses.length);
+          
+          for (let day = 0; day < daysToCopy; day++) {
+            if (sourceUser.dayStatuses[day]) {
+              updatePendingStatus(currentUser.username, day, sourceUser.dayStatuses[day]);
+              importedCount++;
+            }
+          }
+        }
+      });
+      
+
+      generateRosterTable();
+      updateSaveButtonState();
+      
+      if (hasRealChanges()) {
+        showChangesIndicator();
+      }
+      
+      Modal.success(`Successfully imported ${importedCount} status entries from "${sourceRoster.monthYear} - ${sourceRoster.type}"!`);
+      
+    } catch (error) {
+      console.error('Error during import:', error);
+      Modal.error('Error during import: ' + error.message);
+    }
+    
+    resetImportButton();
+  }
+
+  function resetImportButton() {
+    const importBtn = document.getElementById('import-roster-btn');
+    if (importBtn) {
+      importBtn.disabled = false;
+      importBtn.innerHTML = '<i class="fas fa-download"></i> Import Statuses';
+    }
+  }
+
+  function preloadRosterData(rosterId) {
+    if (globalCache.rosterData.has(rosterId)) {
+      return Promise.resolve(globalCache.rosterData.get(rosterId));
+    }
+    
+    return new Promise((resolve, reject) => {
+      const roster = globalCache.rosters.find(r => r.id === rosterId);
+      if (!roster) {
+        reject(new Error('Roster not found'));
+        return;
+      }
+      
+      Promise.all([
+        new Promise((resolveUsers, rejectUsers) => {
+          google.script.run
+            .withSuccessHandler(resolveUsers)
+            .withFailureHandler(rejectUsers)
+            .getUsersForRoster(rosterId);
+        }),
+        new Promise((resolveMonth, rejectMonth) => {
+          google.script.run
+            .withSuccessHandler(resolveMonth)
+            .withFailureHandler(rejectMonth)
+            .getMonthDetails(roster.monthYear);
+        })
+      ]).then(([users, monthData]) => {
+        const rosterData = {
+          users: users || [],
+          monthDetails: monthData || { daysInMonth: 31, dayDetails: [] }
+        };
+        
+        globalCache.rosterData.set(rosterId, rosterData);
+        resolve(rosterData);
+      }).catch(reject);
+    });
+  }
+
+  function preloadAllRosterData() {
+    if (!globalCache.rosters) return;
+    
+
+    const uncachedRosters = globalCache.rosters.filter(roster => 
+      !globalCache.rosterData.has(roster.id)
+    );
+    
+
+    const batchSize = 3;
+    let currentBatch = 0;
+    
+    function loadNextBatch() {
+      const startIndex = currentBatch * batchSize;
+      const endIndex = Math.min(startIndex + batchSize, uncachedRosters.length);
+      
+      if (startIndex >= uncachedRosters.length) return;
+      
+      const promises = [];
+      for (let i = startIndex; i < endIndex; i++) {
+        promises.push(preloadRosterData(uncachedRosters[i].id).catch(error => {
+          console.warn(`Failed to preload data for roster ${uncachedRosters[i].id}:`, error);
+        }));
+      }
+      
+      Promise.all(promises).then(() => {
+        currentBatch++;
+
+        setTimeout(loadNextBatch, 500);
+      });
+    }
+    
+    loadNextBatch();
+  }
+
+  function populateStatusButtons() {
+    const container = document.getElementById('status-buttons-container');
+    if (!container || !globalCache.statuses) return;
+    
+    container.innerHTML = '';
+    globalCache.statuses.forEach(status => {
+      const btn = document.createElement('button');
+      btn.className = 'mini-btn status';
+      btn.innerHTML = `<i class="fas fa-check"></i> ${status}`;
+      btn.onclick = () => setSelectedCellsStatus(status);
+      container.appendChild(btn);
+    });
+  }
+
+  function setupCustomSelectEvents() {
+    document.addEventListener('selectChange', function(e) {
+      const { value, target } = e.detail;
+      
+      if (target === 'filter-type' || target === 'filter-month' || target === 'filter-users') {
+        applyFilters();
+      } else if (target === 'roster-type') {
+
+      } else if (target === 'import-source-roster') {
+        const importBtn = document.getElementById('import-roster-btn');
+        if (importBtn) {
+          importBtn.disabled = !value;
+        }
+      }
+    });
+  }
+
+  function initializeSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const mainContent = document.getElementById('mainContent');
+    const menuLinks = document.querySelectorAll('.sidebar-menu-link');
+    
+    let isOpen = true;
+    let isMobile = window.innerWidth <= 768;
+    
+    function checkMobile() {
+      const wasMobile = isMobile;
+      isMobile = window.innerWidth <= 768;
+      
+      if (wasMobile !== isMobile) {
+        initializeSidebarState();
+      }
+    }
+    
+    function initializeSidebarState() {
+      if (isMobile) {
+        isOpen = false;
+        sidebar.classList.remove('open');
+        sidebar.classList.add('hidden');
+        mainContent.classList.add('sidebar-hidden');
+        sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        sidebarToggle.classList.remove('sidebar-open');
+      } else {
+        isOpen = true;
+        sidebar.classList.remove('hidden', 'open');
+        mainContent.classList.remove('sidebar-hidden');
+        sidebarToggle.innerHTML = '<i class="fas fa-times"></i>';
+        sidebarToggle.classList.add('sidebar-open');
+      }
+    }
+    
+    function openSidebar() {
+      isOpen = true;
+      
+      if (isMobile) {
+        sidebar.classList.add('open');
+        sidebar.classList.remove('hidden');
+        sidebarOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      } else {
+        sidebar.classList.remove('hidden');
+        mainContent.classList.remove('sidebar-hidden');
+        sidebarToggle.classList.add('sidebar-open');
+      }
+      
+      sidebarToggle.innerHTML = '<i class="fas fa-times"></i>';
+    }
+    
+    function closeSidebar() {
+      isOpen = false;
+      
+      if (isMobile) {
+        sidebar.classList.remove('open');
+        sidebar.classList.add('hidden');
+        sidebarOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+      } else {
+        sidebar.classList.add('hidden');
+        mainContent.classList.add('sidebar-hidden');
+        sidebarToggle.classList.remove('sidebar-open');
+      }
+      
+      sidebarToggle.innerHTML = '<i class="fas fa-bars"></i>';
+    }
+    
+    function toggleSidebar() {
+      if (isOpen) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    }
+    
+    sidebarToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      toggleSidebar();
+    });
+    
+    sidebarOverlay.addEventListener('click', function() {
+      if (isMobile) {
+        closeSidebar();
+      }
+    });
+    
+    menuLinks.forEach(link => {
+      link.addEventListener('click', function() {
+        if (isMobile && isOpen) {
+          closeSidebar();
+        }
+      });
+    });
+    
+    window.addEventListener('resize', function() {
+      checkMobile();
+    });
+    
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape' && isOpen) {
+        closeSidebar();
+      }
+    });
+    
+    sidebar.addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+    
+    initializeSidebarState();
+  }
+
+  function checkUserAccess() {
+    document.getElementById('main-content').style.display = 'block';
+    loadInitialData();
+  }
+
+  function getContrastColor(hexColor) {
+    hexColor = hexColor.replace('#', '');
+    
+    const r = parseInt(hexColor.substr(0, 2), 16);
+    const g = parseInt(hexColor.substr(2, 2), 16);
+    const b = parseInt(hexColor.substr(4, 2), 16);
+    
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    
+    return luminance > 0.5 ? '#000000' : '#ffffff';
+  }
+  
+  function createRosterTypeBadge(type, color) {
+    const badge = document.createElement('span');
+    badge.className = 'roster-type-badge';
+    badge.innerHTML = `<i class="fas fa-tag"></i> ${type}`;
+    badge.style.backgroundColor = color;
+    badge.style.color = getContrastColor(color);
+    return badge;
+  }
+  
+  function loadInitialData() {
+    let usedCache = false;
+    function applyData(data, isFromCache = false) {
+      globalCache.rosters = data.rosters || [];
+      globalCache.users = data.users || [];
+      globalCache.statuses = data.statuses || [];
+      globalCache.rosterTypesWithColors = data.rosterTypesWithColors || [];
+      globalCache.userAccess = data.userAccess;
+      if (globalCache.userAccess && globalCache.userAccess.accessLevel === 'admin') {
+      } else if (globalCache.userAccess && globalCache.userAccess.accessLevel === 'view') {
+        document.body.classList.add('view-only');
+      } else {
+        document.getElementById('access-denied-message').style.display = 'block';
+        hidePageLoading();
+        return;
+      }
+      filteredRosters = [...globalCache.rosters];
+      setupFilters();
+      displayRosters();
+      setupEventListeners();
+      populateStatusButtons();
+      const firstRoster = globalCache.rosters[0];
+      if (firstRoster) {
+        currentRoster = firstRoster;
+        loadRosterData(firstRoster.id);
+      }
+      if (!isFromCache) {
+        hidePageLoading();
+        preloadAllRosterData();
+      }
+    }
+    const cached = localStorage.getItem('cachedInitialData');
+    if (cached) {
+      try {
+        const cachedData = JSON.parse(cached);
+        applyData(cachedData, true);
+        usedCache = true;
+        hidePageLoading();
+      } catch (e) {
+        console.warn('Failed to parse cached data:', e);
+      }
+    }
+    setTimeout(() => {
+      if (!usedCache) {
+        showPageLoading();
+      }
+    }, 0);
     google.script.run
-      .withSuccessHandler(function(newRoster) {
-        Modal.success('Roster created successfully!');
-
-        globalCache.rosters.push(newRoster);
-        filteredRosters = [...globalCache.rosters];
-
-        showRosterListView();
-        displayRosters();
-
-
-        btn.disabled = false;
-        btnText.style.display = 'inline';
-        spinner.style.display = 'none';
+      .withSuccessHandler(function(freshData) {
+        try {
+          localStorage.setItem('cachedInitialData', JSON.stringify(freshData));
+        } catch (e) {
+          console.warn('Failed to cache new data:', e);
+        }
+        applyData(freshData);
       })
       .withFailureHandler(function(error) {
-        Modal.error('Error creating roster: ' + (error ? error.message : 'Unknown error'));
-
-
-        btn.disabled = false;
-        btnText.style.display = 'inline';
-        spinner.style.display = 'none';
+        console.error('Error loading initial data:', error);
+        const container = document.getElementById('roster-cards-container');
+        if (container) {
+          container.innerHTML = '<p class="error"><i class="fas fa-exclamation-triangle"></i> Error loading data: ' + (error ? error.message : 'Unknown error') + '</p>';
+        }
+        hidePageLoading();
       })
-      .createRoster(formattedMonthYear, rosterTypeValue);
-  } catch (e) {
-    Modal.error('Error formatting date: ' + e.message);
+      .getInitialData();
+  }
 
+  function loadRosterData(rosterId) {
+    showLoading('roster-info-loading');
+    showLoading('user-management-loading');
+    showLoading('roster-table-loading');
+
+    if (globalCache.rosterData.has(rosterId)) {
+      const cachedData = globalCache.rosterData.get(rosterId);
+      currentRosterUsers = cachedData.users;
+      monthDetails = cachedData.monthDetails;
+
+      hideLoading('roster-info-loading');
+      hideLoading('user-management-loading');
+      hideLoading('roster-table-loading');
+      setupRosterView();
+      return;
+    }
+
+    Promise.all([
+      new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler(reject)
+          .getUsersForRoster(rosterId);
+      }),
+      new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler(reject)
+          .getMonthDetails(currentRoster.monthYear);
+      })
+    ]).then(([rosterUsers, monthData]) => {
+      currentRosterUsers = rosterUsers || [];
+      monthDetails = monthData || { daysInMonth: 31, dayDetails: [] };
+
+      globalCache.rosterData.set(rosterId, {
+        users: currentRosterUsers,
+        monthDetails: monthDetails
+      });
+
+      hideLoading('roster-info-loading');
+      hideLoading('user-management-loading');
+      hideLoading('roster-table-loading');
+      setupRosterView();
+    }).catch(error => {
+      console.error('Error loading roster data:', error);
+      hideLoading('roster-info-loading');
+      hideLoading('user-management-loading');
+      hideLoading('roster-table-loading');
+      Modal.error('Error loading roster data: ' + (error ? error.message : 'Unknown error'));
+    });
+  }
+
+  function setupFilters() {
+    const uniqueTypes = [...new Set(globalCache.rosters.map(r => r.type))];
+    const typeOptions = [
+      { value: '', text: 'All Types' },
+      ...uniqueTypes.map(type => ({ value: type, text: type }))
+    ];
+    CustomSelect.populateOptions('filter-type', typeOptions);
+    
+    const uniqueMonths = [...new Set(globalCache.rosters.map(r => r.monthYear))];
+    const monthOptions = [
+      { value: '', text: 'All Months' },
+      ...uniqueMonths.sort().map(month => ({ value: month, text: month }))
+    ];
+    CustomSelect.populateOptions('filter-month', monthOptions);
+    
+
+    if (globalCache.users && globalCache.users.length > 0) {
+      const uniqueUsers = [...new Set(globalCache.users)];
+      const userOptions = [
+        { value: '', text: 'All Users' },
+        ...uniqueUsers.map(user => ({ value: user, text: user }))
+      ];
+      CustomSelect.populateOptions('filter-users', userOptions);
+    }
+    
+    document.getElementById('clear-filters').addEventListener('click', clearFilters);
+  }
+  
+  function applyFilters() {
+    const typeFilter = CustomSelect.getValue('filter-type');
+    const monthFilter = CustomSelect.getValue('filter-month');
+    const selectedUsers = Array.from(globalCache.selectedUserFilters);
+    
+    filteredRosters = globalCache.rosters.filter(roster => {
+      const typeMatch = !typeFilter || roster.type === typeFilter;
+      const monthMatch = !monthFilter || roster.monthYear === monthFilter;
+      
+      let userMatch = true;
+      if (selectedUsers.length > 0) {
+
+        const rosterData = globalCache.rosterData.get(roster.id);
+        if (rosterData && rosterData.users) {
+          userMatch = selectedUsers.some(selectedUser => 
+            rosterData.users.some(user => user.username === selectedUser)
+          );
+        } else {
+
+          userMatch = true;
+        }
+      }
+      
+      return typeMatch && monthMatch && userMatch;
+    });
+    
+    displayRosters();
+  }
+
+  
+  function clearFilters() {
+    CustomSelect.setValue('filter-type', '');
+    CustomSelect.setValue('filter-month', '');
+    
+
+    globalCache.selectedUserFilters.clear();
+    
+
+    const userTrigger = document.querySelector('[data-target="filter-users"]');
+    if (userTrigger && userTrigger.parentElement) {
+      const selectText = userTrigger.parentElement.querySelector('.select-text');
+      if (selectText) {
+        selectText.textContent = 'All Users';
+      }
+    }
+    
+    filteredRosters = [...globalCache.rosters];
+    displayRosters();
+  }
+  
+  function displayRosters() {
+    const container = document.getElementById('roster-cards-container');
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    if (!filteredRosters || filteredRosters.length === 0) {
+      container.innerHTML = '<div class="empty-message"><i class="fas fa-inbox"></i><br>No rosters found matching the current filters.</div>';
+      return;
+    }
+    
+    const fragment = document.createDocumentFragment();
+    filteredRosters.forEach(function(roster) {
+      if (roster && roster.id) {
+        const card = createRosterCard(roster);
+        fragment.appendChild(card);
+      }
+    });
+    container.appendChild(fragment);
+  }
+  
+  function createRosterCard(roster) {
+    if (!roster || !roster.id) return null;
+    
+    const card = document.createElement('div');
+    card.className = 'roster-card';
+    card.dataset.rosterId = roster.id;
+    
+    const typeInfo = globalCache.rosterTypesWithColors.find(t => t.type === roster.type);
+    const typeColor = typeInfo ? typeInfo.color : 'var(--orange)';
+    
+    const typeBadge = createRosterTypeBadge(roster.type || 'Unknown Type', typeColor);
+    
+    card.innerHTML = `
+      <h3>
+        <span><i class="fas fa-calendar-alt"></i> ${roster.monthYear || 'Unknown Month/Year'}</span>
+        ${typeBadge.outerHTML}
+      </h3>
+      <p><strong><i class="fas fa-id-badge"></i> ID:</strong> ${roster.id}</p>
+    `;
+    
+    card.addEventListener('click', () => viewRosterDetails(roster));
+    
+    return card;
+  }
+  
+  function setupEventListeners() {
+    const createRosterBtn = document.getElementById('create-roster-btn');
+    if (createRosterBtn && globalCache.userAccess && globalCache.userAccess.accessLevel === 'admin') {
+      createRosterBtn.addEventListener('click', showCreateRosterView);
+    }
+    
+    const cancelCreateBtn = document.getElementById('cancel-create');
+    if (cancelCreateBtn) {
+      cancelCreateBtn.addEventListener('click', showRosterListView);
+    }
+    
+    const createRosterForm = document.getElementById('create-roster-form');
+    if (createRosterForm) {
+      createRosterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        handleCreateRoster();
+      });
+    }
+    
+    const backToListBtn = document.getElementById('back-to-list');
+    if (backToListBtn) {
+      backToListBtn.addEventListener('click', async function() {
+        if (hasRealChanges() && globalCache.userAccess.accessLevel === 'admin') {
+          const confirmed = await window.confirm('You have unsaved changes. Are you sure you want to leave without saving?');
+          if (!confirmed) {
+            return;
+          }
+        }
+        showRosterListView();
+      });
+    }
+    
+    const addUsersBtn = document.getElementById('add-users-btn');
+    if (addUsersBtn && globalCache.userAccess.accessLevel === 'admin') {
+      addUsersBtn.addEventListener('click', handleAddUsers);
+    }
+    
+    const saveAllBtn = document.getElementById('save-all-changes');
+    if (saveAllBtn && globalCache.userAccess.accessLevel === 'admin') {
+      saveAllBtn.addEventListener('click', saveAllPendingChanges);
+    }
+    
+    const monthYearInput = document.getElementById('month-year');
+    if (monthYearInput) {
+      monthYearInput.addEventListener('change', updateAvailableRosterTypes);
+    }
+    
+    if (globalCache.userAccess.accessLevel === 'admin') {
+      setupMultiSelectUsers();
+    }
+
+
+    document.addEventListener('mouseup', handleMouseUp);
+  }
+  
+  function setupMultiSelectUsers() {
+    const userInput = document.getElementById('user-input');
+    const chipsContainer = document.getElementById('user-chips-container');
+    
+    if (!userInput || !chipsContainer) return;
+    
+    userInput.addEventListener('focus', function() {
+      showUserModal();
+    });
+    
+    chipsContainer.addEventListener('click', function() {
+      showUserModal();
+    });
+  }
+  
+  function showUserModal() {
+    const usedUsernames = new Set(currentRosterUsers.map(user => user.username));
+    const availableUsers = globalCache.users.filter(user => 
+      !usedUsernames.has(user) && !selectedUsers.has(user)
+    );
+    
+    const modalHTML = `
+      <div class="user-modal" id="user-modal">
+        <div class="user-modal-content">
+          <div class="user-modal-header">
+            <h3 class="user-modal-title">Select Users</h3>
+            <button class="user-modal-close" onclick="hideUserModal()">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="user-modal-search">
+            <input type="text" id="user-search" placeholder="Search users..." onkeyup="filterUserOptions(this.value)">
+          </div>
+          <div class="user-modal-body" id="user-options-container">
+            ${availableUsers.map(user => 
+              `<div class="user-option" onclick="addUserChip('${user}')">
+                <i class="fas fa-user"></i> ${user}
+              </div>`
+            ).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+    
+    const container = document.getElementById('user-modal-container');
+    container.innerHTML = modalHTML;
+    
+    setTimeout(() => {
+      document.getElementById('user-modal').classList.add('show');
+    }, 10);
+  }
+  
+  function hideUserModal() {
+    const modal = document.getElementById('user-modal');
+    if (modal) {
+      modal.classList.remove('show');
+      setTimeout(() => {
+        const container = document.getElementById('user-modal-container');
+        container.innerHTML = '';
+      }, 200);
+    }
+  }
+  
+  function filterUserOptions(searchTerm) {
+    const usedUsernames = new Set(currentRosterUsers.map(user => user.username));
+    const availableUsers = globalCache.users.filter(user => 
+      !usedUsernames.has(user) && 
+      !selectedUsers.has(user) &&
+      user.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    
+    const container = document.getElementById('user-options-container');
+    if (container) {
+      container.innerHTML = availableUsers.map(user => 
+        `<div class="user-option" onclick="addUserChip('${user}')">
+          <i class="fas fa-user"></i> ${user}
+        </div>`
+      ).join('');
+      
+      if (availableUsers.length === 0) {
+        container.innerHTML = '<div class="user-option"><i class="fas fa-user-slash"></i> No users found</div>';
+      }
+    }
+  }
+  
+  function addUserChip(username) {
+    selectedUsers.add(username);
+    
+    const chipsContainer = document.getElementById('user-chips-container');
+    const userInput = document.getElementById('user-input');
+    
+    const chip = document.createElement('div');
+    chip.className = 'user-chip';
+    chip.innerHTML = `
+      <i class="fas fa-user"></i>
+      <span>${username}</span>
+      <button class="remove" onclick="removeUserChip('${username}')">
+        <i class="fas fa-user-minus"></i>
+      </button>
+    `;
+    
+    chipsContainer.insertBefore(chip, userInput);
+    hideUserModal();
+    showUserModal();
+  }
+  
+  function removeUserChip(username) {
+    selectedUsers.delete(username);
+    
+    const chips = document.querySelectorAll('.user-chip');
+    chips.forEach(chip => {
+      if (chip.textContent.includes(username)) {
+        chip.remove();
+      }
+    });
+  }
+  
+  function showLoading(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.style.display = 'flex';
+    }
+  }
+  
+  function hideLoading(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+      element.style.display = 'none';
+    }
+  }
+  
+  function hasRealChanges() {
+    if (pendingChanges.size === 0) return false;
+    
+    for (let [username, currentStatuses] of pendingChanges) {
+      const originalStatuses = originalData.get(username) || [];
+      
+      if (currentStatuses.length !== originalStatuses.length) return true;
+      
+      for (let i = 0; i < currentStatuses.length; i++) {
+        if (currentStatuses[i] !== originalStatuses[i]) return true;
+      }
+    }
+    
+    return false;
+  }
+  
+  function showCreateRosterView() {
+    if (globalCache.userAccess.accessLevel !== 'admin') {
+      Modal.error('Access denied. Only administrators can create rosters.');
+      return;
+    }
+    
+    hideAllViews();
+    const createView = document.getElementById('create-roster-view');
+    if (createView) createView.style.display = 'block';
+    
+    populateRosterTypesDropdown();
+  }
+  
+  function populateRosterTypesDropdown() {
+    if (!globalCache.rosterTypesWithColors) return;
+    
+    const options = [
+      { value: '', text: 'Select a roster type' },
+      ...globalCache.rosterTypesWithColors.map(typeInfo => ({
+        value: typeInfo.type,
+        text: typeInfo.type
+      }))
+    ];
+    
+    if (globalCache.rosterTypesWithColors.length === 0) {
+      options.push({ value: 'Default', text: 'Default' });
+    }
+    
+    CustomSelect.populateOptions('roster-type', options);
+  }
+  
+  function updateAvailableRosterTypes() {
+    const monthYearInput = document.getElementById('month-year');
+    
+    if (!monthYearInput || !monthYearInput.value) return;
+    
+    const date = new Date(monthYearInput.value + '-01');
+    const formattedMonthYear = date.toLocaleString('default', { month: 'long', year: 'numeric' });
+    
+    const usedTypes = globalCache.rosters
+      .filter(roster => roster.monthYear === formattedMonthYear)
+      .map(roster => roster.type);
+    
+    const availableTypes = globalCache.rosterTypesWithColors.filter(typeInfo => !usedTypes.includes(typeInfo.type));
+    
+    const options = [
+      { value: '', text: 'Select a roster type' },
+      ...availableTypes.map(typeInfo => ({
+        value: typeInfo.type,
+        text: typeInfo.type
+      }))
+    ];
+    
+    if (availableTypes.length === 0) {
+      options.push({ value: '', text: 'No available types for this month' });
+    }
+    
+    CustomSelect.populateOptions('roster-type', options);
+  }
+  
+  function showRosterListView() {
+    if (currentRoster && hasRealChanges()) {
+      globalCache.pendingChangesByRoster.set(currentRoster.id, {
+        pendingChanges: new Map(pendingChanges),
+        originalData: new Map(originalData)
+      });
+    }
+    
+    hideAllViews();
+    const listView = document.getElementById('roster-list-view');
+    if (listView) listView.style.display = 'block';
+    
+    currentRoster = null;
+    pendingChanges = new Map();
+    originalData = new Map();
+    selectedUsers.clear();
+    clearSelection();
+    focusedCell = null;
+    updateSaveButtonState();
+  }
+  
+  function hideAllViews() {
+    const views = ['roster-list-view', 'create-roster-view', 'roster-detail-view'];
+    views.forEach(viewId => {
+      const view = document.getElementById(viewId);
+      if (view) view.style.display = 'none';
+    });
+  }
+  
+  let creatingRoster = false;
+
+  function handleCreateRoster() {
+    if (creatingRoster) return;
+    creatingRoster = true;
+
+    if (globalCache.userAccess.accessLevel !== 'admin') {
+      Modal.error('Access denied. Only administrators can create rosters.');
+      creatingRoster = false;
+      return;
+    }
+
+    const btn = document.getElementById('submit-roster-btn');
+    const spinner = btn.querySelector('.loading-spinner');
+    const btnText = btn.querySelector('.btn-text');
+
+    btn.disabled = true;
+    btnText.style.display = 'none';
+    spinner.style.display = 'inline-block';
+
+    const monthYearInput = document.getElementById('month-year');
+    const rosterTypeValue = CustomSelect.getValue('roster-type');
+
+    if (!monthYearInput || !rosterTypeValue) {
+      Modal.error('Please fill in all fields');
+      resetCreateRosterButton();
+      return;
+    }
+
+    const monthYearValue = monthYearInput.value;
+
+    try {
+      const date = new Date(monthYearValue + '-01');
+      const formattedMonthYear = date.toLocaleString('default', {
+        month: 'long',
+        year: 'numeric'
+      });
+
+      google.script.run
+        .withSuccessHandler(function (newRoster) {
+          Modal.success('Roster created successfully!');
+
+          globalCache.rosters.push(newRoster);
+          filteredRosters = [...globalCache.rosters];
+
+          try {
+            const cachedData = {
+              rosters: globalCache.rosters,
+              users: globalCache.users,
+              statuses: globalCache.statuses,
+              rosterTypesWithColors: globalCache.rosterTypesWithColors,
+              userAccess: globalCache.userAccess
+            };
+            localStorage.setItem('cachedInitialData', JSON.stringify(cachedData));
+          } catch (e) {
+            console.warn('Failed to update cached data:', e);
+          }
+
+          showRosterListView();
+          displayRosters();
+          resetCreateRosterButton();
+        })
+        .withFailureHandler(function (error) {
+          Modal.error('Error creating roster: ' + (error?.message || 'Unknown error'));
+          resetCreate
+          Modal.error('Error creating roster: ' + (error?.message || 'Unknown error'));
+          resetCreateRosterButton();
+        })
+        .createRoster(formattedMonthYear, rosterTypeValue);
+
+    } catch (e) {
+      Modal.error('Error formatting date: ' + e.message);
+      resetCreateRosterButton();
+    }
+  }
+
+  function resetCreateRosterButton() {
+    const btn = document.getElementById('submit-roster-btn');
+    const spinner = btn.querySelector('.loading-spinner');
+    const btnText = btn.querySelector('.btn-text');
 
     btn.disabled = false;
     btnText.style.display = 'inline';
     spinner.style.display = 'none';
+    creatingRoster = false;
   }
-}
 
+  function viewRosterDetails(roster) {
+    if (!roster || !roster.id) return;
+    
+    if (currentRoster && currentRoster.id !== roster.id && hasRealChanges()) {
+      globalCache.pendingChangesByRoster.set(currentRoster.id, {
+        pendingChanges: new Map(pendingChanges),
+        originalData: new Map(originalData)
+      });
+    }
+    
+    currentRoster = roster;
+    pendingChanges = new Map();
+    originalData = new Map();
+    selectedUsers.clear();
+    clearSelection();
+    focusedCell = null;
+    
+    const detailRosterId = document.getElementById('detail-roster-id');
+    const detailMonthYear = document.getElementById('detail-month-year');
+    const detailRosterType = document.getElementById('detail-roster-type');
+    const rosterDetailTitle = document.getElementById('roster-detail-title');
+    
+    if (detailRosterId) detailRosterId.textContent = roster.id;
+    if (detailMonthYear) detailMonthYear.textContent = roster.monthYear || 'Unknown';
+    if (detailRosterType) {
+      const typeInfo = globalCache.rosterTypesWithColors.find(t => t.type === roster.type);
+      const typeColor = typeInfo ? typeInfo.color : 'var(--orange)';
+      const typeBadge = createRosterTypeBadge(roster.type || 'Unknown', typeColor);
+      detailRosterType.innerHTML = typeBadge.outerHTML;
+    }
+    if (rosterDetailTitle) rosterDetailTitle.innerHTML = `<i class="fas fa-calendar-check"></i> Roster: ${roster.monthYear || 'Unknown'} (${roster.type || 'Unknown'})`;
+    
+    hideAllViews();
+    const detailView = document.getElementById('roster-detail-view');
+    if (detailView) detailView.style.display = 'block';
+    
+    setupImportControls();
+    loadRosterData(roster.id);
+  }
+       
+  function setupRosterView() {
+    const savedChanges = globalCache.pendingChangesByRoster.get(currentRoster.id);
+    
+    if (savedChanges) {
+      pendingChanges = new Map(savedChanges.pendingChanges);
+      originalData = new Map(savedChanges.originalData);
+    } else {
+      currentRosterUsers.forEach(user => {
+        const dayStatuses = user.dayStatuses || [];
+        while (dayStatuses.length < monthDetails.daysInMonth) {
+          dayStatuses.push('');
+        }
+        originalData.set(user.username, [...dayStatuses]);
+        pendingChanges.set(user.username, [...dayStatuses]);
+      });
+    }
+    
+    displayCurrentUsers();
+    generateRosterTable();
+    updateSaveButtonState();
+    
+    if (hasRealChanges()) {
+      showChangesIndicator();
+    }
+  }
+  
+  function displayCurrentUsers() {
+    const usersList = document.getElementById('users-list');
+    if (!usersList) return;
+    
+    if (currentRosterUsers.length === 0) {
+      usersList.innerHTML = '<p><i class="fas fa-info-circle"></i> No users assigned to this roster.</p>';
+      return;
+    }
+    
+    const fragment = document.createDocumentFragment();
+    currentRosterUsers.forEach(user => {
+      const userRow = document.createElement('div');
+      userRow.className = 'user-row';
       
-      function viewRosterDetails(roster) {
-        if (!roster || !roster.id) return;
-        
-        if (currentRoster && currentRoster.id !== roster.id && hasRealChanges()) {
-          globalCache.pendingChangesByRoster.set(currentRoster.id, {
-            pendingChanges: new Map(pendingChanges),
-            originalData: new Map(originalData)
-          });
-        }
-        
-        currentRoster = roster;
-        pendingChanges = new Map();
-        originalData = new Map();
-        selectedUsers.clear();
-        
-        const detailRosterId = document.getElementById('detail-roster-id');
-        const detailMonthYear = document.getElementById('detail-month-year');
-        const detailRosterType = document.getElementById('detail-roster-type');
-        const rosterDetailTitle = document.getElementById('roster-detail-title');
-        
-        if (detailRosterId) detailRosterId.textContent = roster.id;
-        if (detailMonthYear) detailMonthYear.textContent = roster.monthYear || 'Unknown';
-        if (detailRosterType) {
-          const typeInfo = globalCache.rosterTypesWithColors.find(t => t.type === roster.type);
-          const typeColor = typeInfo ? typeInfo.color : 'var(--orange)';
-          const typeBadge = createRosterTypeBadge(roster.type || 'Unknown', typeColor);
-          detailRosterType.innerHTML = typeBadge.outerHTML;
-        }
-        if (rosterDetailTitle) rosterDetailTitle.innerHTML = `<i class="fas fa-calendar-check"></i> Roster: ${roster.monthYear || 'Unknown'} (${roster.type || 'Unknown'})`;
-        
-        hideAllViews();
-        const detailView = document.getElementById('roster-detail-view');
-        if (detailView) detailView.style.display = 'block';
-        
-        loadRosterData(roster.id);
-      }
-           
-      function setupRosterView() {
-        const savedChanges = globalCache.pendingChangesByRoster.get(currentRoster.id);
-        
-        if (savedChanges) {
-          pendingChanges = new Map(savedChanges.pendingChanges);
-          originalData = new Map(savedChanges.originalData);
-        } else {
-          currentRosterUsers.forEach(user => {
-            const dayStatuses = user.dayStatuses || [];
-            while (dayStatuses.length < monthDetails.daysInMonth) {
-              dayStatuses.push('');
-            }
-            originalData.set(user.username, [...dayStatuses]);
-            pendingChanges.set(user.username, [...dayStatuses]);
-          });
-        }
-        
-        displayCurrentUsers();
-        generateRosterTable();
-        updateSaveButtonState();
-        
-        if (hasRealChanges()) {
-          showChangesIndicator();
-        }
-      }
+      const removeButton = globalCache.userAccess.accessLevel === 'admin' 
+        ? `<button class="danger-btn admin-only" onclick="removeUser('${user.username}')">
+             <i class="fas fa-user-minus"></i>
+           </button>`
+        : '';
       
-      function displayCurrentUsers() {
-        const usersList = document.getElementById('users-list');
-        if (!usersList) return;
-        
-        if (currentRosterUsers.length === 0) {
-          usersList.innerHTML = '<p><i class="fas fa-info-circle"></i> No users assigned to this roster.</p>';
-          return;
+      userRow.innerHTML = `
+        <div class="user-info">
+          <i class="fas fa-user"></i> <strong>${user.username}</strong>
+        </div>
+        ${removeButton}
+      `;
+      fragment.appendChild(userRow);
+    });
+    
+    usersList.innerHTML = '';
+    usersList.appendChild(fragment);
+  }
+  
+  function handleAddUsers() {
+    if (globalCache.userAccess.accessLevel !== 'admin') {
+      Modal.error('Access denied. Only administrators can add users.');
+      return;
+    }
+    
+    if (selectedUsers.size === 0) {
+      Modal.error('Please select at least one user');
+      return;
+    }
+    
+    const usernames = Array.from(selectedUsers);
+    const addBtn = document.getElementById('add-users-btn');
+    
+    if (addBtn) {
+      addBtn.disabled = true;
+      addBtn.innerHTML = '<div class="loading-spinner"></div>Adding Users...';
+    }
+    
+    google.script.run
+      .withSuccessHandler(function(newUsers) {
+        if (addBtn) {
+          addBtn.disabled = false;
+          addBtn.innerHTML = '<i class="fas fa-plus"></i> Add Selected Users';
         }
         
-        const fragment = document.createDocumentFragment();
-        currentRosterUsers.forEach(user => {
-          const userRow = document.createElement('div');
-          userRow.className = 'user-row';
-          
-          const removeButton = globalCache.userAccess.accessLevel === 'admin' 
-            ? `<button class="danger-btn admin-only" onclick="removeUser('${user.username}')">
-                 <i class="fas fa-user-minus"></i>
-               </button>`
-            : '';
-          
-          userRow.innerHTML = `
-            <div class="user-info">
-              <i class="fas fa-user"></i> <strong>${user.username}</strong>
-            </div>
-            ${removeButton}
-          `;
-          fragment.appendChild(userRow);
+        Modal.success(`Successfully added ${newUsers.length} users!`);
+        
+        currentRosterUsers.push(...newUsers);
+        globalCache.rosterData.set(currentRoster.id, {
+          users: currentRosterUsers,
+          monthDetails: monthDetails
         });
         
-        usersList.innerHTML = '';
-        usersList.appendChild(fragment);
-      }
-      
-      function handleAddUsers() {
-        if (globalCache.userAccess.accessLevel !== 'admin') {
-          Modal.error('Access denied. Only administrators can add users.');
-          return;
-        }
+        selectedUsers.clear();
+        const chips = document.querySelectorAll('.user-chip');
+        chips.forEach(chip => chip.remove());
         
-        if (selectedUsers.size === 0) {
-          Modal.error('Please select at least one user');
-          return;
-        }
-        
-        const usernames = Array.from(selectedUsers);
-        const addBtn = document.getElementById('add-users-btn');
-        
+        setupRosterView();
+      })
+      .withFailureHandler(function(error) {
         if (addBtn) {
-          addBtn.disabled = true;
-          addBtn.innerHTML = '<div class="loading-spinner"></div>Adding Users...';
+          addBtn.disabled = false;
+          addBtn.innerHTML = '<i class="fas fa-plus"></i> Add Selected Users';
         }
-        
+        Modal.error('Error adding users: ' + (error ? error.message : 'Unknown error'));
+      })
+      .addUsersToRoster(currentRoster.id, usernames);
+  }
+  
+  function removeUser(username) {
+    if (globalCache.userAccess.accessLevel !== 'admin') {
+      Modal.error('Access denied. Only administrators can remove users.');
+      return;
+    }
+    
+    Modal.confirm(
+      `Are you sure you want to remove ${username} from this roster?`,
+      'Remove User',
+      () => {
         google.script.run
-          .withSuccessHandler(function(newUsers) {
-            if (addBtn) {
-              addBtn.disabled = false;
-              addBtn.innerHTML = '<i class="fas fa-plus"></i> Add Selected Users';
-            }
+          .withSuccessHandler(function() {
+            Modal.success('User removed successfully!');
             
-            Modal.success(`Successfully added ${newUsers.length} users!`);
-            
-            currentRosterUsers.push(...newUsers);
+            currentRosterUsers = currentRosterUsers.filter(user => user.username !== username);
             globalCache.rosterData.set(currentRoster.id, {
               users: currentRosterUsers,
               monthDetails: monthDetails
             });
             
-            selectedUsers.clear();
-            const chips = document.querySelectorAll('.user-chip');
-            chips.forEach(chip => chip.remove());
+            pendingChanges.delete(username);
+            originalData.delete(username);
             
             setupRosterView();
           })
           .withFailureHandler(function(error) {
-            if (addBtn) {
-              addBtn.disabled = false;
-              addBtn.innerHTML = '<i class="fas fa-plus"></i> Add Selected Users';
-            }
-            Modal.error('Error adding users: ' + (error ? error.message : 'Unknown error'));
+            Modal.error('Error removing user: ' + (error ? error.message : 'Unknown error'));
           })
-          .addUsersToRoster(currentRoster.id, usernames);
+          .removeUserFromRoster(currentRoster.id, username);
+      }
+    );
+  }
+  
+  function generateRosterTable() {
+    const tableContent = document.getElementById('roster-table-content');
+    if (!tableContent) return;
+    
+    if (currentRosterUsers.length === 0) {
+      tableContent.innerHTML = '<p><i class="fas fa-info-circle"></i> No users assigned to this roster. Add users above to create the schedule.</p>';
+      return;
+    }
+    
+    const table = document.createElement('table');
+    table.className = 'roster-table';
+    
+    const thead = document.createElement('thead');
+    const headerRow = document.createElement('tr');
+    
+    const userHeader = document.createElement('th');
+    userHeader.innerHTML = '<i class="fas fa-users"></i> User';
+    headerRow.appendChild(userHeader);
+    
+    monthDetails.dayDetails.forEach(dayDetail => {
+      const dayHeader = document.createElement('th');
+      dayHeader.innerHTML = `
+        <div class="day-header">
+          <div class="day-number">${dayDetail.day}</div>
+          <div class="day-name">${dayDetail.dayName}</div>
+        </div>
+      `;
+      
+      const monthIndex = new Date(currentRoster.monthYear + ' 1').getMonth();
+      const date = new Date(parseInt(currentRoster.monthYear.split(' ')[1]), monthIndex, dayDetail.day);
+      
+      if (date.getDay() === 0 || date.getDay() === 6) {
+        dayHeader.classList.add('weekend');
       }
       
-      function removeUser(username) {
-        if (globalCache.userAccess.accessLevel !== 'admin') {
-          Modal.error('Access denied. Only administrators can remove users.');
-          return;
-        }
-        
-        Modal.confirm(
-          `Are you sure you want to remove ${username} from this roster?`,
-          'Remove User',
-          () => {
-            google.script.run
-              .withSuccessHandler(function() {
-                Modal.success('User removed successfully!');
-                
-                currentRosterUsers = currentRosterUsers.filter(user => user.username !== username);
-                globalCache.rosterData.set(currentRoster.id, {
-                  users: currentRosterUsers,
-                  monthDetails: monthDetails
-                });
-                
-                pendingChanges.delete(username);
-                originalData.delete(username);
-                
-                setupRosterView();
-              })
-              .withFailureHandler(function(error) {
-                Modal.error('Error removing user: ' + (error ? error.message : 'Unknown error'));
-              })
-              .removeUserFromRoster(currentRoster.id, username);
-          }
-        );
-      }
+      headerRow.appendChild(dayHeader);
+    });
+    
+    thead.appendChild(headerRow);
+    table.appendChild(thead);
+    
+    const tbody = document.createElement('tbody');
+    
+    currentRosterUsers.forEach(user => {
+      const row = document.createElement('tr');
       
-      function generateRosterTable() {
-        const tableContent = document.getElementById('roster-table-content');
-        if (!tableContent) return;
+      const userCell = document.createElement('td');
+      userCell.innerHTML = `<i class="fas fa-user"></i> ${user.username}`;
+      row.appendChild(userCell);
+      
+      const userStatuses = pendingChanges.get(user.username) || [];
+      
+      for (let day = 0; day < monthDetails.daysInMonth; day++) {
+        const statusCell = document.createElement('td');
+        statusCell.className = 'status-cell';
+        statusCell.dataset.username = user.username;
+        statusCell.dataset.day = day;
         
-        if (currentRosterUsers.length === 0) {
-          tableContent.innerHTML = '<p><i class="fas fa-info-circle"></i> No users assigned to this roster. Add users above to create the schedule.</p>';
-          return;
+        const status = userStatuses[day] || '';
+        statusCell.textContent = status || '-';
+        
+        if (!status) {
+          statusCell.classList.add('empty');
         }
         
-        const table = document.createElement('table');
-        table.className = 'roster-table';
-        
-        const thead = document.createElement('thead');
-        const headerRow = document.createElement('tr');
-        
-        const userHeader = document.createElement('th');
-        userHeader.innerHTML = '<i class="fas fa-users"></i> User';
-        headerRow.appendChild(userHeader);
-        
-        monthDetails.dayDetails.forEach(dayDetail => {
-          const dayHeader = document.createElement('th');
-          dayHeader.innerHTML = `
-            <div class="day-header">
-              <div class="day-number">${dayDetail.day}</div>
-              <div class="day-name">${dayDetail.dayName}</div>
-            </div>
-          `;
-          
-          const date = new Date(currentRoster.monthYear.split(' ')[1], 
-                               ['January', 'February', 'March', 'April', 'May', 'June',
-                                'July', 'August', 'September', 'October', 'November', 'December']
-                               .indexOf(currentRoster.monthYear.split(' ')[0]), dayDetail.day);
+        const dayDetail = monthDetails.dayDetails[day];
+        if (dayDetail) {
+          const monthIndex = new Date(currentRoster.monthYear + ' 1').getMonth();
+          const date = new Date(parseInt(currentRoster.monthYear.split(' ')[1]), monthIndex, dayDetail.day);
           
           if (date.getDay() === 0 || date.getDay() === 6) {
-            dayHeader.classList.add('weekend');
+            statusCell.classList.add('weekend');
           }
-          
-          headerRow.appendChild(dayHeader);
-        });
+        }
         
-        thead.appendChild(headerRow);
-        table.appendChild(thead);
+        if (globalCache.userAccess?.accessLevel === 'admin') {
+          statusCell.addEventListener('click', function(e) {
+            handleCellClick(user.username, day, e);
+          });
+          
+          statusCell.addEventListener('mousedown', function(e) {
+            handleCellMouseDown(user.username, day, e);
+          });
+          
+          statusCell.addEventListener('mouseenter', function() {
+            handleCellMouseEnter(user.username, day);
+          });
+        }
         
-        const tbody = document.createElement('tbody');
-        currentRosterUsers.forEach(user => {
-          const userRow = document.createElement('tr');
-          
-          const userCell = document.createElement('td');
-          userCell.innerHTML = `<i class="fas fa-user"></i> ${user.username}`;
-          userRow.appendChild(userCell);
-          
-          const userStatuses = pendingChanges.get(user.username) || [];
-          
-          for (let day = 0; day < monthDetails.daysInMonth; day++) {
-            const dayCell = document.createElement('td');
-            const currentStatus = userStatuses[day] || '';
-            
-            dayCell.className = 'status-cell';
-            dayCell.textContent = currentStatus || '-';
-            dayCell.dataset.username = user.username;
-            dayCell.dataset.day = day;
-            
-            if (!currentStatus) {
-              dayCell.classList.add('empty');
-            }
-            
-            const date = new Date(currentRoster.monthYear.split(' ')[1], 
-                                 ['January', 'February', 'March', 'April', 'May', 'June',
-                                  'July', 'August', 'September', 'October', 'November', 'December']
-                                 .indexOf(currentRoster.monthYear.split(' ')[0]), day + 1);
-            
-            if (date.getDay() === 0 || date.getDay() === 6) {
-              dayCell.classList.add('weekend');
-            }
-            
-            if (globalCache.userAccess.accessLevel === 'admin') {
-              dayCell.addEventListener('click', function() {
-                showStatusModal(user.username, day, currentStatus);
-              });
-            }
-            
-            userRow.appendChild(dayCell);
-          }
-          
-          tbody.appendChild(userRow);
-        });
-        
-        table.appendChild(tbody);
-        tableContent.innerHTML = '';
-        tableContent.appendChild(table);
+        row.appendChild(statusCell);
       }
       
-      function showStatusModal(username, dayIndex, currentStatus) {
-        if (globalCache.userAccess.accessLevel !== 'admin') return;
-        
-        const modalHTML = `
-          <div class="status-select-modal" id="status-select-modal">
-            <div class="status-select-content">
-              <div class="status-select-header">
-                <h3 class="status-select-title">Select Status for ${username}</h3>
-                <button class="status-select-close" onclick="hideStatusModal()">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-              <div class="status-select-body">
-                <div class="status-option ${!currentStatus ? 'selected' : ''}" 
-                     onclick="selectStatus('${username}', ${dayIndex}, '')">
-                  <i class="fas fa-minus"></i> No Status
-                </div>
-                ${globalCache.statuses.map(status => 
-                  `<div class="status-option ${status === currentStatus ? 'selected' : ''}" 
-                        onclick="selectStatus('${username}', ${dayIndex}, '${status}')">
-                    <i class="fas fa-check"></i> ${status}
-                  </div>`
-                ).join('')}
-              </div>
-            </div>
+      tbody.appendChild(row);
+    });
+    
+    table.appendChild(tbody);
+    tableContent.innerHTML = '';
+    tableContent.appendChild(table);
+    
+
+    updateCellSelection();
+    
+
+    if (!focusedCell && currentRosterUsers.length > 0) {
+      setFocusedCell(currentRosterUsers[0].username, 0);
+    }
+  }
+  
+  function showStatusModal(username, day, currentStatus) {
+    if (globalCache.userAccess?.accessLevel !== 'admin') return;
+    
+    const modalHTML = `
+      <div class="status-select-modal" id="status-select-modal">
+        <div class="status-select-content">
+          <div class="status-select-header">
+            <h3 class="status-select-title">Set Status for ${username} - Day ${day + 1}</h3>
+            <button class="status-select-close" onclick="hideStatusModal()">
+              <i class="fas fa-times"></i>
+            </button>
           </div>
-        `;
-        
+          <div class="status-select-body">
+            <div class="status-option ${!currentStatus ? 'selected' : ''}" onclick="selectStatus('${username}', ${day}, '')">
+              <i class="fas fa-minus"></i> Clear
+            </div>
+            ${globalCache.statuses.map(status => 
+              `<div class="status-option ${status === currentStatus ? 'selected' : ''}" 
+                    onclick="selectStatus('${username}', ${day}, '${status}')">
+                <i class="fas fa-check"></i> ${status}
+              </div>`
+            ).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+    
+    const container = document.getElementById('status-select-modal-container');
+    container.innerHTML = modalHTML;
+    
+    setTimeout(() => {
+      document.getElementById('status-select-modal').classList.add('show');
+    }, 10);
+  }
+  
+  function hideStatusModal() {
+    const modal = document.getElementById('status-select-modal');
+    if (modal) {
+      modal.classList.remove('show');
+      setTimeout(() => {
         const container = document.getElementById('status-select-modal-container');
-        container.innerHTML = modalHTML;
-        
-        setTimeout(() => {
-          document.getElementById('status-select-modal').classList.add('show');
-        }, 10);
-      }
+        container.innerHTML = '';
+      }, 200);
+    }
+  }
+  
+  function selectStatus(username, day, status) {
+    updatePendingStatus(username, day, status);
+    hideStatusModal();
+    generateRosterTable();
+    updateSaveButtonState();
+    
+    if (hasRealChanges()) {
+      showChangesIndicator();
+    } else {
+      hideChangesIndicator();
+    }
+  }
+  
+  function updatePendingStatus(username, day, status) {
+    if (!pendingChanges.has(username)) {
+      const originalStatuses = originalData.get(username) || [];
+      pendingChanges.set(username, [...originalStatuses]);
+    }
+    
+    const userStatuses = pendingChanges.get(username);
+    userStatuses[day] = status;
+  }
+  
+  function updateSaveButtonState() {
+    const saveBtn = document.getElementById('save-all-changes');
+    if (saveBtn && globalCache.userAccess?.accessLevel === 'admin') {
+      saveBtn.disabled = !hasRealChanges();
+    }
+  }
+  
+  function showChangesIndicator() {
+    const indicator = document.getElementById('changes-indicator');
+    if (indicator) {
+      indicator.classList.add('show');
+    }
+  }
+  
+  function hideChangesIndicator() {
+    const indicator = document.getElementById('changes-indicator');
+    if (indicator) {
+      indicator.classList.remove('show');
+    }
+  }
+  
+  function saveAllPendingChanges() {
+    if (globalCache.userAccess?.accessLevel !== 'admin') {
+      Modal.error('Access denied. Only administrators can save changes.');
+      return;
+    }
+    
+    if (!hasRealChanges()) {
+      Modal.alert('No changes to save');
+      return;
+    }
+    
+    const saveBtn = document.getElementById('save-all-changes');
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<div class="loading-spinner"></div>Saving Changes...';
+    }
+    
+    const changesArray = [];
+    for (let [username, statuses] of pendingChanges) {
+      const originalStatuses = originalData.get(username) || [];
       
-      function hideStatusModal() {
-        const modal = document.getElementById('status-select-modal');
-        if (modal) {
-          modal.classList.remove('show');
-          setTimeout(() => {
-            const container = document.getElementById('status-select-modal-container');
-            container.innerHTML = '';
-          }, 200);
+      for (let day = 0; day < statuses.length; day++) {
+        if (statuses[day] !== originalStatuses[day]) {
+          changesArray.push({
+            username: username,
+            day: day,
+            status: statuses[day]
+          });
         }
       }
-      
-      function selectStatus(username, dayIndex, status) {
-        updatePendingStatus(username, dayIndex, status);
-        hideStatusModal();
-        generateRosterTable();
-      }
-      
-      function updatePendingStatus(username, dayIndex, status) {
-        if (!pendingChanges.has(username)) {
-          const dayStatuses = new Array(monthDetails.daysInMonth).fill('');
-          pendingChanges.set(username, dayStatuses);
+    }
+    
+    google.script.run
+      .withSuccessHandler(function() {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = '<i class="fas fa-save"></i> Save All Changes';
         }
         
-        const userStatuses = pendingChanges.get(username);
-        userStatuses[dayIndex] = status;
+        Modal.success('All changes saved successfully!');
         
-        const cachedData = globalCache.rosterData.get(currentRoster.id);
-        if (cachedData) {
-          const userIndex = cachedData.users.findIndex(u => u.username === username);
-          if (userIndex !== -1) {
-            cachedData.users[userIndex].dayStatuses = [...userStatuses];
-          }
+
+        for (let [username, statuses] of pendingChanges) {
+          originalData.set(username, [...statuses]);
         }
+        
+
+        const updatedUsers = currentRosterUsers.map(user => ({
+          ...user,
+          dayStatuses: pendingChanges.get(user.username) || []
+        }));
+        
+        globalCache.rosterData.set(currentRoster.id, {
+          users: updatedUsers,
+          monthDetails: monthDetails
+        });
+        
+
+        globalCache.pendingChangesByRoster.delete(currentRoster.id);
         
         updateSaveButtonState();
-        if (hasRealChanges()) {
-          showChangesIndicator();
-        } else {
-          hideChangesIndicator();
-        }
-      }
-      
-      function updateSaveButtonState() {
-        const saveBtn = document.getElementById('save-all-changes');
-        if (saveBtn && globalCache.userAccess.accessLevel === 'admin') {
-          saveBtn.disabled = !hasRealChanges();
-        }
-      }
-      
-      function showChangesIndicator() {
-        const indicator = document.getElementById('changes-indicator');
-        if (indicator && globalCache.userAccess.accessLevel === 'admin') {
-          indicator.classList.add('show');
-        }
-      }
-      
-      function hideChangesIndicator() {
-        const indicator = document.getElementById('changes-indicator');
-        if (indicator) {
-          indicator.classList.remove('show');
-        }
-      }
-      
-      function saveAllPendingChanges() {
-        if (!hasRealChanges() || globalCache.userAccess.accessLevel !== 'admin') return;
-        
-        const saveBtn = document.getElementById('save-all-changes');
+        hideChangesIndicator();
+      })
+      .withFailureHandler(function(error) {
         if (saveBtn) {
-          saveBtn.disabled = true;
-          saveBtn.innerHTML = '<div class="loading-spinner"></div>Saving...';
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = '<i class="fas fa-save"></i> Save All Changes';
         }
-        
-        const updates = [];
-        pendingChanges.forEach((dayStatuses, username) => {
-          const originalStatuses = originalData.get(username) || [];
-          
-          let hasChanges = false;
-          for (let i = 0; i < dayStatuses.length; i++) {
-            if (dayStatuses[i] !== (originalStatuses[i] || '')) {
-              hasChanges = true;
-              break;
-            }
-          }
-          
-          if (hasChanges) {
-            updates.push({
-              rosterId: currentRoster.id,
-              username: username,
-              dayStatuses: dayStatuses
-            });
-          }
-        });
-        
-        if (updates.length === 0) {
-          if (saveBtn) {
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = '<i class="fas fa-save"></i> Save All Changes';
-          }
-          return;
-        }
-        
-        google.script.run
-          .withSuccessHandler(function(updatedCount) {
-            if (saveBtn) {
-              saveBtn.disabled = false;
-              saveBtn.innerHTML = '<i class="fas fa-save"></i> Save All Changes';
-            }
-            hideChangesIndicator();
-            Modal.success(`Successfully saved changes for ${updatedCount} users!`);
-            
-            updates.forEach(update => {
-              originalData.set(update.username, [...update.dayStatuses]);
-            });
-            
-            globalCache.pendingChangesByRoster.delete(currentRoster.id);
-            
-            updateSaveButtonState();
-          })
-          .withFailureHandler(function(error) {
-            if (saveBtn) {
-              saveBtn.disabled = false;
-              saveBtn.innerHTML = '<i class="fas fa-save"></i> Save All Changes';
-            }
-            Modal.error('Error saving changes: ' + (error ? error.message : 'Unknown error'));
-          })
-          .batchUpdateUserStatuses(updates);
-      }
-    </script>
-  </body>
-</html>
+        Modal.error('Error saving changes: ' + (error ? error.message : 'Unknown error'));
+      })
+      .saveRosterChanges(currentRoster.id, changesArray);
+  }
+
+
+  window.hideUserModal = hideUserModal;
+  window.addUserChip = addUserChip;
+  window.removeUserChip = removeUserChip;
+  window.filterUserOptions = filterUserOptions;
+  window.removeUser = removeUser;
+  window.hideStatusModal = hideStatusModal;
+  window.selectStatus = selectStatus;
+  window.CustomSelect = CustomSelect;
+</script>
