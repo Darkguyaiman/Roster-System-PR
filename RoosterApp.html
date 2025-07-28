@@ -4379,73 +4379,87 @@
       Modal.error('Access denied. Only administrators can save changes.');
       return;
     }
-    
+
     if (!hasRealChanges()) {
       Modal.alert('No changes to save');
       return;
     }
-    
+
     const saveBtn = document.getElementById('save-all-changes');
     if (saveBtn) {
       saveBtn.disabled = true;
       saveBtn.innerHTML = '<div class="loading-spinner"></div>Saving Changes...';
     }
-    
+
     const changesArray = [];
+
     for (let [username, statuses] of pendingChanges) {
       const originalStatuses = originalData.get(username) || [];
-      
+      let hasChange = false;
+
       for (let day = 0; day < statuses.length; day++) {
         if (statuses[day] !== originalStatuses[day]) {
-          changesArray.push({
-            username: username,
-            day: day,
-            status: statuses[day]
-          });
+          hasChange = true;
+          break;
         }
       }
+
+      if (hasChange) {
+        changesArray.push({
+          rosterId: currentRoster.id,
+          username: username,
+          dayStatuses: statuses
+        });
+      }
     }
-    
+
+    if (changesArray.length === 0) {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save All Changes';
+      }
+      Modal.alert('No changes to save');
+      return;
+    }
+
     google.script.run
-      .withSuccessHandler(function() {
+      .withSuccessHandler(function () {
         if (saveBtn) {
           saveBtn.disabled = false;
           saveBtn.innerHTML = '<i class="fas fa-save"></i> Save All Changes';
         }
-        
+
         Modal.success('All changes saved successfully!');
-        
 
         for (let [username, statuses] of pendingChanges) {
           originalData.set(username, [...statuses]);
         }
-        
 
         const updatedUsers = currentRosterUsers.map(user => ({
           ...user,
           dayStatuses: pendingChanges.get(user.username) || []
         }));
-        
+
         globalCache.rosterData.set(currentRoster.id, {
           users: updatedUsers,
           monthDetails: monthDetails
         });
-        
 
         globalCache.pendingChangesByRoster.delete(currentRoster.id);
-        
+
         updateSaveButtonState();
         hideChangesIndicator();
       })
-      .withFailureHandler(function(error) {
+      .withFailureHandler(function (error) {
         if (saveBtn) {
           saveBtn.disabled = false;
           saveBtn.innerHTML = '<i class="fas fa-save"></i> Save All Changes';
         }
         Modal.error('Error saving changes: ' + (error ? error.message : 'Unknown error'));
       })
-      .saveRosterChanges(currentRoster.id, changesArray);
+      .batchUpdateUserStatuses(changesArray);
   }
+
 
 
   window.hideUserModal = hideUserModal;
