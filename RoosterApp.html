@@ -46,7 +46,6 @@
         display: flex;
       }
       
-
       .page-loading-overlay {
         position: fixed;
         top: 0;
@@ -101,7 +100,6 @@
         color: var(--teal);
       }
       
-
       .sidebar {
         width: var(--sidebar-width);
         height: 100vh;
@@ -212,7 +210,6 @@
         margin-left: 10px;
       }
       
-
       .main-content {
         flex: 1;
         margin-left: var(--sidebar-width);
@@ -279,7 +276,6 @@
         visibility: visible;
       }
       
-
       .container {
         max-width: 1600px;
         margin: 0 auto;
@@ -655,7 +651,6 @@
         filter: invert(40%) sepia(100%) saturate(200%) hue-rotate(150deg);
         cursor: pointer;
       }
-
       
       .clear-filters-btn {
         background: var(--rust);
@@ -793,7 +788,6 @@
         position: relative;
       }
 
-      /* Multi-select user filter */
       .user-filter-chips-container {
         border: 2px solid var(--light-teal);
         border-radius: 8px;
@@ -947,11 +941,13 @@
         font-weight: 500;
         position: relative;
         user-select: none;
+        border: 2px solid transparent;
       }
       
       .status-cell:hover {
         background: rgba(10, 147, 150, 0.1);
-        transform: scale(1.05);
+        transform: scale(1.02);
+        border-color: var(--turquoise);
       }
       
       .status-cell.empty {
@@ -959,20 +955,72 @@
         font-style: italic;
       }
       
+      /* Enhanced selection styles */
       .status-cell.selected {
-        background: rgba(59, 130, 246, 0.3) !important;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.4)) !important;
         border: 2px solid #3b82f6 !important;
         transform: scale(1.02);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        z-index: 10;
       }
       
       .status-cell.selecting {
         background: rgba(59, 130, 246, 0.2) !important;
+        border: 1px solid #3b82f6 !important;
       }
 
       .status-cell.focused {
-        background: rgba(255, 193, 7, 0.3) !important;
+        background: linear-gradient(135deg, rgba(255, 193, 7, 0.3), rgba(255, 152, 0, 0.4)) !important;
         border: 2px solid #ffc107 !important;
         transform: scale(1.02);
+        box-shadow: 0 2px 8px rgba(255, 193, 7, 0.3);
+        z-index: 11;
+      }
+
+      /* Copy/Cut visual feedback */
+      .status-cell.copied {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(22, 163, 74, 0.4)) !important;
+        border: 2px solid #22c55e !important;
+        animation: pulseGreen 1s ease-in-out;
+      }
+
+      .status-cell.cut {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(220, 38, 38, 0.4)) !important;
+        border: 2px solid #ef4444 !important;
+        animation: pulseRed 1s ease-in-out;
+        opacity: 0.7;
+      }
+
+      /* Delete visual feedback */
+      .status-cell.deleted {
+        background: linear-gradient(135deg, rgba(156, 163, 175, 0.3), rgba(107, 114, 128, 0.4)) !important;
+        border: 2px solid #9ca3af !important;
+        animation: pulseGray 1s ease-in-out;
+      }
+
+      @keyframes pulseGreen {
+        0%, 100% { box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3); }
+        50% { box-shadow: 0 4px 16px rgba(34, 197, 94, 0.6); }
+      }
+
+      @keyframes pulseRed {
+        0%, 100% { box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3); }
+        50% { box-shadow: 0 4px 16px rgba(239, 68, 68, 0.6); }
+      }
+
+      @keyframes pulseGray {
+        0%, 100% { box-shadow: 0 2px 8px rgba(156, 163, 175, 0.3); }
+        50% { box-shadow: 0 4px 16px rgba(156, 163, 175, 0.6); }
+      }
+
+      /* Selection rectangle for drag selection */
+      .selection-rectangle {
+        position: absolute;
+        border: 2px dashed #3b82f6;
+        background: rgba(59, 130, 246, 0.1);
+        pointer-events: none;
+        z-index: 1000;
+        border-radius: 4px;
       }
       
       .status-select-modal {
@@ -1414,7 +1462,6 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
       }
       
-
       .user-modal {
         position: fixed;
         top: 0;
@@ -1531,7 +1578,7 @@
         border-bottom: none;
       }
 
-      /* Multi-select and Import Features */
+      /* Enhanced Multi-select and Import Features */
       .multi-select-controls {
         background: rgba(255, 255, 255, 0.95);
         padding: 20px;
@@ -1541,10 +1588,23 @@
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2);
         display: none;
+        border-left: 4px solid var(--turquoise);
       }
 
       .multi-select-controls.show {
         display: block;
+        animation: slideDown 0.3s ease-out;
+      }
+
+      @keyframes slideDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       .multi-select-header {
@@ -1567,12 +1627,19 @@
       }
 
       .selection-count {
-        background: var(--turquoise);
+        background: linear-gradient(135deg, var(--turquoise), var(--teal));
         color: white;
-        padding: 6px 12px;
+        padding: 8px 16px;
         border-radius: 20px;
         font-size: 12px;
         font-weight: 600;
+        box-shadow: 0 2px 8px rgba(10, 147, 150, 0.3);
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
       }
 
       .multi-select-actions {
@@ -1586,6 +1653,13 @@
         border-radius: 12px;
         padding: 15px;
         border: 1px solid var(--light-teal);
+        transition: all 0.3s ease;
+      }
+
+      .action-group:hover {
+        background: rgba(148, 210, 189, 0.15);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(148, 210, 189, 0.2);
       }
 
       .action-group-label {
@@ -1618,30 +1692,62 @@
         gap: 8px;
         min-height: 44px;
         text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .mini-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.5s;
+      }
+
+      .mini-btn:hover::before {
+        left: 100%;
       }
 
       .mini-btn.copy {
-        background: var(--turquoise);
+        background: linear-gradient(135deg, var(--turquoise), var(--teal));
         color: white;
       }
 
       .mini-btn.paste {
-        background: var(--orange);
+        background: linear-gradient(135deg, var(--orange), var(--burnt-orange));
         color: white;
       }
 
       .mini-btn.cut {
-        background: var(--rust);
+        background: linear-gradient(135deg, var(--rust), var(--red));
+        color: white;
+      }
+
+      .mini-btn.delete {
+        background: linear-gradient(135deg, #6c757d, #495057);
         color: white;
       }
 
       .mini-btn.status {
-        background: var(--light-teal);
-        color: var(--dark-teal);
+        background: linear-gradient(135deg, var(--light-teal), var(--turquoise));
+        color: white;
       }
 
       .mini-btn.clear {
-        background: #6c757d;
+        background: linear-gradient(135deg, #6c757d, #495057);
+        color: white;
+      }
+
+      .mini-btn.undo {
+        background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        color: white;
+      }
+
+      .mini-btn.redo {
+        background: linear-gradient(135deg, #06b6d4, #0891b2);
         color: white;
       }
 
@@ -1657,8 +1763,12 @@
         box-shadow: none;
       }
 
+      .mini-btn:disabled::before {
+        display: none;
+      }
+
       .clear-selection-btn {
-        background: var(--red);
+        background: linear-gradient(135deg, var(--red), var(--dark-red));
         color: white;
         border: none;
         padding: 8px 16px;
@@ -1673,8 +1783,9 @@
       }
 
       .clear-selection-btn:hover {
-        background: var(--dark-red);
+        background: linear-gradient(135deg, var(--dark-red), #7f1d1d);
         transform: translateY(-1px);
+        box-shadow: 0 3px 10px rgba(174, 32, 18, 0.3);
       }
 
       .import-controls {
@@ -1685,6 +1796,7 @@
         box-shadow: 0 4px 20px rgba(0, 18, 25, 0.1);
         backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2);
+        border-left: 4px solid var(--orange);
       }
 
       .import-header {
@@ -1719,7 +1831,7 @@
         position: fixed;
         top: 20px;
         right: 20px;
-        background: var(--turquoise);
+        background: linear-gradient(135deg, var(--turquoise), var(--teal));
         color: white;
         padding: 12px 20px;
         border-radius: 8px;
@@ -1730,10 +1842,65 @@
         display: flex;
         align-items: center;
         gap: 8px;
+        font-weight: 600;
       }
 
       .clipboard-indicator.show {
         transform: translateX(0);
+        animation: slideInRight 0.3s ease-out;
+      }
+
+      @keyframes slideInRight {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      /* Keyboard shortcuts help */
+      .keyboard-shortcuts {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(0, 18, 25, 0.9);
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        font-size: 12px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 1000;
+        max-width: 250px;
+      }
+
+      .keyboard-shortcuts.show {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .keyboard-shortcuts h4 {
+        margin: 0 0 10px 0;
+        color: var(--orange);
+        font-size: 14px;
+      }
+
+      .shortcut-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+      }
+
+      .shortcut-key {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 11px;
       }
 
       @media (max-width: 768px) {
@@ -1854,6 +2021,19 @@
         .import-form {
           flex-direction: column;
         }
+
+        .clipboard-indicator {
+          right: 10px;
+          top: 10px;
+          padding: 10px 15px;
+          font-size: 14px;
+        }
+
+        .keyboard-shortcuts {
+          bottom: 10px;
+          right: 10px;
+          max-width: 200px;
+        }
       }
       
       @media (max-width: 480px) {
@@ -1895,6 +2075,11 @@
           padding: 12px;
           font-size: 14px;
           min-height: 44px;
+        }
+
+        .clipboard-indicator {
+          padding: 8px 12px;
+          font-size: 12px;
         }
       }
 
@@ -2133,7 +2318,7 @@
               </div>
             </div>
 
-            <!-- Multi-Select Controls -->
+            <!-- Enhanced Multi-Select Controls -->
             <div id="multi-select-controls" class="multi-select-controls">
               <div class="multi-select-header">
                 <h3 class="multi-select-title">
@@ -2163,6 +2348,26 @@
                     <button id="cut-btn" class="mini-btn cut" disabled>
                       <i class="fas fa-cut"></i>
                       Cut
+                    </button>
+                    <button id="delete-btn" class="mini-btn delete" disabled>
+                      <i class="fas fa-trash"></i>
+                      Delete
+                    </button>
+                  </div>
+                </div>
+                <div class="action-group">
+                  <div class="action-group-label">
+                    <i class="fas fa-history"></i>
+                    History Actions
+                  </div>
+                  <div class="action-buttons">
+                    <button id="undo-btn" class="mini-btn undo" disabled>
+                      <i class="fas fa-undo"></i>
+                      Undo
+                    </button>
+                    <button id="redo-btn" class="mini-btn redo" disabled>
+                      <i class="fas fa-redo"></i>
+                      Redo
                     </button>
                   </div>
                 </div>
@@ -2213,10 +2418,47 @@
         </div>
       </div>
 
-      <!-- Clipboard Indicator -->
+      <!-- Enhanced Clipboard Indicator -->
       <div id="clipboard-indicator" class="clipboard-indicator">
         <i class="fas fa-clipboard"></i>
         <span id="clipboard-text">Status copied!</span>
+      </div>
+
+      <!-- Keyboard Shortcuts Help -->
+      <div id="keyboard-shortcuts" class="keyboard-shortcuts">
+        <h4><i class="fas fa-keyboard"></i> Keyboard Shortcuts</h4>
+        <div class="shortcut-item">
+          <span>Copy</span>
+          <span class="shortcut-key">Ctrl+C</span>
+        </div>
+        <div class="shortcut-item">
+          <span>Paste</span>
+          <span class="shortcut-key">Ctrl+V</span>
+        </div>
+        <div class="shortcut-item">
+          <span>Cut</span>
+          <span class="shortcut-key">Ctrl+X</span>
+        </div>
+        <div class="shortcut-item">
+          <span>Delete</span>
+          <span class="shortcut-key">Delete</span>
+        </div>
+        <div class="shortcut-item">
+          <span>Undo</span>
+          <span class="shortcut-key">Ctrl+Z</span>
+        </div>
+        <div class="shortcut-item">
+          <span>Redo</span>
+          <span class="shortcut-key">Ctrl+Y</span>
+        </div>
+        <div class="shortcut-item">
+          <span>Navigate</span>
+          <span class="shortcut-key">Arrow Keys</span>
+        </div>
+        <div class="shortcut-item">
+          <span>Edit Cell</span>
+          <span class="shortcut-key">Enter</span>
+        </div>
       </div>
 
       <div id="modal-container"></div>
@@ -2462,7 +2704,6 @@
         globalCache.selectedUserFilters.add(value);
       }
       
-
       const option = document.querySelector(`[data-value="${value}"]`);
       if (option) {
         const icon = option.querySelector('i');
@@ -2475,7 +2716,6 @@
         }
       }
       
-
       const header = document.querySelector('.select-modal-title');
       if (header) {
         header.textContent = `Select Users (${globalCache.selectedUserFilters.size} selected)`;
@@ -2485,7 +2725,6 @@
     clearAllUsers: function() {
       globalCache.selectedUserFilters.clear();
       
-
       document.querySelectorAll('.select-option[data-value]').forEach(option => {
         option.classList.remove('selected');
         const icon = option.querySelector('i');
@@ -2494,7 +2733,6 @@
         }
       });
       
-
       const header = document.querySelector('.select-modal-title');
       if (header) {
         header.textContent = `Select Users (0 selected)`;
@@ -2502,7 +2740,6 @@
     },
     
     applyUserFilter: function() {
-
       const select = document.querySelector(`[data-target="filter-users"]`).parentElement;
       const trigger = select.querySelector('.select-trigger');
       
@@ -2517,7 +2754,6 @@
       
       CustomSelect.hideModal('filter-users');
       
-
       const changeEvent = new CustomEvent('selectChange', {
         detail: { value: Array.from(globalCache.selectedUserFilters), text: '', target: 'filter-users' }
       });
@@ -2597,16 +2833,23 @@
   let selectedUsers = new Set();
   let filteredRosters = [];
   
-
+  // Enhanced multi-select variables
   let selectedCells = new Set();
   let isSelecting = false;
+  let isDragSelecting = false;
   let selectionStartCell = null;
   let copiedStatus = '';
   let copiedCells = new Set();
+  let cutCells = new Set();
   
-
+  // Enhanced navigation variables
   let focusedCell = null;
   let lastClickTime = 0;
+  
+  // Undo/Redo system
+  let undoStack = [];
+  let redoStack = [];
+  const MAX_UNDO_STACK_SIZE = 50;
   
   document.addEventListener('DOMContentLoaded', function() {
     CustomSelect.init();
@@ -2615,11 +2858,249 @@
     initializeSidebar();
     setupMultiSelectFeatures();
     setupKeyboardNavigation();
+    setupKeyboardShortcutsHelp();
+    setupUndoRedoSystem();
   });
+
+  function setupUndoRedoSystem() {
+    // Add event listeners for undo/redo buttons
+    document.getElementById('undo-btn')?.addEventListener('click', performUndo);
+    document.getElementById('redo-btn')?.addEventListener('click', performRedo);
+    
+    // Update button states initially
+    updateUndoRedoButtons();
+  }
+
+  function saveStateForUndo(description = 'Change') {
+    if (!currentRoster) return;
+    
+    // Create a deep copy of current state
+    const state = {
+      rosterId: currentRoster.id,
+      description: description,
+      timestamp: Date.now(),
+      pendingChanges: new Map(),
+      originalData: new Map(originalData)
+    };
+    
+    // Deep copy pending changes
+    for (let [username, statuses] of pendingChanges) {
+      state.pendingChanges.set(username, [...statuses]);
+    }
+    
+    // Add to undo stack
+    undoStack.push(state);
+    
+    // Limit stack size
+    if (undoStack.length > MAX_UNDO_STACK_SIZE) {
+      undoStack.shift();
+    }
+    
+    // Clear redo stack when new action is performed
+    redoStack = [];
+    
+    updateUndoRedoButtons();
+  }
+
+  function performUndo() {
+    if (undoStack.length === 0 || !currentRoster) return;
+    
+    // Save current state to redo stack
+    const currentState = {
+      rosterId: currentRoster.id,
+      description: 'Redo point',
+      timestamp: Date.now(),
+      pendingChanges: new Map(),
+      originalData: new Map(originalData)
+    };
+    
+    for (let [username, statuses] of pendingChanges) {
+      currentState.pendingChanges.set(username, [...statuses]);
+    }
+    
+    redoStack.push(currentState);
+    
+    // Restore previous state
+    const previousState = undoStack.pop();
+    if (previousState && previousState.rosterId === currentRoster.id) {
+      pendingChanges = new Map();
+      for (let [username, statuses] of previousState.pendingChanges) {
+        pendingChanges.set(username, [...statuses]);
+      }
+      
+      originalData = new Map(previousState.originalData);
+      
+      // Refresh UI
+      generateRosterTable();
+      updateSaveButtonState();
+      
+      if (hasRealChanges()) {
+        showChangesIndicator();
+      } else {
+        hideChangesIndicator();
+      }
+      
+      showClipboardIndicator(`Undone: ${previousState.description}`);
+    }
+    
+    updateUndoRedoButtons();
+  }
+
+  function performRedo() {
+    if (redoStack.length === 0 || !currentRoster) return;
+    
+    // Save current state to undo stack
+    const currentState = {
+      rosterId: currentRoster.id,
+      description: 'Undo point',
+      timestamp: Date.now(),
+      pendingChanges: new Map(),
+      originalData: new Map(originalData)
+    };
+    
+    for (let [username, statuses] of pendingChanges) {
+      currentState.pendingChanges.set(username, [...statuses]);
+    }
+    
+    undoStack.push(currentState);
+    
+    // Restore next state
+    const nextState = redoStack.pop();
+    if (nextState && nextState.rosterId === currentRoster.id) {
+      pendingChanges = new Map();
+      for (let [username, statuses] of nextState.pendingChanges) {
+        pendingChanges.set(username, [...statuses]);
+      }
+      
+      originalData = new Map(nextState.originalData);
+      
+      // Refresh UI
+      generateRosterTable();
+      updateSaveButtonState();
+      
+      if (hasRealChanges()) {
+        showChangesIndicator();
+      } else {
+        hideChangesIndicator();
+      }
+      
+      showClipboardIndicator(`Redone: ${nextState.description}`);
+    }
+    
+    updateUndoRedoButtons();
+  }
+
+  function updateUndoRedoButtons() {
+    const undoBtn = document.getElementById('undo-btn');
+    const redoBtn = document.getElementById('redo-btn');
+    
+    if (undoBtn) {
+      undoBtn.disabled = undoStack.length === 0 || !currentRoster;
+    }
+    
+    if (redoBtn) {
+      redoBtn.disabled = redoStack.length === 0 || !currentRoster;
+    }
+  }
+
+  function clearUndoRedoStacks() {
+    undoStack = [];
+    redoStack = [];
+    updateUndoRedoButtons();
+  }
+
+  function setupKeyboardShortcutsHelp() {
+    let helpTimeout;
+    
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'F1' || (e.ctrlKey && e.key === '?')) {
+        e.preventDefault();
+        toggleKeyboardShortcuts();
+      }
+      
+      // Show shortcuts temporarily when using keyboard shortcuts
+      if ((e.ctrlKey || e.metaKey) && ['c', 'v', 'x', 'a', 'z', 'y'].includes(e.key.toLowerCase()) || e.key === 'Delete') {
+        showKeyboardShortcuts();
+        clearTimeout(helpTimeout);
+        helpTimeout = setTimeout(hideKeyboardShortcuts, 3000);
+      }
+    });
+  }
+
+  function showKeyboardShortcuts() {
+    const shortcuts = document.getElementById('keyboard-shortcuts');
+    if (shortcuts) {
+      shortcuts.classList.add('show');
+    }
+  }
+
+  function hideKeyboardShortcuts() {
+    const shortcuts = document.getElementById('keyboard-shortcuts');
+    if (shortcuts) {
+      shortcuts.classList.remove('show');
+    }
+  }
+
+  function toggleKeyboardShortcuts() {
+    const shortcuts = document.getElementById('keyboard-shortcuts');
+    if (shortcuts) {
+      shortcuts.classList.toggle('show');
+    }
+  }
 
   function setupKeyboardNavigation() {
     document.addEventListener('keydown', function(e) {
-      if (!currentRoster || !focusedCell) return;
+      // Only handle keyboard shortcuts when not in input fields
+      const isInInputField = e.target.matches('input, textarea, select') || e.target.isContentEditable;
+      
+      // Handle global shortcuts
+      if ((e.ctrlKey || e.metaKey) && currentRoster && globalCache.userAccess?.accessLevel === 'admin') {
+        switch(e.key.toLowerCase()) {
+          case 'c':
+            if (!isInInputField) {
+              e.preventDefault();
+              handleCopyStatus();
+            }
+            break;
+          case 'v':
+            if (!isInInputField) {
+              e.preventDefault();
+              handlePasteStatus();
+            }
+            break;
+          case 'x':
+            if (!isInInputField) {
+              e.preventDefault();
+              handleCutStatus();
+            }
+            break;
+          case 'z':
+            if (!isInInputField) {
+              e.preventDefault();
+              if (e.shiftKey) {
+                performRedo();
+              } else {
+                performUndo();
+              }
+            }
+            break;
+          case 'y':
+            if (!isInInputField) {
+              e.preventDefault();
+              performRedo();
+            }
+            break;
+          case 'a':
+            if (e.target.closest('.roster-table') && !isInInputField) {
+              e.preventDefault();
+              selectAllCells();
+            }
+            break;
+        }
+      }
+      
+      // Handle navigation only when focused on table and not in input
+      if (!currentRoster || !focusedCell || isInInputField) return;
       
       const { username, day } = focusedCell;
       let newUsername = username;
@@ -2664,6 +3145,19 @@
           }
           break;
           
+        case 'Delete':
+          e.preventDefault();
+          if (globalCache.userAccess?.accessLevel === 'admin') {
+            handleDeleteStatus();
+          }
+          break;
+          
+        case 'Escape':
+          e.preventDefault();
+          clearSelection();
+          hideKeyboardShortcuts();
+          break;
+          
         default:
           return;
       }
@@ -2675,18 +3169,18 @@
   }
 
   function setFocusedCell(username, day) {
-
+    // Remove previous focus
     document.querySelectorAll('.status-cell.focused').forEach(cell => {
       cell.classList.remove('focused');
     });
     
-
+    // Set new focus
     const cell = document.querySelector(`[data-username="${username}"][data-day="${day}"]`);
     if (cell) {
       cell.classList.add('focused');
       focusedCell = { username, day };
       
-
+      // Smooth scroll to focused cell
       cell.scrollIntoView({ 
         behavior: 'smooth', 
         block: 'nearest', 
@@ -2696,53 +3190,18 @@
   }
 
   function setupMultiSelectFeatures() {
-
-    document.addEventListener('keydown', function(e) {
-      if ((e.ctrlKey || e.metaKey) && currentRoster && globalCache.userAccess?.accessLevel === 'admin') {
-        switch(e.key.toLowerCase()) {
-          case 'c':
-            if (!e.target.matches('input, textarea')) {
-              e.preventDefault();
-              handleCopyStatus();
-            }
-            break;
-          case 'v':
-            if (!e.target.matches('input, textarea')) {
-              e.preventDefault();
-              handlePasteStatus();
-            }
-            break;
-          case 'x':
-            if (!e.target.matches('input, textarea')) {
-              e.preventDefault();
-              handleCutStatus();
-            }
-            break;
-          case 'a':
-            if (e.target.closest('.roster-table')) {
-              e.preventDefault();
-              selectAllCells();
-            }
-            break;
-        }
-      }
-      
-      if (e.key === 'Escape') {
-        clearSelection();
-      }
-    });
-
-
+    // Enhanced button event listeners
     document.getElementById('copy-btn')?.addEventListener('click', handleCopyStatus);
     document.getElementById('paste-btn')?.addEventListener('click', handlePasteStatus);
     document.getElementById('cut-btn')?.addEventListener('click', handleCutStatus);
+    document.getElementById('delete-btn')?.addEventListener('click', handleDeleteStatus);
     document.getElementById('clear-selection-btn')?.addEventListener('click', clearSelection);
     document.getElementById('clear-status-btn')?.addEventListener('click', () => setSelectedCellsStatus(''));
     
-
+    // Import functionality
     document.getElementById('import-roster-btn')?.addEventListener('click', handleImportFromRoster);
     
-
+    // Import source selection
     document.addEventListener('selectChange', function(e) {
       if (e.detail.target === 'import-source-roster') {
         const importBtn = document.getElementById('import-roster-btn');
@@ -2751,6 +3210,10 @@
         }
       }
     });
+
+    // Enhanced mouse events for drag selection
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mousemove', handleMouseMove);
   }
 
   function getCellKey(username, day) {
@@ -2771,57 +3234,36 @@
     const currentTime = Date.now();
     const cellKey = getCellKey(username, day);
     
-
+    // Set focused cell
     setFocusedCell(username, day);
     
-
+    // Handle double-click for editing
     if (currentTime - lastClickTime < 300 && focusedCell && 
         focusedCell.username === username && focusedCell.day === day) {
-
       const currentStatus = getCurrentStatus(username, day);
       showStatusModal(username, day, currentStatus);
-      lastClickTime = 0; 
+      lastClickTime = 0;
       return;
     }
     
     lastClickTime = currentTime;
     
+    // Enhanced selection logic
     if (event.ctrlKey || event.metaKey) {
-
+      // Toggle selection
       if (selectedCells.has(cellKey)) {
         selectedCells.delete(cellKey);
       } else {
         selectedCells.add(cellKey);
       }
     } else if (event.shiftKey && selectedCells.size > 0) {
-
+      // Range selection
       const lastSelectedKey = Array.from(selectedCells)[selectedCells.size - 1];
       const lastSelected = parseCellKey(lastSelectedKey);
       
-      if (lastSelected.username === username) {
-
-        const startDay = Math.min(lastSelected.day, day);
-        const endDay = Math.max(lastSelected.day, day);
-        
-        for (let d = startDay; d <= endDay; d++) {
-          selectedCells.add(getCellKey(username, d));
-        }
-      } else {
-
-        const userIndex1 = currentRosterUsers.findIndex(u => u.username === lastSelected.username);
-        const userIndex2 = currentRosterUsers.findIndex(u => u.username === username);
-        
-        if (userIndex1 !== -1 && userIndex2 !== -1) {
-          const startUser = Math.min(userIndex1, userIndex2);
-          const endUser = Math.max(userIndex1, userIndex2);
-          
-          for (let u = startUser; u <= endUser; u++) {
-            selectedCells.add(getCellKey(currentRosterUsers[u].username, day));
-          }
-        }
-      }
+      selectRange(lastSelected.username, lastSelected.day, username, day);
     } else {
-
+      // Single selection (unless clicking on already selected cell)
       if (!(selectedCells.has(cellKey) && selectedCells.size === 1)) {
         selectedCells.clear();
         selectedCells.add(cellKey);
@@ -2832,11 +3274,30 @@
     updateMultiSelectControls();
   }
 
+  function selectRange(startUsername, startDay, endUsername, endDay) {
+    const startUserIndex = currentRosterUsers.findIndex(u => u.username === startUsername);
+    const endUserIndex = currentRosterUsers.findIndex(u => u.username === endUsername);
+    
+    const minUserIndex = Math.min(startUserIndex, endUserIndex);
+    const maxUserIndex = Math.max(startUserIndex, endUserIndex);
+    const minDay = Math.min(startDay, endDay);
+    const maxDay = Math.max(startDay, endDay);
+    
+    // Clear current selection and select range
+    selectedCells.clear();
+    
+    for (let userIndex = minUserIndex; userIndex <= maxUserIndex; userIndex++) {
+      for (let day = minDay; day <= maxDay; day++) {
+        selectedCells.add(getCellKey(currentRosterUsers[userIndex].username, day));
+      }
+    }
+  }
+
   function handleCellMouseDown(username, day, event) {
     if (globalCache.userAccess?.accessLevel !== 'admin') return;
     if (event.ctrlKey || event.metaKey || event.shiftKey) return;
     
-    isSelecting = true;
+    isDragSelecting = true;
     selectionStartCell = { username, day };
     
     const cellKey = getCellKey(username, day);
@@ -2845,49 +3306,61 @@
     
     updateCellSelection();
     updateMultiSelectControls();
+    
+    event.preventDefault(); // Prevent text selection
   }
 
   function handleCellMouseEnter(username, day) {
-    if (!isSelecting || !selectionStartCell) return;
+    if (!isDragSelecting || !selectionStartCell) return;
     
-
+    // Clear current selection
     selectedCells.clear();
     
-
-    const startUserIndex = currentRosterUsers.findIndex(u => u.username === selectionStartCell.username);
-    const endUserIndex = currentRosterUsers.findIndex(u => u.username === username);
-    const startDay = Math.min(selectionStartCell.day, day);
-    const endDay = Math.max(selectionStartCell.day, day);
-    const startUser = Math.min(startUserIndex, endUserIndex);
-    const endUser = Math.max(startUserIndex, endUserIndex);
-    
-
-    for (let u = startUser; u <= endUser; u++) {
-      for (let d = startDay; d <= endDay; d++) {
-        selectedCells.add(getCellKey(currentRosterUsers[u].username, d));
-      }
-    }
+    // Select rectangular range
+    selectRange(selectionStartCell.username, selectionStartCell.day, username, day);
     
     updateCellSelection();
     updateMultiSelectControls();
   }
 
   function handleMouseUp() {
-    isSelecting = false;
+    isDragSelecting = false;
     selectionStartCell = null;
   }
 
-  function updateCellSelection() {
+  function handleMouseMove(event) {
+    // Additional mouse move handling if needed
+  }
 
+  function updateCellSelection() {
+    // Clear all selection classes first
     document.querySelectorAll('.status-cell').forEach(cell => {
-      const username = cell.dataset.username;
-      const day = parseInt(cell.dataset.day);
-      const cellKey = getCellKey(username, day);
-      
-      if (selectedCells.has(cellKey)) {
+      cell.classList.remove('selected', 'copied', 'cut', 'deleted');
+    });
+    
+    // Apply selection classes
+    selectedCells.forEach(cellKey => {
+      const { username, day } = parseCellKey(cellKey);
+      const cell = document.querySelector(`[data-username="${username}"][data-day="${day}"]`);
+      if (cell) {
         cell.classList.add('selected');
-      } else {
-        cell.classList.remove('selected');
+      }
+    });
+    
+    // Apply copied/cut visual feedback
+    copiedCells.forEach(cellKey => {
+      const { username, day } = parseCellKey(cellKey);
+      const cell = document.querySelector(`[data-username="${username}"][data-day="${day}"]`);
+      if (cell) {
+        cell.classList.add('copied');
+      }
+    });
+    
+    cutCells.forEach(cellKey => {
+      const { username, day } = parseCellKey(cellKey);
+      const cell = document.querySelector(`[data-username="${username}"][data-day="${day}"]`);
+      if (cell) {
+        cell.classList.add('cut');
       }
     });
   }
@@ -2898,6 +3371,7 @@
     const copyBtn = document.getElementById('copy-btn');
     const pasteBtn = document.getElementById('paste-btn');
     const cutBtn = document.getElementById('cut-btn');
+    const deleteBtn = document.getElementById('delete-btn');
     
     if (selectedCells.size > 0) {
       controlsContainer?.classList.add('show');
@@ -2905,17 +3379,24 @@
         selectionCount.textContent = `${selectedCells.size} cell${selectedCells.size > 1 ? 's' : ''} selected`;
       }
       
-
-      if (copyBtn) copyBtn.disabled = selectedCells.size !== 1;
+      // Enhanced button states
+      if (copyBtn) copyBtn.disabled = selectedCells.size === 0;
       if (cutBtn) cutBtn.disabled = selectedCells.size === 0;
+      if (deleteBtn) deleteBtn.disabled = selectedCells.size === 0;
       if (pasteBtn) pasteBtn.disabled = !copiedStatus || selectedCells.size === 0;
     } else {
       controlsContainer?.classList.remove('show');
     }
+    
+    // Update undo/redo buttons
+    updateUndoRedoButtons();
   }
 
   function clearSelection() {
     selectedCells.clear();
+    copiedCells.clear();
+    cutCells.clear();
+    copiedStatus = '';
     updateCellSelection();
     updateMultiSelectControls();
   }
@@ -2937,36 +3418,90 @@
   }
 
   function handleCopyStatus() {
-    if (selectedCells.size === 1) {
-      const cellKey = Array.from(selectedCells)[0];
-      const { username, day } = parseCellKey(cellKey);
-      const status = getCurrentStatus(username, day);
+    if (selectedCells.size > 0) {
+      // For single cell, copy the status
+      if (selectedCells.size === 1) {
+        const cellKey = Array.from(selectedCells)[0];
+        const { username, day } = parseCellKey(cellKey);
+        const status = getCurrentStatus(username, day);
+        copiedStatus = status;
+      } else {
+        // For multiple cells, we'll use the most common status
+        const statusCounts = new Map();
+        selectedCells.forEach(cellKey => {
+          const { username, day } = parseCellKey(cellKey);
+          const status = getCurrentStatus(username, day) || '';
+          statusCounts.set(status, (statusCounts.get(status) || 0) + 1);
+        });
+        
+        // Find most common status
+        let mostCommonStatus = '';
+        let maxCount = 0;
+        statusCounts.forEach((count, status) => {
+          if (count > maxCount) {
+            maxCount = count;
+            mostCommonStatus = status;
+          }
+        });
+        
+        copiedStatus = mostCommonStatus;
+      }
       
-      copiedStatus = status;
-      copiedCells = new Set([cellKey]);
+      copiedCells = new Set(selectedCells);
+      cutCells.clear();
       
-      showClipboardIndicator(`Copied: "${status || 'Empty'}"`);
+      showClipboardIndicator(`Copied: "${copiedStatus || 'Empty'}" from ${selectedCells.size} cell${selectedCells.size > 1 ? 's' : ''}`);
+      updateCellSelection();
       updateMultiSelectControls();
     }
   }
 
   function handlePasteStatus() {
-    if (copiedStatus !== '' && selectedCells.size > 0) {
+    if (copiedStatus !== null && selectedCells.size > 0) {
+      saveStateForUndo('Paste Status');
       setSelectedCellsStatus(copiedStatus);
-      showClipboardIndicator(`Pasted: "${copiedStatus}" to ${selectedCells.size} cells`);
+      showClipboardIndicator(`Pasted: "${copiedStatus}" to ${selectedCells.size} cell${selectedCells.size > 1 ? 's' : ''}`);
+      
+      // Clear cut cells after paste
+      cutCells.clear();
+      updateCellSelection();
     }
   }
 
   function handleCutStatus() {
     if (selectedCells.size > 0) {
-
-      if (selectedCells.size === 1) {
-        handleCopyStatus();
-      }
+      // Copy first
+      handleCopyStatus();
       
+      // Mark as cut
+      cutCells = new Set(selectedCells);
+      copiedCells.clear();
+      
+      showClipboardIndicator(`Cut ${selectedCells.size} cell${selectedCells.size > 1 ? 's' : ''} - paste to move`);
+      updateCellSelection();
+    }
+  }
 
+  function handleDeleteStatus() {
+    if (selectedCells.size > 0) {
+      saveStateForUndo('Delete Status');
+      
+      // Clear the selected cells
       setSelectedCellsStatus('');
-      showClipboardIndicator(`Cut ${selectedCells.size} cells`);
+      
+      // Show visual feedback
+      selectedCells.forEach(cellKey => {
+        const { username, day } = parseCellKey(cellKey);
+        const cell = document.querySelector(`[data-username="${username}"][data-day="${day}"]`);
+        if (cell) {
+          cell.classList.add('deleted');
+          setTimeout(() => {
+            cell.classList.remove('deleted');
+          }, 1000);
+        }
+      });
+      
+      showClipboardIndicator(`Deleted ${selectedCells.size} cell${selectedCells.size > 1 ? 's' : ''}`);
     }
   }
 
@@ -2975,6 +3510,17 @@
       const { username, day } = parseCellKey(cellKey);
       updatePendingStatus(username, day, status);
     });
+    
+    // If this was a cut operation, clear the cut cells
+    if (cutCells.size > 0) {
+      cutCells.forEach(cellKey => {
+        const { username, day } = parseCellKey(cellKey);
+        if (!selectedCells.has(cellKey)) {
+          updatePendingStatus(username, day, '');
+        }
+      });
+      cutCells.clear();
+    }
     
     generateRosterTable();
     updateSaveButtonState();
@@ -2996,14 +3542,14 @@
       
       setTimeout(() => {
         indicator.classList.remove('show');
-      }, 2000);
+      }, 3000);
     }
   }
 
   function setupImportControls() {
     if (!currentRoster || !globalCache.rosters) return;
     
-
+    // Get available rosters for import (excluding current roster)
     const availableRosters = globalCache.rosters.filter(r => r.id !== currentRoster.id);
     const importOptions = [
       { value: '', text: 'Select a roster to import from' },
@@ -3039,14 +3585,14 @@
       importBtn.innerHTML = '<div class="loading-spinner"></div>Importing...';
     }
     
-
+    // Check if we have cached data for the source roster
     const cachedSourceData = globalCache.rosterData.get(sourceRoster.id);
     
     if (cachedSourceData) {
-
+      // Use cached data
       performImportWithData(sourceRoster, cachedSourceData.users);
     } else {
-
+      // Load data from server
       google.script.run
         .withSuccessHandler(function(sourceRosterData) {
           if (!sourceRosterData || !sourceRosterData.users) {
@@ -3055,7 +3601,7 @@
             return;
           }
           
-
+          // Also load month details for the source roster
           google.script.run
             .withSuccessHandler(function(monthData) {
               globalCache.rosterData.set(sourceRoster.id, {
@@ -3067,7 +3613,7 @@
             })
             .withFailureHandler(function(error) {
               console.warn('Failed to load month details for source roster:', error);
-
+              // Continue without month details
               globalCache.rosterData.set(sourceRoster.id, {
                 users: sourceRosterData.users,
                 monthDetails: { daysInMonth: 31, dayDetails: [] }
@@ -3089,7 +3635,10 @@
     let importedCount = 0;
     
     try {
-
+      // Save state for undo
+      saveStateForUndo(`Import from ${sourceRoster.monthYear} - ${sourceRoster.type}`);
+      
+      // Import matching users' statuses
       currentRosterUsers.forEach(currentUser => {
         const sourceUser = sourceUsers.find(su => su.username === currentUser.username);
         if (sourceUser && sourceUser.dayStatuses) {
@@ -3104,7 +3653,7 @@
         }
       });
       
-
+      // Refresh the table and update UI
       generateRosterTable();
       updateSaveButtonState();
       
@@ -3170,12 +3719,12 @@
   function preloadAllRosterData() {
     if (!globalCache.rosters) return;
     
-
+    // Get rosters that aren't cached yet
     const uncachedRosters = globalCache.rosters.filter(roster => 
       !globalCache.rosterData.has(roster.id)
     );
     
-
+    // Load in batches to avoid overwhelming the server
     const batchSize = 3;
     let currentBatch = 0;
     
@@ -3194,7 +3743,7 @@
       
       Promise.all(promises).then(() => {
         currentBatch++;
-
+        // Small delay between batches
         setTimeout(loadNextBatch, 500);
       });
     }
@@ -3211,7 +3760,10 @@
       const btn = document.createElement('button');
       btn.className = 'mini-btn status';
       btn.innerHTML = `<i class="fas fa-check"></i> ${status}`;
-      btn.onclick = () => setSelectedCellsStatus(status);
+      btn.onclick = () => {
+        saveStateForUndo(`Set Status: ${status}`);
+        setSelectedCellsStatus(status);
+      };
       container.appendChild(btn);
     });
   }
@@ -3223,7 +3775,7 @@
       if (target === 'filter-type' || target === 'filter-month' || target === 'filter-users') {
         applyFilters();
       } else if (target === 'roster-type') {
-
+        // Handle roster type selection
       } else if (target === 'import-source-roster') {
         const importBtn = document.getElementById('import-roster-btn');
         if (importBtn) {
@@ -3375,13 +3927,16 @@
   
   function loadInitialData() {
     let usedCache = false;
+    
     function applyData(data, isFromCache = false) {
       globalCache.rosters = data.rosters || [];
       globalCache.users = data.users || [];
       globalCache.statuses = data.statuses || [];
       globalCache.rosterTypesWithColors = data.rosterTypesWithColors || [];
       globalCache.userAccess = data.userAccess;
+      
       if (globalCache.userAccess && globalCache.userAccess.accessLevel === 'admin') {
+        // Admin access granted
       } else if (globalCache.userAccess && globalCache.userAccess.accessLevel === 'view') {
         document.body.classList.add('view-only');
       } else {
@@ -3389,21 +3944,27 @@
         hidePageLoading();
         return;
       }
+      
       filteredRosters = [...globalCache.rosters];
       setupFilters();
       displayRosters();
       setupEventListeners();
       populateStatusButtons();
+      
+      // Auto-select first roster if available
       const firstRoster = globalCache.rosters[0];
       if (firstRoster) {
         currentRoster = firstRoster;
         loadRosterData(firstRoster.id);
       }
+      
       if (!isFromCache) {
         hidePageLoading();
         preloadAllRosterData();
       }
     }
+    
+    // Try to use cached data first
     const cached = localStorage.getItem('cachedInitialData');
     if (cached) {
       try {
@@ -3415,11 +3976,15 @@
         console.warn('Failed to parse cached data:', e);
       }
     }
+    
+    // Show loading if we didn't use cache
     setTimeout(() => {
       if (!usedCache) {
         showPageLoading();
       }
     }, 0);
+    
+    // Always fetch fresh data
     google.script.run
       .withSuccessHandler(function(freshData) {
         try {
@@ -3445,6 +4010,10 @@
     showLoading('user-management-loading');
     showLoading('roster-table-loading');
 
+    // Clear undo/redo stacks when switching rosters
+    clearUndoRedoStacks();
+
+    // Check if we have cached data
     if (globalCache.rosterData.has(rosterId)) {
       const cachedData = globalCache.rosterData.get(rosterId);
       currentRosterUsers = cachedData.users;
@@ -3457,6 +4026,7 @@
       return;
     }
 
+    // Load data from server
     Promise.all([
       new Promise((resolve, reject) => {
         google.script.run
@@ -3474,6 +4044,7 @@
       currentRosterUsers = rosterUsers || [];
       monthDetails = monthData || { daysInMonth: 31, dayDetails: [] };
 
+      // Cache the data
       globalCache.rosterData.set(rosterId, {
         users: currentRosterUsers,
         monthDetails: monthDetails
@@ -3493,6 +4064,7 @@
   }
 
   function setupFilters() {
+    // Setup type filter
     const uniqueTypes = [...new Set(globalCache.rosters.map(r => r.type))];
     const typeOptions = [
       { value: '', text: 'All Types' },
@@ -3500,6 +4072,7 @@
     ];
     CustomSelect.populateOptions('filter-type', typeOptions);
     
+    // Setup month filter
     const uniqueMonths = [...new Set(globalCache.rosters.map(r => r.monthYear))];
     const monthOptions = [
       { value: '', text: 'All Months' },
@@ -3507,7 +4080,7 @@
     ];
     CustomSelect.populateOptions('filter-month', monthOptions);
     
-
+    // Setup user filter
     if (globalCache.users && globalCache.users.length > 0) {
       const uniqueUsers = [...new Set(globalCache.users)];
       const userOptions = [
@@ -3531,14 +4104,14 @@
       
       let userMatch = true;
       if (selectedUsers.length > 0) {
-
+        // Check if roster has any of the selected users
         const rosterData = globalCache.rosterData.get(roster.id);
         if (rosterData && rosterData.users) {
           userMatch = selectedUsers.some(selectedUser => 
             rosterData.users.some(user => user.username === selectedUser)
           );
         } else {
-
+          // If we don't have cached data, assume it matches
           userMatch = true;
         }
       }
@@ -3548,16 +4121,15 @@
     
     displayRosters();
   }
-
   
   function clearFilters() {
     CustomSelect.setValue('filter-type', '');
     CustomSelect.setValue('filter-month', '');
     
-
+    // Clear user filter
     globalCache.selectedUserFilters.clear();
     
-
+    // Update user filter display
     const userTrigger = document.querySelector('[data-target="filter-users"]');
     if (userTrigger && userTrigger.parentElement) {
       const selectText = userTrigger.parentElement.querySelector('.select-text');
@@ -3666,9 +4238,6 @@
     if (globalCache.userAccess.accessLevel === 'admin') {
       setupMultiSelectUsers();
     }
-
-
-    document.addEventListener('mouseup', handleMouseUp);
   }
   
   function setupMultiSelectUsers() {
@@ -3879,6 +4448,7 @@
   }
   
   function showRosterListView() {
+    // Save pending changes for current roster
     if (currentRoster && hasRealChanges()) {
       globalCache.pendingChangesByRoster.set(currentRoster.id, {
         pendingChanges: new Map(pendingChanges),
@@ -3890,12 +4460,14 @@
     const listView = document.getElementById('roster-list-view');
     if (listView) listView.style.display = 'block';
     
+    // Reset state
     currentRoster = null;
     pendingChanges = new Map();
     originalData = new Map();
     selectedUsers.clear();
     clearSelection();
     focusedCell = null;
+    clearUndoRedoStacks();
     updateSaveButtonState();
   }
   
@@ -3949,6 +4521,7 @@
         .withSuccessHandler(function (newRoster) {
           Modal.success('Roster created successfully!');
 
+          // Update cache
           globalCache.rosters.push(newRoster);
           filteredRosters = [...globalCache.rosters];
 
@@ -3970,8 +4543,6 @@
           resetCreateRosterButton();
         })
         .withFailureHandler(function (error) {
-          Modal.error('Error creating roster: ' + (error?.message || 'Unknown error'));
-          resetCreate
           Modal.error('Error creating roster: ' + (error?.message || 'Unknown error'));
           resetCreateRosterButton();
         })
@@ -3997,6 +4568,7 @@
   function viewRosterDetails(roster) {
     if (!roster || !roster.id) return;
     
+    // Save current roster changes if switching
     if (currentRoster && currentRoster.id !== roster.id && hasRealChanges()) {
       globalCache.pendingChangesByRoster.set(currentRoster.id, {
         pendingChanges: new Map(pendingChanges),
@@ -4010,7 +4582,9 @@
     selectedUsers.clear();
     clearSelection();
     focusedCell = null;
+    clearUndoRedoStacks();
     
+    // Update UI elements
     const detailRosterId = document.getElementById('detail-roster-id');
     const detailMonthYear = document.getElementById('detail-month-year');
     const detailRosterType = document.getElementById('detail-roster-type');
@@ -4035,12 +4609,14 @@
   }
        
   function setupRosterView() {
+    // Check for saved changes
     const savedChanges = globalCache.pendingChangesByRoster.get(currentRoster.id);
     
     if (savedChanges) {
       pendingChanges = new Map(savedChanges.pendingChanges);
       originalData = new Map(savedChanges.originalData);
     } else {
+      // Initialize data
       currentRosterUsers.forEach(user => {
         const dayStatuses = user.dayStatuses || [];
         while (dayStatuses.length < monthDetails.daysInMonth) {
@@ -4121,12 +4697,14 @@
         
         Modal.success(`Successfully added ${newUsers.length} users!`);
         
+        // Update data
         currentRosterUsers.push(...newUsers);
         globalCache.rosterData.set(currentRoster.id, {
           users: currentRosterUsers,
           monthDetails: monthDetails
         });
         
+        // Clear selection
         selectedUsers.clear();
         const chips = document.querySelectorAll('.user-chip');
         chips.forEach(chip => chip.remove());
@@ -4157,12 +4735,14 @@
           .withSuccessHandler(function() {
             Modal.success('User removed successfully!');
             
+            // Update data
             currentRosterUsers = currentRosterUsers.filter(user => user.username !== username);
             globalCache.rosterData.set(currentRoster.id, {
               users: currentRosterUsers,
               monthDetails: monthDetails
             });
             
+            // Clear pending changes for this user
             pendingChanges.delete(username);
             originalData.delete(username);
             
@@ -4188,6 +4768,7 @@
     const table = document.createElement('table');
     table.className = 'roster-table';
     
+    // Create header
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     
@@ -4195,6 +4776,7 @@
     userHeader.innerHTML = '<i class="fas fa-users"></i> User';
     headerRow.appendChild(userHeader);
     
+    // Add day headers
     monthDetails.dayDetails.forEach(dayDetail => {
       const dayHeader = document.createElement('th');
       dayHeader.innerHTML = `
@@ -4204,6 +4786,7 @@
         </div>
       `;
       
+      // Add weekend styling
       const monthIndex = new Date(currentRoster.monthYear + ' 1').getMonth();
       const date = new Date(parseInt(currentRoster.monthYear.split(' ')[1]), monthIndex, dayDetail.day);
       
@@ -4217,17 +4800,20 @@
     thead.appendChild(headerRow);
     table.appendChild(thead);
     
+    // Create body
     const tbody = document.createElement('tbody');
     
     currentRosterUsers.forEach(user => {
       const row = document.createElement('tr');
       
+      // User name cell
       const userCell = document.createElement('td');
       userCell.innerHTML = `<i class="fas fa-user"></i> ${user.username}`;
       row.appendChild(userCell);
       
       const userStatuses = pendingChanges.get(user.username) || [];
       
+      // Create status cells
       for (let day = 0; day < monthDetails.daysInMonth; day++) {
         const statusCell = document.createElement('td');
         statusCell.className = 'status-cell';
@@ -4241,6 +4827,7 @@
           statusCell.classList.add('empty');
         }
         
+        // Add weekend styling
         const dayDetail = monthDetails.dayDetails[day];
         if (dayDetail) {
           const monthIndex = new Date(currentRoster.monthYear + ' 1').getMonth();
@@ -4251,6 +4838,7 @@
           }
         }
         
+        // Add event listeners for admin users
         if (globalCache.userAccess?.accessLevel === 'admin') {
           statusCell.addEventListener('click', function(e) {
             handleCellClick(user.username, day, e);
@@ -4275,10 +4863,10 @@
     tableContent.innerHTML = '';
     tableContent.appendChild(table);
     
-
+    // Update selection display
     updateCellSelection();
     
-
+    // Set initial focus if needed
     if (!focusedCell && currentRosterUsers.length > 0) {
       setFocusedCell(currentRosterUsers[0].username, 0);
     }
@@ -4331,6 +4919,7 @@
   }
   
   function selectStatus(username, day, status) {
+    saveStateForUndo(`Set Status: ${status || 'Clear'}`);
     updatePendingStatus(username, day, status);
     hideStatusModal();
     generateRosterTable();
@@ -4431,10 +5020,12 @@
 
         Modal.success('All changes saved successfully!');
 
+        // Update original data
         for (let [username, statuses] of pendingChanges) {
           originalData.set(username, [...statuses]);
         }
 
+        // Update cached data
         const updatedUsers = currentRosterUsers.map(user => ({
           ...user,
           dayStatuses: pendingChanges.get(user.username) || []
@@ -4445,7 +5036,9 @@
           monthDetails: monthDetails
         });
 
+        // Clear saved changes and undo/redo stacks
         globalCache.pendingChangesByRoster.delete(currentRoster.id);
+        clearUndoRedoStacks();
 
         updateSaveButtonState();
         hideChangesIndicator();
@@ -4460,8 +5053,7 @@
       .batchUpdateUserStatuses(changesArray);
   }
 
-
-
+  // Global function exports for onclick handlers
   window.hideUserModal = hideUserModal;
   window.addUserChip = addUserChip;
   window.removeUserChip = removeUserChip;
@@ -4471,3 +5063,5 @@
   window.selectStatus = selectStatus;
   window.CustomSelect = CustomSelect;
 </script>
+</body>
+</html>
