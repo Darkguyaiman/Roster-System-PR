@@ -1,4 +1,3 @@
-
 function doGet() {
   return HtmlService.createTemplateFromFile('RoosterApp')
     .evaluate()
@@ -228,34 +227,42 @@ function generateRosterId() {
   return newId;
 }
 
+
 function createRoster(monthYear, rosterType) {
-  const userAccess = getCurrentUserAccess();
-  if (userAccess.accessLevel !== 'admin') {
-    throw new Error('Access denied. Only administrators can create rosters.');
+  const lock = LockService.getScriptLock();
+  try {
+    lock.waitLock(5000);
+
+    const userAccess = getCurrentUserAccess();
+    if (userAccess.accessLevel !== 'admin') {
+      throw new Error('Access denied. Only administrators can create rosters.');
+    }
+
+    if (checkRosterTypeExists(monthYear, rosterType)) {
+      throw new Error(`A roster of type "${rosterType}" already exists for ${monthYear}.`);
+    }
+
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let rosterSheet = ss.getSheetByName('Rosters');
+
+    if (!rosterSheet) {
+      rosterSheet = ss.insertSheet('Rosters');
+      rosterSheet.getRange(3, 2, 1, 3).setValues([["Roster ID", "Month/Year", "Roster Type"]]);
+    }
+
+    const rosterId = generateRosterId();
+    rosterSheet.appendRow(['', rosterId, monthYear, rosterType]);
+
+    return {
+      id: rosterId,
+      monthYear: monthYear,
+      type: rosterType
+    };
+
+  } finally {
+    lock.releaseLock();
   }
-
-  if (checkRosterTypeExists(monthYear, rosterType)) {
-    throw new Error(`A roster of type "${rosterType}" already exists for ${monthYear}. Each month can only have one roster of each type.`);
-  }
-
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let rosterSheet = ss.getSheetByName('Rosters');
-
-  if (!rosterSheet) {
-    rosterSheet = ss.insertSheet('Rosters');
-    rosterSheet.getRange(3, 2, 1, 3).setValues([["Roster ID", "Month/Year", "Roster Type"]]);
-  }
-
-  const rosterId = generateRosterId();
-  rosterSheet.appendRow(['', rosterId, monthYear, rosterType]);
-
-  return {
-    id: rosterId,
-    monthYear: monthYear,
-    type: rosterType
-  };
 }
-
 
 
 function getUsersForRoster(rosterId) {
