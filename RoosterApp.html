@@ -17,11 +17,9 @@
         --rust: #BB3E03;
         --red: #AE2012;
         --dark-red: #9B2226;
-
         --anim-duration-fast: 0.2s;
         --anim-duration-medium: 0.3s;
         --anim-duration-slow: 0.5s;
-        
         --sidebar-width: 250px;
         --sidebar-bg: var(--dark-teal);
         --sidebar-text: white;
@@ -954,8 +952,7 @@
         color: #999;
         font-style: italic;
       }
-      
-      /* Enhanced selection styles */
+
       .status-cell.selected {
         background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(37, 99, 235, 0.4)) !important;
         border: 2px solid #3b82f6 !important;
@@ -977,7 +974,6 @@
         z-index: 11;
       }
 
-      /* Copy/Cut visual feedback */
       .status-cell.copied {
         background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(22, 163, 74, 0.4)) !important;
         border: 2px solid #22c55e !important;
@@ -991,7 +987,6 @@
         opacity: 0.7;
       }
 
-      /* Delete visual feedback */
       .status-cell.deleted {
         background: linear-gradient(135deg, rgba(156, 163, 175, 0.3), rgba(107, 114, 128, 0.4)) !important;
         border: 2px solid #9ca3af !important;
@@ -1013,7 +1008,6 @@
         50% { box-shadow: 0 4px 16px rgba(156, 163, 175, 0.6); }
       }
 
-      /* Selection rectangle for drag selection */
       .selection-rectangle {
         position: absolute;
         border: 2px dashed #3b82f6;
@@ -1127,6 +1121,14 @@
       
       .weekend.roster-table th {
         background: linear-gradient(135deg, var(--rust), var(--red)) !important;
+      }
+
+      .sunday {
+        background-color: #fffbeb !important;
+      }
+
+      .sunday.roster-table th {
+        background: linear-gradient(135deg, #f59e0b, #d97706) !important;
       }
       
       .user-row {
@@ -1578,7 +1580,6 @@
         border-bottom: none;
       }
 
-      /* Enhanced Multi-select and Import Features */
       .multi-select-controls {
         background: rgba(255, 255, 255, 0.95);
         padding: 20px;
@@ -1861,7 +1862,6 @@
         }
       }
 
-      /* Keyboard shortcuts help */
       .keyboard-shortcuts {
         position: fixed;
         bottom: 20px;
@@ -2100,6 +2100,27 @@
 
       .roster-table-wrapper::-webkit-scrollbar-thumb:hover {
         background: var(--teal);
+      }
+
+      .saturday-indicator {
+        background: linear-gradient(135deg, var(--orange), var(--burnt-orange));
+        color: white;
+        padding: 6px 12px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 8px;
+      }
+
+      .weekend.saturday {
+        background-color: #fff0e0 !important;
+      }
+
+      .weekend.saturday.roster-table th {
+        background: linear-gradient(135deg, var(--orange), var(--burnt-orange)) !important;
       }
     </style>
   </head>
@@ -2832,8 +2853,6 @@
   let monthDetails = { daysInMonth: 31, dayDetails: [] };
   let selectedUsers = new Set();
   let filteredRosters = [];
-  
-  // Enhanced multi-select variables
   let selectedCells = new Set();
   let isSelecting = false;
   let isDragSelecting = false;
@@ -2841,12 +2860,8 @@
   let copiedStatus = '';
   let copiedCells = new Set();
   let cutCells = new Set();
-  
-  // Enhanced navigation variables
   let focusedCell = null;
   let lastClickTime = 0;
-  
-  // Undo/Redo system
   let undoStack = [];
   let redoStack = [];
   const MAX_UNDO_STACK_SIZE = 50;
@@ -2863,18 +2878,13 @@
   });
 
   function setupUndoRedoSystem() {
-    // Add event listeners for undo/redo buttons
     document.getElementById('undo-btn')?.addEventListener('click', performUndo);
     document.getElementById('redo-btn')?.addEventListener('click', performRedo);
-    
-    // Update button states initially
     updateUndoRedoButtons();
   }
 
   function saveStateForUndo(description = 'Change') {
     if (!currentRoster) return;
-    
-    // Create a deep copy of current state
     const state = {
       rosterId: currentRoster.id,
       description: description,
@@ -2882,30 +2892,19 @@
       pendingChanges: new Map(),
       originalData: new Map(originalData)
     };
-    
-    // Deep copy pending changes
     for (let [username, statuses] of pendingChanges) {
       state.pendingChanges.set(username, [...statuses]);
     }
-    
-    // Add to undo stack
     undoStack.push(state);
-    
-    // Limit stack size
     if (undoStack.length > MAX_UNDO_STACK_SIZE) {
       undoStack.shift();
     }
-    
-    // Clear redo stack when new action is performed
     redoStack = [];
-    
     updateUndoRedoButtons();
   }
 
   function performUndo() {
     if (undoStack.length === 0 || !currentRoster) return;
-    
-    // Save current state to redo stack
     const currentState = {
       rosterId: currentRoster.id,
       description: 'Redo point',
@@ -2913,43 +2912,31 @@
       pendingChanges: new Map(),
       originalData: new Map(originalData)
     };
-    
     for (let [username, statuses] of pendingChanges) {
       currentState.pendingChanges.set(username, [...statuses]);
     }
-    
     redoStack.push(currentState);
-    
-    // Restore previous state
     const previousState = undoStack.pop();
     if (previousState && previousState.rosterId === currentRoster.id) {
       pendingChanges = new Map();
       for (let [username, statuses] of previousState.pendingChanges) {
         pendingChanges.set(username, [...statuses]);
       }
-      
       originalData = new Map(previousState.originalData);
-      
-      // Refresh UI
       generateRosterTable();
       updateSaveButtonState();
-      
       if (hasRealChanges()) {
         showChangesIndicator();
       } else {
         hideChangesIndicator();
       }
-      
       showClipboardIndicator(`Undone: ${previousState.description}`);
     }
-    
     updateUndoRedoButtons();
   }
 
   function performRedo() {
     if (redoStack.length === 0 || !currentRoster) return;
-    
-    // Save current state to undo stack
     const currentState = {
       rosterId: currentRoster.id,
       description: 'Undo point',
@@ -2957,36 +2944,26 @@
       pendingChanges: new Map(),
       originalData: new Map(originalData)
     };
-    
     for (let [username, statuses] of pendingChanges) {
       currentState.pendingChanges.set(username, [...statuses]);
     }
-    
     undoStack.push(currentState);
-    
-    // Restore next state
     const nextState = redoStack.pop();
     if (nextState && nextState.rosterId === currentRoster.id) {
       pendingChanges = new Map();
       for (let [username, statuses] of nextState.pendingChanges) {
         pendingChanges.set(username, [...statuses]);
       }
-      
       originalData = new Map(nextState.originalData);
-      
-      // Refresh UI
       generateRosterTable();
       updateSaveButtonState();
-      
       if (hasRealChanges()) {
         showChangesIndicator();
       } else {
         hideChangesIndicator();
       }
-      
       showClipboardIndicator(`Redone: ${nextState.description}`);
     }
-    
     updateUndoRedoButtons();
   }
 
@@ -3017,8 +2994,6 @@
         e.preventDefault();
         toggleKeyboardShortcuts();
       }
-      
-      // Show shortcuts temporarily when using keyboard shortcuts
       if ((e.ctrlKey || e.metaKey) && ['c', 'v', 'x', 'a', 'z', 'y'].includes(e.key.toLowerCase()) || e.key === 'Delete') {
         showKeyboardShortcuts();
         clearTimeout(helpTimeout);
@@ -3050,10 +3025,7 @@
 
   function setupKeyboardNavigation() {
     document.addEventListener('keydown', function(e) {
-      // Only handle keyboard shortcuts when not in input fields
       const isInInputField = e.target.matches('input, textarea, select') || e.target.isContentEditable;
-      
-      // Handle global shortcuts
       if ((e.ctrlKey || e.metaKey) && currentRoster && globalCache.userAccess?.accessLevel === 'admin') {
         switch(e.key.toLowerCase()) {
           case 'c':
@@ -3098,14 +3070,10 @@
             break;
         }
       }
-      
-      // Handle navigation only when focused on table and not in input
       if (!currentRoster || !focusedCell || isInInputField) return;
-      
       const { username, day } = focusedCell;
       let newUsername = username;
       let newDay = day;
-      
       switch(e.key) {
         case 'ArrowUp':
           e.preventDefault();
@@ -3160,8 +3128,7 @@
           
         default:
           return;
-      }
-      
+      }      
       if (newUsername !== username || newDay !== day) {
         setFocusedCell(newUsername, newDay);
       }
@@ -3169,18 +3136,13 @@
   }
 
   function setFocusedCell(username, day) {
-    // Remove previous focus
     document.querySelectorAll('.status-cell.focused').forEach(cell => {
       cell.classList.remove('focused');
     });
-    
-    // Set new focus
     const cell = document.querySelector(`[data-username="${username}"][data-day="${day}"]`);
     if (cell) {
       cell.classList.add('focused');
       focusedCell = { username, day };
-      
-      // Smooth scroll to focused cell
       cell.scrollIntoView({ 
         behavior: 'smooth', 
         block: 'nearest', 
@@ -3190,18 +3152,14 @@
   }
 
   function setupMultiSelectFeatures() {
-    // Enhanced button event listeners
     document.getElementById('copy-btn')?.addEventListener('click', handleCopyStatus);
     document.getElementById('paste-btn')?.addEventListener('click', handlePasteStatus);
     document.getElementById('cut-btn')?.addEventListener('click', handleCutStatus);
     document.getElementById('delete-btn')?.addEventListener('click', handleDeleteStatus);
     document.getElementById('clear-selection-btn')?.addEventListener('click', clearSelection);
     document.getElementById('clear-status-btn')?.addEventListener('click', () => setSelectedCellsStatus(''));
-    
-    // Import functionality
     document.getElementById('import-roster-btn')?.addEventListener('click', handleImportFromRoster);
-    
-    // Import source selection
+
     document.addEventListener('selectChange', function(e) {
       if (e.detail.target === 'import-source-roster') {
         const importBtn = document.getElementById('import-roster-btn');
@@ -3211,7 +3169,6 @@
       }
     });
 
-    // Enhanced mouse events for drag selection
     document.addEventListener('mouseup', handleMouseUp);
     document.addEventListener('mousemove', handleMouseMove);
   }
@@ -3230,14 +3187,10 @@
 
   function handleCellClick(username, day, event) {
     if (globalCache.userAccess?.accessLevel !== 'admin') return;
-    
     const currentTime = Date.now();
     const cellKey = getCellKey(username, day);
-    
-    // Set focused cell
     setFocusedCell(username, day);
-    
-    // Handle double-click for editing
+
     if (currentTime - lastClickTime < 300 && focusedCell && 
         focusedCell.username === username && focusedCell.day === day) {
       const currentStatus = getCurrentStatus(username, day);
@@ -3245,25 +3198,22 @@
       lastClickTime = 0;
       return;
     }
-    
     lastClickTime = currentTime;
-    
-    // Enhanced selection logic
     if (event.ctrlKey || event.metaKey) {
-      // Toggle selection
+
       if (selectedCells.has(cellKey)) {
         selectedCells.delete(cellKey);
       } else {
         selectedCells.add(cellKey);
       }
     } else if (event.shiftKey && selectedCells.size > 0) {
-      // Range selection
+
       const lastSelectedKey = Array.from(selectedCells)[selectedCells.size - 1];
       const lastSelected = parseCellKey(lastSelectedKey);
       
       selectRange(lastSelected.username, lastSelected.day, username, day);
     } else {
-      // Single selection (unless clicking on already selected cell)
+
       if (!(selectedCells.has(cellKey) && selectedCells.size === 1)) {
         selectedCells.clear();
         selectedCells.add(cellKey);
@@ -3283,7 +3233,7 @@
     const minDay = Math.min(startDay, endDay);
     const maxDay = Math.max(startDay, endDay);
     
-    // Clear current selection and select range
+
     selectedCells.clear();
     
     for (let userIndex = minUserIndex; userIndex <= maxUserIndex; userIndex++) {
@@ -3307,16 +3257,16 @@
     updateCellSelection();
     updateMultiSelectControls();
     
-    event.preventDefault(); // Prevent text selection
+    event.preventDefault(); 
   }
 
   function handleCellMouseEnter(username, day) {
     if (!isDragSelecting || !selectionStartCell) return;
     
-    // Clear current selection
+
     selectedCells.clear();
     
-    // Select rectangular range
+
     selectRange(selectionStartCell.username, selectionStartCell.day, username, day);
     
     updateCellSelection();
@@ -3329,16 +3279,16 @@
   }
 
   function handleMouseMove(event) {
-    // Additional mouse move handling if needed
+
   }
 
   function updateCellSelection() {
-    // Clear all selection classes first
+
     document.querySelectorAll('.status-cell').forEach(cell => {
       cell.classList.remove('selected', 'copied', 'cut', 'deleted');
     });
     
-    // Apply selection classes
+
     selectedCells.forEach(cellKey => {
       const { username, day } = parseCellKey(cellKey);
       const cell = document.querySelector(`[data-username="${username}"][data-day="${day}"]`);
@@ -3347,7 +3297,7 @@
       }
     });
     
-    // Apply copied/cut visual feedback
+
     copiedCells.forEach(cellKey => {
       const { username, day } = parseCellKey(cellKey);
       const cell = document.querySelector(`[data-username="${username}"][data-day="${day}"]`);
@@ -3379,7 +3329,7 @@
         selectionCount.textContent = `${selectedCells.size} cell${selectedCells.size > 1 ? 's' : ''} selected`;
       }
       
-      // Enhanced button states
+
       if (copyBtn) copyBtn.disabled = selectedCells.size === 0;
       if (cutBtn) cutBtn.disabled = selectedCells.size === 0;
       if (deleteBtn) deleteBtn.disabled = selectedCells.size === 0;
@@ -3388,7 +3338,7 @@
       controlsContainer?.classList.remove('show');
     }
     
-    // Update undo/redo buttons
+
     updateUndoRedoButtons();
   }
 
@@ -3419,14 +3369,14 @@
 
   function handleCopyStatus() {
     if (selectedCells.size > 0) {
-      // For single cell, copy the status
+
       if (selectedCells.size === 1) {
         const cellKey = Array.from(selectedCells)[0];
         const { username, day } = parseCellKey(cellKey);
         const status = getCurrentStatus(username, day);
         copiedStatus = status;
       } else {
-        // For multiple cells, we'll use the most common status
+
         const statusCounts = new Map();
         selectedCells.forEach(cellKey => {
           const { username, day } = parseCellKey(cellKey);
@@ -3434,7 +3384,7 @@
           statusCounts.set(status, (statusCounts.get(status) || 0) + 1);
         });
         
-        // Find most common status
+
         let mostCommonStatus = '';
         let maxCount = 0;
         statusCounts.forEach((count, status) => {
@@ -3462,7 +3412,7 @@
       setSelectedCellsStatus(copiedStatus);
       showClipboardIndicator(`Pasted: "${copiedStatus}" to ${selectedCells.size} cell${selectedCells.size > 1 ? 's' : ''}`);
       
-      // Clear cut cells after paste
+
       cutCells.clear();
       updateCellSelection();
     }
@@ -3470,10 +3420,10 @@
 
   function handleCutStatus() {
     if (selectedCells.size > 0) {
-      // Copy first
+
       handleCopyStatus();
       
-      // Mark as cut
+
       cutCells = new Set(selectedCells);
       copiedCells.clear();
       
@@ -3486,10 +3436,10 @@
     if (selectedCells.size > 0) {
       saveStateForUndo('Delete Status');
       
-      // Clear the selected cells
+
       setSelectedCellsStatus('');
       
-      // Show visual feedback
+
       selectedCells.forEach(cellKey => {
         const { username, day } = parseCellKey(cellKey);
         const cell = document.querySelector(`[data-username="${username}"][data-day="${day}"]`);
@@ -3511,7 +3461,7 @@
       updatePendingStatus(username, day, status);
     });
     
-    // If this was a cut operation, clear the cut cells
+
     if (cutCells.size > 0) {
       cutCells.forEach(cellKey => {
         const { username, day } = parseCellKey(cellKey);
@@ -3549,7 +3499,7 @@
   function setupImportControls() {
     if (!currentRoster || !globalCache.rosters) return;
     
-    // Get available rosters for import (excluding current roster)
+
     const availableRosters = globalCache.rosters.filter(r => r.id !== currentRoster.id);
     const importOptions = [
       { value: '', text: 'Select a roster to import from' },
@@ -3585,14 +3535,14 @@
       importBtn.innerHTML = '<div class="loading-spinner"></div>Importing...';
     }
     
-    // Check if we have cached data for the source roster
+
     const cachedSourceData = globalCache.rosterData.get(sourceRoster.id);
     
     if (cachedSourceData) {
-      // Use cached data
+
       performImportWithData(sourceRoster, cachedSourceData.users);
     } else {
-      // Load data from server
+
       google.script.run
         .withSuccessHandler(function(sourceRosterData) {
           if (!sourceRosterData || !sourceRosterData.users) {
@@ -3601,7 +3551,7 @@
             return;
           }
           
-          // Also load month details for the source roster
+
           google.script.run
             .withSuccessHandler(function(monthData) {
               globalCache.rosterData.set(sourceRoster.id, {
@@ -3613,7 +3563,7 @@
             })
             .withFailureHandler(function(error) {
               console.warn('Failed to load month details for source roster:', error);
-              // Continue without month details
+
               globalCache.rosterData.set(sourceRoster.id, {
                 users: sourceRosterData.users,
                 monthDetails: { daysInMonth: 31, dayDetails: [] }
@@ -3635,10 +3585,10 @@
     let importedCount = 0;
     
     try {
-      // Save state for undo
+
       saveStateForUndo(`Import from ${sourceRoster.monthYear} - ${sourceRoster.type}`);
       
-      // Import matching users' statuses
+
       currentRosterUsers.forEach(currentUser => {
         const sourceUser = sourceUsers.find(su => su.username === currentUser.username);
         if (sourceUser && sourceUser.dayStatuses) {
@@ -3653,7 +3603,7 @@
         }
       });
       
-      // Refresh the table and update UI
+
       generateRosterTable();
       updateSaveButtonState();
       
@@ -3719,12 +3669,12 @@
   function preloadAllRosterData() {
     if (!globalCache.rosters) return;
     
-    // Get rosters that aren't cached yet
+
     const uncachedRosters = globalCache.rosters.filter(roster => 
       !globalCache.rosterData.has(roster.id)
     );
     
-    // Load in batches to avoid overwhelming the server
+
     const batchSize = 3;
     let currentBatch = 0;
     
@@ -3743,7 +3693,7 @@
       
       Promise.all(promises).then(() => {
         currentBatch++;
-        // Small delay between batches
+
         setTimeout(loadNextBatch, 500);
       });
     }
@@ -3775,7 +3725,7 @@
       if (target === 'filter-type' || target === 'filter-month' || target === 'filter-users') {
         applyFilters();
       } else if (target === 'roster-type') {
-        // Handle roster type selection
+
       } else if (target === 'import-source-roster') {
         const importBtn = document.getElementById('import-roster-btn');
         if (importBtn) {
@@ -3936,7 +3886,7 @@
       globalCache.userAccess = data.userAccess;
       
       if (globalCache.userAccess && globalCache.userAccess.accessLevel === 'admin') {
-        // Admin access granted
+
       } else if (globalCache.userAccess && globalCache.userAccess.accessLevel === 'view') {
         document.body.classList.add('view-only');
       } else {
@@ -3951,7 +3901,7 @@
       setupEventListeners();
       populateStatusButtons();
       
-      // Auto-select first roster if available
+
       const firstRoster = globalCache.rosters[0];
       if (firstRoster) {
         currentRoster = firstRoster;
@@ -3964,7 +3914,7 @@
       }
     }
     
-    // Try to use cached data first
+
     const cached = localStorage.getItem('cachedInitialData');
     if (cached) {
       try {
@@ -3977,14 +3927,14 @@
       }
     }
     
-    // Show loading if we didn't use cache
+
     setTimeout(() => {
       if (!usedCache) {
         showPageLoading();
       }
     }, 0);
     
-    // Always fetch fresh data
+
     google.script.run
       .withSuccessHandler(function(freshData) {
         try {
@@ -4005,15 +3955,17 @@
       .getInitialData();
   }
 
-  function loadRosterData(rosterId) {
+  function loadRosterData(rosterId, forceRefresh = true) {
     showLoading('roster-info-loading');
     showLoading('user-management-loading');
     showLoading('roster-table-loading');
 
-    // Clear undo/redo stacks when switching rosters
     clearUndoRedoStacks();
 
-    // Check if we have cached data
+    if (forceRefresh) {
+      globalCache.rosterData.delete(rosterId);
+    }
+
     if (globalCache.rosterData.has(rosterId)) {
       const cachedData = globalCache.rosterData.get(rosterId);
       currentRosterUsers = cachedData.users;
@@ -4026,7 +3978,6 @@
       return;
     }
 
-    // Load data from server
     Promise.all([
       new Promise((resolve, reject) => {
         google.script.run
@@ -4044,7 +3995,6 @@
       currentRosterUsers = rosterUsers || [];
       monthDetails = monthData || { daysInMonth: 31, dayDetails: [] };
 
-      // Cache the data
       globalCache.rosterData.set(rosterId, {
         users: currentRosterUsers,
         monthDetails: monthDetails
@@ -4064,7 +4014,7 @@
   }
 
   function setupFilters() {
-    // Setup type filter
+
     const uniqueTypes = [...new Set(globalCache.rosters.map(r => r.type))];
     const typeOptions = [
       { value: '', text: 'All Types' },
@@ -4072,7 +4022,7 @@
     ];
     CustomSelect.populateOptions('filter-type', typeOptions);
     
-    // Setup month filter
+
     const uniqueMonths = [...new Set(globalCache.rosters.map(r => r.monthYear))];
     const monthOptions = [
       { value: '', text: 'All Months' },
@@ -4080,7 +4030,7 @@
     ];
     CustomSelect.populateOptions('filter-month', monthOptions);
     
-    // Setup user filter
+
     if (globalCache.users && globalCache.users.length > 0) {
       const uniqueUsers = [...new Set(globalCache.users)];
       const userOptions = [
@@ -4104,14 +4054,14 @@
       
       let userMatch = true;
       if (selectedUsers.length > 0) {
-        // Check if roster has any of the selected users
+
         const rosterData = globalCache.rosterData.get(roster.id);
         if (rosterData && rosterData.users) {
           userMatch = selectedUsers.some(selectedUser => 
             rosterData.users.some(user => user.username === selectedUser)
           );
         } else {
-          // If we don't have cached data, assume it matches
+
           userMatch = true;
         }
       }
@@ -4126,10 +4076,10 @@
     CustomSelect.setValue('filter-type', '');
     CustomSelect.setValue('filter-month', '');
     
-    // Clear user filter
+
     globalCache.selectedUserFilters.clear();
     
-    // Update user filter display
+
     const userTrigger = document.querySelector('[data-target="filter-users"]');
     if (userTrigger && userTrigger.parentElement) {
       const selectText = userTrigger.parentElement.querySelector('.select-text');
@@ -4175,11 +4125,18 @@
     
     const typeBadge = createRosterTypeBadge(roster.type || 'Unknown Type', typeColor);
     
+
+    const isSaturdayRoster = roster.type && roster.type.toLowerCase().includes('saturday');
+    const saturdayIndicator = isSaturdayRoster ? 
+      '<div class="saturday-indicator"><i class="fas fa-calendar-day"></i> Saturdays Only</div>' : 
+      '';
+    
     card.innerHTML = `
       <h3>
         <span><i class="fas fa-calendar-alt"></i> ${roster.monthYear || 'Unknown Month/Year'}</span>
         ${typeBadge.outerHTML}
       </h3>
+      ${saturdayIndicator}
       <p><strong><i class="fas fa-id-badge"></i> ID:</strong> ${roster.id}</p>
     `;
     
@@ -4448,7 +4405,7 @@
   }
   
   function showRosterListView() {
-    // Save pending changes for current roster
+
     if (currentRoster && hasRealChanges()) {
       globalCache.pendingChangesByRoster.set(currentRoster.id, {
         pendingChanges: new Map(pendingChanges),
@@ -4460,7 +4417,7 @@
     const listView = document.getElementById('roster-list-view');
     if (listView) listView.style.display = 'block';
     
-    // Reset state
+
     currentRoster = null;
     pendingChanges = new Map();
     originalData = new Map();
@@ -4521,7 +4478,7 @@
         .withSuccessHandler(function (newRoster) {
           Modal.success('Roster created successfully!');
 
-          // Update cache
+
           globalCache.rosters.push(newRoster);
           filteredRosters = [...globalCache.rosters];
 
@@ -4567,15 +4524,28 @@
 
   function viewRosterDetails(roster) {
     if (!roster || !roster.id) return;
-    
-    // Save current roster changes if switching
+
+    const detailRosterId = document.getElementById('detail-roster-id');
+    const detailMonthYear = document.getElementById('detail-month-year');
+    const detailRosterType = document.getElementById('detail-roster-type');
+
+    if (detailRosterId) detailRosterId.textContent = 'Loading...';
+    if (detailMonthYear) detailMonthYear.textContent = 'Loading...';
+    if (detailRosterType) detailRosterType.innerHTML = 'Loading...';
+
+    const tableContent = document.getElementById('roster-table-content');
+    if (tableContent) tableContent.innerHTML = '<p class="loading">Loading schedule...</p>';
+
+    const usersList = document.getElementById('users-list');
+    if (usersList) usersList.innerHTML = '<p class="loading">Loading users...</p>';
+
     if (currentRoster && currentRoster.id !== roster.id && hasRealChanges()) {
       globalCache.pendingChangesByRoster.set(currentRoster.id, {
         pendingChanges: new Map(pendingChanges),
         originalData: new Map(originalData)
       });
     }
-    
+
     currentRoster = roster;
     pendingChanges = new Map();
     originalData = new Map();
@@ -4583,13 +4553,7 @@
     clearSelection();
     focusedCell = null;
     clearUndoRedoStacks();
-    
-    // Update UI elements
-    const detailRosterId = document.getElementById('detail-roster-id');
-    const detailMonthYear = document.getElementById('detail-month-year');
-    const detailRosterType = document.getElementById('detail-roster-type');
-    const rosterDetailTitle = document.getElementById('roster-detail-title');
-    
+
     if (detailRosterId) detailRosterId.textContent = roster.id;
     if (detailMonthYear) detailMonthYear.textContent = roster.monthYear || 'Unknown';
     if (detailRosterType) {
@@ -4598,25 +4562,34 @@
       const typeBadge = createRosterTypeBadge(roster.type || 'Unknown', typeColor);
       detailRosterType.innerHTML = typeBadge.outerHTML;
     }
-    if (rosterDetailTitle) rosterDetailTitle.innerHTML = `<i class="fas fa-calendar-check"></i> Roster: ${roster.monthYear || 'Unknown'} (${roster.type || 'Unknown'})`;
-    
+
+    const rosterDetailTitle = document.getElementById('roster-detail-title');
+    if (rosterDetailTitle) {
+      rosterDetailTitle.innerHTML = `<i class="fas fa-calendar-check"></i> Roster: ${roster.monthYear || 'Unknown'} (${roster.type || 'Unknown'})`;
+    }
+
     hideAllViews();
     const detailView = document.getElementById('roster-detail-view');
     if (detailView) detailView.style.display = 'block';
-    
+
     setupImportControls();
-    loadRosterData(roster.id);
+
+    showLoading('roster-info-loading');
+    showLoading('user-management-loading');
+    showLoading('roster-table-loading');
+
+    loadRosterData(roster.id, true);
   }
        
   function setupRosterView() {
-    // Check for saved changes
+
     const savedChanges = globalCache.pendingChangesByRoster.get(currentRoster.id);
     
     if (savedChanges) {
       pendingChanges = new Map(savedChanges.pendingChanges);
       originalData = new Map(savedChanges.originalData);
     } else {
-      // Initialize data
+
       currentRosterUsers.forEach(user => {
         const dayStatuses = user.dayStatuses || [];
         while (dayStatuses.length < monthDetails.daysInMonth) {
@@ -4697,14 +4670,14 @@
         
         Modal.success(`Successfully added ${newUsers.length} users!`);
         
-        // Update data
+
         currentRosterUsers.push(...newUsers);
         globalCache.rosterData.set(currentRoster.id, {
           users: currentRosterUsers,
           monthDetails: monthDetails
         });
         
-        // Clear selection
+
         selectedUsers.clear();
         const chips = document.querySelectorAll('.user-chip');
         chips.forEach(chip => chip.remove());
@@ -4735,14 +4708,14 @@
           .withSuccessHandler(function() {
             Modal.success('User removed successfully!');
             
-            // Update data
+
             currentRosterUsers = currentRosterUsers.filter(user => user.username !== username);
             globalCache.rosterData.set(currentRoster.id, {
               users: currentRosterUsers,
               monthDetails: monthDetails
             });
             
-            // Clear pending changes for this user
+
             pendingChanges.delete(username);
             originalData.delete(username);
             
@@ -4765,10 +4738,11 @@
       return;
     }
     
+    const isSaturdayOnly = currentRoster.type && currentRoster.type.toLowerCase().includes('saturday');
+    
     const table = document.createElement('table');
     table.className = 'roster-table';
     
-    // Create header
     const thead = document.createElement('thead');
     const headerRow = document.createElement('tr');
     
@@ -4776,8 +4750,15 @@
     userHeader.innerHTML = '<i class="fas fa-users"></i> User';
     headerRow.appendChild(userHeader);
     
-    // Add day headers
-    monthDetails.dayDetails.forEach(dayDetail => {
+    const daysToShow = isSaturdayOnly ? 
+      monthDetails.dayDetails.filter((dayDetail, index) => {
+        const monthIndex = new Date(currentRoster.monthYear + ' 1').getMonth();
+        const date = new Date(parseInt(currentRoster.monthYear.split(' ')[1]), monthIndex, dayDetail.day);
+        return date.getDay() === 6;
+      }) : 
+      monthDetails.dayDetails;
+    
+    daysToShow.forEach(dayDetail => {
       const dayHeader = document.createElement('th');
       dayHeader.innerHTML = `
         <div class="day-header">
@@ -4785,36 +4766,35 @@
           <div class="day-name">${dayDetail.dayName}</div>
         </div>
       `;
-      
-      // Add weekend styling
-      const monthIndex = new Date(currentRoster.monthYear + ' 1').getMonth();
-      const date = new Date(parseInt(currentRoster.monthYear.split(' ')[1]), monthIndex, dayDetail.day);
-      
-      if (date.getDay() === 0 || date.getDay() === 6) {
-        dayHeader.classList.add('weekend');
-      }
-      
+      dayHeader.classList.add('weekend');
       headerRow.appendChild(dayHeader);
     });
     
     thead.appendChild(headerRow);
     table.appendChild(thead);
     
-    // Create body
     const tbody = document.createElement('tbody');
     
     currentRosterUsers.forEach(user => {
       const row = document.createElement('tr');
       
-      // User name cell
       const userCell = document.createElement('td');
       userCell.innerHTML = `<i class="fas fa-user"></i> ${user.username}`;
       row.appendChild(userCell);
       
       const userStatuses = pendingChanges.get(user.username) || [];
       
-      // Create status cells
+      let saturdayCount = 0;
       for (let day = 0; day < monthDetails.daysInMonth; day++) {
+        if (isSaturdayOnly) {
+          const dayDetail = monthDetails.dayDetails[day];
+          if (dayDetail) {
+            const monthIndex = new Date(currentRoster.monthYear + ' 1').getMonth();
+            const date = new Date(parseInt(currentRoster.monthYear.split(' ')[1]), monthIndex, dayDetail.day);
+            if (date.getDay() !== 6) continue;
+          }
+        }
+        
         const statusCell = document.createElement('td');
         statusCell.className = 'status-cell';
         statusCell.dataset.username = user.username;
@@ -4827,33 +4807,29 @@
           statusCell.classList.add('empty');
         }
         
-        // Add weekend styling
         const dayDetail = monthDetails.dayDetails[day];
         if (dayDetail) {
           const monthIndex = new Date(currentRoster.monthYear + ' 1').getMonth();
           const date = new Date(parseInt(currentRoster.monthYear.split(' ')[1]), monthIndex, dayDetail.day);
-          
-          if (date.getDay() === 0 || date.getDay() === 6) {
-            statusCell.classList.add('weekend');
+          if (date.getDay() === 6) {
+            statusCell.classList.add('weekend', 'saturday');
           }
         }
         
-        // Add event listeners for admin users
         if (globalCache.userAccess?.accessLevel === 'admin') {
           statusCell.addEventListener('click', function(e) {
             handleCellClick(user.username, day, e);
           });
-          
           statusCell.addEventListener('mousedown', function(e) {
             handleCellMouseDown(user.username, day, e);
           });
-          
           statusCell.addEventListener('mouseenter', function() {
             handleCellMouseEnter(user.username, day);
           });
         }
         
         row.appendChild(statusCell);
+        saturdayCount++;
       }
       
       tbody.appendChild(row);
@@ -4863,10 +4839,8 @@
     tableContent.innerHTML = '';
     tableContent.appendChild(table);
     
-    // Update selection display
     updateCellSelection();
     
-    // Set initial focus if needed
     if (!focusedCell && currentRosterUsers.length > 0) {
       setFocusedCell(currentRosterUsers[0].username, 0);
     }
@@ -5020,12 +4994,12 @@
 
         Modal.success('All changes saved successfully!');
 
-        // Update original data
+
         for (let [username, statuses] of pendingChanges) {
           originalData.set(username, [...statuses]);
         }
 
-        // Update cached data
+
         const updatedUsers = currentRosterUsers.map(user => ({
           ...user,
           dayStatuses: pendingChanges.get(user.username) || []
@@ -5036,7 +5010,7 @@
           monthDetails: monthDetails
         });
 
-        // Clear saved changes and undo/redo stacks
+
         globalCache.pendingChangesByRoster.delete(currentRoster.id);
         clearUndoRedoStacks();
 
@@ -5053,7 +5027,7 @@
       .batchUpdateUserStatuses(changesArray);
   }
 
-  // Global function exports for onclick handlers
+
   window.hideUserModal = hideUserModal;
   window.addUserChip = addUserChip;
   window.removeUserChip = removeUserChip;
